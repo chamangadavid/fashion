@@ -1,110 +1,310 @@
 <!-- Resources/js/Pages/Welcome.vue -->
+
+
 <script setup>
 import { Head } from "@inertiajs/vue3";
-import AppFooter from '@/Components/AppFooter.vue';
-import Header from '@/Components/Header.vue';
-import SlidingBackground from '@/Components/SlidingBackground.vue';
-import AnimatedHero from '@/Components/AnimatedHero.vue';
-import NewsSection from '@/Components/NewsSection.vue';
-import AnnouncementsSection from '@/Components/AnnouncementsSection.vue';
-import ProductGallery from '@/Components/ProductGallery.vue';
-import ProfessionalBanner from '@/Components/ProfessionalBanner.vue'
-import FeaturesSection from '@/Components/FeaturesSection.vue';
-import AboutOrganic from '@/Components/AboutOrganic.vue'
-import OurFarmingTeam from '@/Components/OurFarmingTeam.vue'
-import Testimonials from '@/Components/Testimonials.vue'
-import FaqSection from '@/Components/FaqSection.vue'
+import Header from "@/Components/Header.vue";
+import AnimatedHero from "@/Components/AnimatedHero.vue";
+import QuickShop from "@/Components/QuickShop.vue";
+import AboutBrand from "@/Components/AboutBrand.vue";
+import NewArrivals from "@/Components/NewArrivals.vue";
+
+import FeaturedProducts from "@/Components/FeaturedProducts.vue";
+import CategoryProductSection from "@/Components/CategoryProductSection.vue";
+import SignatureStyles from "@/Components/SignatureStyles.vue";
+import AccessoriesSection from "@/Components/AccessoriesSection.vue";
+import PaymentMethods from "@/Components/PaymentMethods.vue";
+import AppFooter from "@/Components/AppFooter.vue";
+
 
 defineProps({
     canLogin: Boolean,
     canRegister: Boolean,
 });
+
+
+/*
+|--------------------------------------------------------------------------
+| Denim Products
+|--------------------------------------------------------------------------
+*/
+
+const denimProducts = [
+
+    {
+        id: 1,
+        name: "Contour Denim Jacket",
+        price: "K66.99",
+        image: "/assets/categories/denim/denim-jacket.jpg",
+        colors: ["#50769d", "#252525"],
+        href: "/products/contour-denim-jacket",
+    },
+
+    {
+        id: 2,
+        name: "High-Waisted Wide-Leg Jeans with Cuffed Hem",
+        price: "K69.99",
+        image: "/assets/categories/denim/wide-leg-jeans.jpg",
+        colors: ["#91a9bd"],
+        href: "/products/high-waisted-wide-leg-jeans",
+    },
+
+    {
+        id: 3,
+        name: "Button Up Long Sleeve Denim Shirt",
+        price: "K52.99",
+        image: "/assets/categories/denim/denim-shirt.jpg",
+        colors: ["#416589"],
+        href: "/products/button-up-denim-shirt",
+    },
+
+    {
+        id: 4,
+        name: "Raw Hem High Waist Bootcut Jeans",
+        price: "K58.99",
+        image: "/assets/categories/denim/pink-jeans.jpg",
+        colors: ["#df7896"],
+        href: "/products/raw-hem-bootcut-jeans",
+    },
+
+];
+
+
+/*
+|--------------------------------------------------------------------------
+| Blouses Products
+|--------------------------------------------------------------------------
+*/
+
+const blouseProducts = [
+
+    {
+        id: 1,
+        name: "Heart Print Button Up Flounce Sleeve Shirt",
+        originalPrice: "K74.99",
+        price: "K60.99",
+        discount: "18%",
+        sale: true,
+        image: "/assets/categories/blouses/heart-print.jpg",
+        colors: ["#3b3b3b"],
+        href: "/products/heart-print-shirt",
+    },
+
+    {
+        id: 2,
+        name: "Women's Elegant Floral Embroidered V-Neck Blouse",
+        price: "K49.99",
+        image: "/assets/categories/blouses/floral-blouse.jpg",
+        colors: ["#c7b2a5"],
+        href: "/products/floral-embroidered-blouse",
+    },
+
+    {
+        id: 3,
+        name: "The Silk-Feel Button-Up Blouse",
+        price: "K49.99",
+        image: "/assets/categories/blouses/silk-blouse.jpg",
+        colors: [
+            "#7f304d",
+            "#c5b8a7",
+            "#7f91a0",
+            "#222222",
+        ],
+        extraColors: 2,
+        href: "/products/silk-feel-blouse",
+    },
+
+    {
+        id: 4,
+        name: "Women's Elegant Floral Blouse – Keyhole Neckline",
+        originalPrice: "K45.99",
+        price: "K39.99",
+        discount: "13%",
+        sale: true,
+        image: "/assets/categories/blouses/purple-blouse.jpg",
+        colors: [
+            "#bca5c5",
+            "#222222",
+            "#d8d1c9",
+            "#d0a85c",
+        ],
+        extraColors: 1,
+        href: "/products/floral-keyhole-blouse",
+    },
+
+];
+
+
+/*
+|--------------------------------------------------------------------------
+| Skirts & Bottoms
+|--------------------------------------------------------------------------
+*/
+
+const bottomsProducts = [
+
+    {
+        id: 1,
+        name: "High-Waisted Pleated Wide-Leg Cropped Pants",
+        price: "K49.99",
+        image: "/assets/categories/bottoms/pleated-pants.jpg",
+        colors: ["#b8aa7f"],
+        href: "/products/pleated-wide-leg-pants",
+    },
+
+    {
+        id: 2,
+        name: "The Tailored Palazzo",
+        price: "K69.99",
+        image: "/assets/categories/bottoms/palazzo.jpg",
+        colors: ["#4b4d3c", "#222222"],
+        href: "/products/tailored-palazzo",
+    },
+
+    {
+        id: 3,
+        name: "Honey Tied High Waist Wide Leg Pants for Women",
+        price: "K65.99",
+        image: "/assets/categories/bottoms/wide-leg-pants.jpg",
+        colors: [
+            "#e8e2d7",
+            "#a99482",
+            "#687995",
+            "#384d69",
+        ],
+        extraColors: 4,
+        href: "/products/honey-tied-wide-leg-pants",
+    },
+
+    {
+        id: 4,
+        name: "Leather High-Waist Side Slit Maxi Skirt",
+        originalPrice: "K66.99",
+        price: "K59.99",
+        discount: "10%",
+        sale: true,
+        image: "/assets/categories/bottoms/leather-skirt.jpg",
+        colors: ["#222222"],
+        href: "/products/leather-maxi-skirt",
+    },
+
+];
+
 </script>
 
+
+
 <template>
-    <Head title="Alinaswe farm" />
+    <Head title="Fashion Styles" />
 
-    <div class="min-h-screen relative overflow-x-hidden">
-        <!-- Sliding Background with Particles -->
-        <SlidingBackground />
+    <div class="min-h-screen bg-white text-gray-800">
 
-        <!-- Content Container -->
-        <div class="relative z-10 flex flex-col min-h-screen">
-            <!-- Header Component -->
-            <Header :canLogin="canLogin" :canRegister="canRegister" />
+        <!-- ========================= -->
+        <!-- HEADER -->
+        <!-- ========================= -->
 
-            <!-- Hero Content with Animations -->
-            <AnimatedHero />
+        <Header
+            :canLogin="canLogin"
+            :canRegister="canRegister"
+        />
 
-            <!-- Main Content Sections -->
-            <div class="bg-gradient-to-b from-transparent to-teal-900/20 pb-16">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
 
-                    <!-- Features Section -->
-                    <div>
-                        <FeaturesSection />
-                    </div>
+        <!-- ========================= -->
+        <!-- HERO -->
+        <!-- ========================= -->
 
-                    <!-- About Alinawe Farm Section -->
-                    <div class="mb-5">
-                        <AboutOrganic />
-                    </div>
+        <AnimatedHero />
 
-                    <!-- News and Announcements Grid -->
-                    <!-- <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-                        <NewsSection />
-                        <AnnouncementsSection />
-                    </div> -->
+        <!-- ========================= -->
+        <!-- MAIN CONTENT -->
+        <!-- ========================= -->
 
-                    <div class="mb-5">
-                         <NewsSection />
-                    </div>
+        <main>
 
-                    <!-- Product Gallery Section -->
-                    <div>
-                        <ProductGallery />
-                    </div> 
+        <!-- ========================= -->
+        <!-- QUICK SHOP -->
+        <!-- ========================= -->
 
-                    <!-- Our Farming Team Section -->
-                    <div>
-                        <OurFarmingTeam />
-                    </div>
+        <QuickShop />
 
-                    <!-- Professiona Banner section -->
-                    <div>
-                        <ProfessionalBanner />
-                    </div>
+        <!-- ========================= -->
+        <!-- ABOUT THE BRAND -->
+        <!-- ========================= -->
 
-                    <!-- Testimonials Section -->
-                    <div>
-                        <Testimonials />
-                    </div>
+        <section>
+            <AboutBrand />
+        </section>
 
-                    <div>
-                        <FaqSection />
-                    </div>
+            <!-- NEW ARRIVALS -->
+            <section>
+                <NewArrivals />
+            </section>
 
-                </div>
-            </div>
-        </div>
-    </div>
+            <section>
+                <FeaturedProducts />
+            </section>
 
-    <!-- Footer -->
-    <div class="relative z-10">
-        <AppFooter />
+            <!-- ========================= -->
+            <!-- SIGNATURE STYLES -->
+            <!-- ========================= -->
+
+            <section>
+                <SignatureStyles />
+            </section>
+
+            <!-- Accessories -->
+            <section>
+                <AccessoriesSection />
+            </section>
+
+            <section>
+            <CategoryProductSection
+                title="Denim Drops – Jeans, Jackets & Skirts"
+                :products="denimProducts"
+                view-more-href="/clothing/denim"
+            />
+
+            <CategoryProductSection
+                title="Blouses, Tops, & Tees"
+                :products="blouseProducts"
+                view-more-href="/clothing/women/tops"
+            />
+
+            <CategoryProductSection
+                title="Flirty Skirts & Effortless Bottoms"
+                :products="bottomsProducts"
+                view-more-href="/clothing/women/bottoms"
+            />
+            </section>
+
+        </main>
+
+        <!-- ========================= -->
+        <!-- FOOTER -->
+        <!-- ========================= -->
+        <section>
+            <AppFooter />
+        </section>
+        
+
+        <!-- ========================= -->
+        <!-- PAYMENT METHODS -->
+        <!-- ========================= -->
+        <section>
+            <PaymentMethods />
+        </section>
+
+
     </div>
 </template>
 
 <style>
-/* Global styles for smooth scrolling */
 html {
-  scroll-behavior: smooth;
+    scroll-behavior: smooth;
 }
 
-/* Ensure footer doesn't overlap content */
-@media (min-height: 100vh) {
-  .relative.z-10.flex.flex-col {
-    min-height: 100vh;
-  }
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
 }
 </style>
