@@ -1,3 +1,4 @@
+<!-- resources\js\Components\Header.vue -->
 <script setup>
 import { Link } from "@inertiajs/vue3";
 import { Tooltip } from "ant-design-vue";

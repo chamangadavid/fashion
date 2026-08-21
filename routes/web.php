@@ -7,6 +7,15 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\Staff\StaffsController;
 use App\Http\Controllers\UserSearchController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MyFashions\OrderController;
+use App\Http\Controllers\MyFashions\ProductController;
+use App\Http\Controllers\MyFashions\CollectionController;
+use App\Http\Controllers\MyFashions\CustomerController;
+use App\Http\Controllers\MyFashions\ReportController;
+use App\Http\Controllers\MyFashions\FashionUserController;
+use App\Http\Controllers\MyFashions\FashionSettingsController;
+use App\Http\Controllers\ShopController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
@@ -28,6 +37,7 @@ Route::get('/', function () {
 });
 
 
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -39,9 +49,9 @@ Route::get('/dashboard', function () {
 |--------------------------------------------------------------------------
 */
 
-Route::get('/test-imagick', function() {
-    phpinfo();
-});
+// Route::get('/test-imagick', function() {
+//     phpinfo();
+// });
 
 
 /*
@@ -49,6 +59,18 @@ Route::get('/test-imagick', function() {
 | Site Pages
 |--------------------------------------------------------------------------
 */
+
+//Collection Api
+Route::get('/collections', function () {
+    return Inertia::render('Site/Collections/Index');
+})->name('collections.index');
+
+
+Route::get('/shop/{slug}', [ShopController::class, 'category'])->name('shop.category');
+
+
+
+
 
 Route::get('/about-us', function () {
     return Inertia::render('Site/aboutUs');
@@ -134,6 +156,10 @@ Route::post('/contact', [ContactController::class, 'store']);
 
 Route::middleware('auth')->group(function () {
 
+ Route::get('/user-dashboard', [DashboardController::class, 'index'])->name('user.dashboard');
+
+
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -159,6 +185,169 @@ Route::middleware('auth')->group(function () {
     Route::get('/contacts', [ContactController::class, 'index']);
     Route::delete('/contacts/{id}', [ContactController::class, 'destroy']);
     
+
+
+     //Cards & Assign
+    Route::get('/eBusinessCards', [RolePermissionController::class, 'eBusinessCards'])->name('admin.eBusinessCards');
+    Route::get('/users', [RolePermissionController::class, 'users']);
+    Route::post('/users/assign-role', [RolePermissionController::class, 'assignRole']);
+
+
+
+
+
+    //Order Routes
+    // Route::prefix('fashion')->group(function () {
+
+    //     // Fashion Dashboard
+    //     //Route::get('/', [DashboardController::class, 'fashionDashboard'])->name('fashion.index');
+
+    //     Route::get('/orders', [OrderController::class, 'index'])->name('fashion.orders.index');
+    //     Route::get('/orders/pending', [OrderController::class, 'pending'])->name('fashion.orders.pending');
+    //     Route::get('/orders/processing', [OrderController::class, 'processing'])->name('fashion.orders.processing');
+    //     Route::get('/orders/completed', [OrderController::class, 'completed'])->name('fashion.orders.completed');
+
+    // });
+
+
+
+
+    /*
+|--------------------------------------------------------------------------
+| MY FASHION
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('fashion')->group(function () {
+
+    /*
+    |--------------------------------------------------------------------------
+    | DASHBOARD
+    |--------------------------------------------------------------------------
+    */
+
+    // Route::get('/', [DashboardController::class,
+    //     'fashionDashboard'
+    // ])->name('fashion.index');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ORDERS
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/orders', [OrderController::class, 'index'])->name('fashion.orders.index');
+    Route::get('/orders/pending', [OrderController::class, 'pending'])->name('fashion.orders.pending');
+    Route::get('/orders/processing', [OrderController::class, 'processing'])->name('fashion.orders.processing');
+    Route::get('/orders/completed', [OrderController::class, 'completed'])->name('fashion.orders.completed');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | PRODUCTS
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/products', [ProductController::class, 'index'])->name('fashion.products.index');
+    Route::get('/products/create', [ProductController::class, 'create'])->name('fashion.products.create');
+    Route::get('/products/categories', [ProductController::class, 'categories'])->name('fashion.products.categories');
+    Route::get('/products/inventory', [ProductController::class, 'inventory'])->name('fashion.products.inventory');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | COLLECTIONS
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/collections', [CollectionController::class, 'index'])->name('fashion.collections.index');
+    Route::get('/collections/create', [CollectionController::class, 'create'])->name('fashion.collections.create');
+    Route::get('/collections/featured', [CollectionController::class, 'featured'])->name('fashion.collections.featured');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CUSTOMERS
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/customers', [CustomerController::class, 'index'])->name('fashion.customers.index');
+    Route::get('/customers/groups', [CustomerController::class, 'groups'])->name('fashion.customers.groups');
+    Route::get('/customers/vip', [CustomerController::class, 'vip'])->name('fashion.customers.vip');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | REPORTS
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/reports/sales', [ReportController::class, 'sales'])->name('fashion.reports.sales');
+    Route::get('/reports/products', [ReportController::class, 'products'])->name('fashion.reports.products');
+    Route::get('/reports/customers', [ReportController::class, 'customers'])->name('fashion.reports.customers');
+    Route::get('/reports/revenue', [ReportController::class, 'revenue'])->name('fashion.reports.revenue');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | USERS
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/users', [FashionUserController::class, 'index'])->name('fashion.users.index');
+    Route::get('/users/create', [FashionUserController::class, 'create'])->name('fashion.users.create');
+    Route::get('/users/roles', [FashionUserController::class, 'roles'])->name('fashion.users.roles');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | SETTINGS
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/settings', [FashionSettingsController::class, 'index'])->name('fashion.settings.index');
+    Route::get('/settings/store', [FashionSettingsController::class, 'store'])->name('fashion.settings.store');
+    Route::get('/settings/payments', [FashionSettingsController::class, 'payments'])->name('fashion.settings.payments');
+    Route::get('/settings/shipping', [FashionSettingsController::class, 'shipping'])->name('fashion.settings.shipping');
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

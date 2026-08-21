@@ -5,11 +5,7 @@
       <!-- Animated Logo Container -->
       <div class="logo-container">
         <div class="logo-wrapper">
-          <!-- <img
-            src="/assets/marz-logo.png"
-            alt="AAIB"
-            class="loading-logo"
-          /> -->
+
            <img
             src="/assets/marz-logo.png"
             alt="AAIB"
@@ -21,23 +17,10 @@
 
       <!-- Company Name with Gradient -->
       <div class="company-info">
-        <h1 class="company-name">Alinaswe Farm</h1>
-        <p class="company-tagline">Cultivating Freshness, Raising Excellence</p>
+        <h1 class="company-name">Fashion Style</h1>
+        <p class="company-tagline">Discover your signature style</p>
       </div>
 
-      <!-- Progress Bar -->
-      <div class="progress-container">
-        <div class="progress-bar">
-          <div 
-            class="progress-fill"
-            :style="{ width: `${progress}%` }"
-          ></div>
-        </div>
-        <div class="progress-text">
-          <span class="percentage">{{ Math.round(progress) }}%</span>
-          <span class="loading-text">Loading...</span>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -69,10 +52,13 @@ export default {
 </script>
 
 <style scoped>
+
 .loading-screen {
   position: fixed;
   inset: 0;
-  background: linear-gradient(135deg, #0f172a 0%, #115e59 50%, #0f172a 100%);
+  background:
+    radial-gradient(circle at 50% 35%, rgba(252, 229, 154, 0.12), transparent 30%),
+    linear-gradient(135deg, #000000 0%, #17130a 45%, #000000 100%);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -145,10 +131,13 @@ export default {
   inset: 0;
   border-radius: 50%;
   border: 3px solid transparent;
-  border-top-color: #14b8a6;
-  border-right-color: #10b981;
+  border-top-color: #FCE59A;
+  border-right-color: #D4AF37;
+  border-bottom-color: rgba(212, 175, 55, 0.25);
   animation: slowSpin 2.5s linear infinite;
+  box-shadow: 0 0 25px rgba(212, 175, 55, 0.25);
 }
+
 
 @keyframes slowSpin {
   to {
@@ -160,9 +149,14 @@ export default {
 .logo-wrapper::before {
   content: '';
   position: absolute;
-  inset: -8px;
+  inset: -15px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(20, 184, 166, 0.1), transparent);
+  background: radial-gradient(
+    circle,
+    rgba(252, 229, 154, 0.18),
+    rgba(212, 175, 55, 0.08),
+    transparent 70%
+  );
   animation: pulseGlow 2s ease-in-out infinite;
 }
 
@@ -197,7 +191,13 @@ export default {
 .company-name {
   font-size: 2rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #ffffff 0%, #14b8a6 50%, #10b981 100%);
+  background: linear-gradient(
+    135deg,
+    #FFF7EB 0%,
+    #FCE59A 40%,
+    #D4AF37 70%,
+    #FFF1D1 100%
+  );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -217,7 +217,8 @@ export default {
 }
 
 .company-tagline {
-  color: rgba(255, 255, 255, 0.7);
+  color: #FFF1D1;
+  /* color: rgba(255, 255, 255, 0.7); */
   font-size: 0.95rem;
   font-weight: 500;
   letter-spacing: 2px;
@@ -382,76 +383,3 @@ export default {
   }
 }
 </style>
-
-
-
-<!-- <template>
-  <div class="loading-screen">
-    <div class="loading-content">
-      <div class="gradient-loader"></div>
-
-      <h1 class="company-name">Aircraft Accidents Investigation Board</h1>
-
-      <a-progress
-        :percent="progress"
-        :stroke-color="['#7e22ce', '#a855f7']"
-        :show-info="false"
-        stroke-linecap="round"
-      />
-    </div>
-  </div>
-</template>
-
-<script>
-export default {
-  props: {
-    progress: {
-      type: Number,
-      default: 0
-    }
-  }
-}
-</script>
-
-<style scoped>
-.loading-screen {
-  position: fixed;
-  inset: 0;
-  background: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.loading-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2rem;
-}
-
-.gradient-loader {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  background: conic-gradient(
-    from 0deg,
-    #7e22ce,
-    #a855f7,
-    #d8b4fe,
-    #7e22ce
-  );
-  animation: rotate 1.2s linear infinite;
-  mask: radial-gradient(farthest-side, transparent 70%, black 71%);
-}
-
-@keyframes rotate {
-  100% { transform: rotate(360deg); }
-}
-
-.company-name {
-  color: #4B5563;
-  font-size: 1.3rem;
-  font-weight: 600;
-}
-</style> -->

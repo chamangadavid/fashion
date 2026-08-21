@@ -16,34 +16,113 @@ class RolePermissionSeeder extends Seeder
      */
     public function run(): void
     {
-        // Define permissions
+        /*
+        |--------------------------------------------------------------------------
+        | Permissions
+        |--------------------------------------------------------------------------
+        */
+
         $permissions = [
             'manage access control',
             'manage staff access control',
         ];
 
-        // Create and store all permissions
         foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission]);
+            Permission::firstOrCreate([
+                'name' => $permission,
+            ]);
         }
 
-        // Create a super admin role and assign all permissions
-        $superAdminRole = Role::firstOrCreate(['name' => 'Super Admin']);
-        $superAdminRole->syncPermissions(Permission::all());
 
-        // Create administrator user
+        /*
+        |--------------------------------------------------------------------------
+        | Super Admin Role
+        |--------------------------------------------------------------------------
+        */
+
+        $superAdminRole = Role::firstOrCreate([
+            'name' => 'Super Admin',
+        ]);
+
+        // Super Admin gets all permissions
+        $superAdminRole->syncPermissions(
+            Permission::all()
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Users Role
+        |--------------------------------------------------------------------------
+        |
+        | Normal customers/users do NOT receive administrative permissions.
+        |
+        */
+
+        $usersRole = Role::firstOrCreate([
+            'name' => 'Users',
+        ]);
+
+        // Make sure Users role has no admin permissions
+        $usersRole->syncPermissions([]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Administrator User
+        |--------------------------------------------------------------------------
+        */
+
         $admin = User::firstOrCreate(
-            ['email' => 'Administrator@gmail.com'],
+            [
+                'email' => 'Administrator@gmail.com',
+            ],
             [
                 'name' => 'Administrator',
                 'password' => Hash::make('12345678'),
             ]
         );
 
-        // Assign Super Admin role to user
-        $admin->assignRole($superAdminRole);
+        // Make sure administrator has Super Admin role
+        $admin->syncRoles([
+            $superAdminRole,
+        ]);
 
-        //to run seeder
-        //php artisan db:seed --class=RolePermissionSeeder
+
+        /*
+        |--------------------------------------------------------------------------
+        | Normal User
+        |--------------------------------------------------------------------------
+        |
+        | This creates a test customer account.
+        |
+        */
+
+        $user = User::firstOrCreate(
+            [
+                'email' => 'user@gmail.com',
+            ],
+            [
+                'name' => 'Normal User',
+                'password' => Hash::make('12345678'),
+            ]
+        );
+
+        // Make sure this account has ONLY the Users role
+        $user->syncRoles([
+            $usersRole,
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Done
+        |--------------------------------------------------------------------------
+        |
+        | Run:
+        |
+        | php artisan db:seed --class=RolePermissionSeeder
+        |
+        */
     }
 }

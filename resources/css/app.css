@@ -2,97 +2,134 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --bg-primary: #ffffff;
-    --bg-secondary: #f3f4f6;
-    --text-primary: #111827;
-    --text-secondary: #6b7280;
-    --border-color: #e5e7eb;
-  }
+/* =========================================================
+   THEME VARIABLES
+========================================================= */
 
-  .dark {
-    --bg-primary: #111827;
-    --bg-secondary: #1f2937;
-    --text-primary: #f9fafb;
-    --text-secondary: #9ca3af;
-    --border-color: #374151;
-  }
+@layer base {
+    :root {
+        --bg-primary: #ffffff;
+        --bg-secondary: #f3f4f6;
+        --text-primary: #111827;
+        --text-secondary: #6b7280;
+        --border-color: #e5e7eb;
+    }
+
+    .dark {
+        --bg-primary: #111827;
+        --bg-secondary: #1f2937;
+        --text-primary: #f9fafb;
+        --text-secondary: #9ca3af;
+        --border-color: #374151;
+    }
 }
 
+/* =========================================================
+   GLOBAL
+========================================================= */
 
-/* Loading screen transitions */
+html,
+body {
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    color: var(--text-primary);
+    background-color: var(--bg-secondary);
+
+    overflow-x: hidden;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+/* =========================================================
+   LOADING SCREEN
+========================================================= */
+
 #app-loading {
     position: fixed;
     top: 0;
     left: 0;
+
     width: 100%;
     height: 100%;
+
     z-index: 9999;
+
     transition: opacity 0.8s ease-out;
-  }
-  
-  #app-loading.fade-out {
-    opacity: 0;
-  }
-
-
-
-  .ant-progress-inner {
-    height: 8px !important;
-    border-radius: 4px !important;
-  }
-  
-  .ant-progress-bg {
-    height: 8px !important;
-    border-radius: 4px !important;
-    transition: all 0.4s cubic-bezier(0.08, 0.82, 0.17, 1) !important;
-  }
-
-
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
-
-body {
-    font-family: 'Montserrat', sans-serif;
-    box-sizing: border-box; 
-    color: #333; 
-    overflow-x: hidden; 
-
-    background-color: var(--bg-secondary);
-  color: var(--text-primary);
 }
 
+#app-loading.fade-out {
+    opacity: 0;
+}
 
-/* Custom scrollbar for dark mode */
+/* =========================================================
+   ANT DESIGN
+========================================================= */
+
+.ant-progress-inner {
+    height: 8px !important;
+    border-radius: 4px !important;
+}
+
+.ant-progress-bg {
+    height: 8px !important;
+    border-radius: 4px !important;
+
+    transition:
+        all 0.4s cubic-bezier(0.08, 0.82, 0.17, 1) !important;
+}
+
+/* =========================================================
+   DARK MODE SCROLLBAR
+========================================================= */
+
 .dark ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+    width: 8px;
+    height: 8px;
 }
 
 .dark ::-webkit-scrollbar-track {
-  background: #1f2937;
+    background: #1f2937;
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: #374151;
-  border-radius: 4px;
+    background: #374151;
+    border-radius: 4px;
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: #4b5563;
+    background: #4b5563;
 }
 
-/* Smooth transitions for theme switching */
-* {
-  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-}
+/* =========================================================
+   HERO
+========================================================= */
 
 .hero-image-positioning {
     position: relative;
-    right: -100px; 
-    top: -20px; 
+    right: -100px;
+    top: -20px;
 }
 
+@media (max-width: 992px) {
+    .hero-image-positioning {
+        position: static;
+        right: 0;
+        top: 0;
+    }
+}
+
+/* =========================================================
+   COMPONENTS
+========================================================= */
 
 @layer components {
     .navbar-contact-button {
@@ -102,6 +139,7 @@ body {
     .btn-primary {
         @apply bg-[#92e623] text-[#004d40] px-8 py-4 rounded-md text-lg cursor-pointer transition-colors duration-300;
     }
+
     .btn-primary:hover {
         @apply bg-[#7ad11a];
     }
@@ -109,17 +147,284 @@ body {
     .btn-secondary {
         @apply bg-transparent text-white border-2 border-white px-8 py-4 rounded-md text-lg cursor-pointer transition-colors duration-300;
     }
-    .btn-secondary:hover {
-        @apply bg-white bg-opacity-10; 
-    }
 
+    .btn-secondary:hover {
+        @apply bg-white bg-opacity-10;
+    }
 }
 
+/* =========================================================
+   ADMIN DASHBOARD
+========================================================= */
 
-@media (max-width: 992px) {
-    .hero-image-positioning {
-        position: static; 
-        right: 0;
-        top: 0;
-    }
+.admin-dashboard {
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif !important;
+
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/*
+ * Make everything inside the dashboard use Inter.
+ * This prevents inherited fonts from AuthenticatedLayout/Tailwind.
+ */
+
+.admin-dashboard,
+.admin-dashboard *,
+.admin-dashboard *::before,
+.admin-dashboard *::after {
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+}
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.admin-dashboard .sidebar-link {
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif !important;
+
+    font-size: 14px !important;
+    font-weight: 600 !important;
+
+    line-height: 1.5;
+
+    min-height: 48px;
+}
+
+.admin-dashboard .sidebar-submenu-link {
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif !important;
+
+    font-size: 13px !important;
+    font-weight: 500 !important;
+
+    line-height: 1.5;
+
+    min-height: 40px;
+}
+
+.admin-dashboard .nav-heading {
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif !important;
+
+    font-size: 11px !important;
+    font-weight: 700 !important;
+
+    letter-spacing: 1.5px;
+}
+
+/* =========================================================
+   SIDEBAR DROPDOWN
+========================================================= */
+
+.admin-dashboard .sidebar-dropdown-trigger {
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif !important;
+
+    font-size: 14px !important;
+    font-weight: 600 !important;
+
+    line-height: 1.5;
+}
+
+/* =========================================================
+   DASHBOARD HEADER
+========================================================= */
+
+.admin-dashboard .dashboard-title h1 {
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif !important;
+
+    font-size: 24px !important;
+    font-weight: 700 !important;
+
+    line-height: 1.3;
+}
+
+.admin-dashboard .dashboard-title p {
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif !important;
+
+    font-size: 13px !important;
+    font-weight: 400 !important;
+}
+
+/* =========================================================
+   STAT CARDS
+========================================================= */
+
+.admin-dashboard .stat-card p {
+    font-size: 12px !important;
+    font-weight: 500 !important;
+}
+
+.admin-dashboard .stat-card h2 {
+    font-size: 26px !important;
+    font-weight: 700 !important;
+
+    line-height: 1.2;
+}
+
+/* =========================================================
+   PANELS
+========================================================= */
+
+.admin-dashboard .panel-header h3 {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+}
+
+.admin-dashboard .panel-header p {
+    font-size: 12px !important;
+    font-weight: 400 !important;
+}
+
+/* =========================================================
+   ORDERS
+========================================================= */
+
+.admin-dashboard .order-information strong {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+}
+
+.admin-dashboard .order-information span {
+    font-size: 12px !important;
+    font-weight: 400 !important;
+}
+
+.admin-dashboard .order-information small {
+    font-size: 11px !important;
+}
+
+.admin-dashboard .order-status strong {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+}
+
+.admin-dashboard .status-badge {
+    font-size: 10px !important;
+    font-weight: 600 !important;
+}
+
+/* =========================================================
+   FEED
+========================================================= */
+
+.admin-dashboard .feed-content strong {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+}
+
+.admin-dashboard .feed-content span {
+    font-size: 11px !important;
+}
+
+.admin-dashboard .feed-content small {
+    font-size: 10px !important;
+}
+
+/* =========================================================
+   REPORTS
+========================================================= */
+
+.admin-dashboard .report-information strong {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+}
+
+.admin-dashboard .report-information small {
+    font-size: 10px !important;
+}
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.admin-dashboard .new-action-button {
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif !important;
+
+    font-size: 12px !important;
+    font-weight: 600 !important;
+}
+
+.admin-dashboard .profile-button {
+    font-size: 16px !important;
+}
+
+/* =========================================================
+   STORE STATUS
+========================================================= */
+
+.admin-dashboard .store-status strong {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+}
+
+.admin-dashboard .store-status small {
+    font-size: 10px !important;
+}
+
+/* =========================================================
+   QUICK SUMMARY
+========================================================= */
+
+.admin-dashboard .quick-summary span {
+    font-size: 12px !important;
+}
+
+/* =========================================================
+   TRANSITIONS
+========================================================= */
+
+.admin-dashboard .sidebar-link,
+.admin-dashboard .sidebar-submenu-link,
+.admin-dashboard .sidebar-dropdown-trigger,
+.admin-dashboard .new-action-button,
+.admin-dashboard .panel-menu,
+.admin-dashboard .profile-button {
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
 }

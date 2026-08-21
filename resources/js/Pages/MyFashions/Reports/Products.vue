@@ -1,0 +1,32 @@
+<script setup>
+
+import MyFashionLayout from '@/Layouts/MyFashionLayout.vue';
+import { Head } from '@inertiajs/vue3';
+
+defineProps({
+    reports: {
+        type: Array,
+        default: () => [],
+    },
+});
+
+</script>
+
+<template>
+ <Head title="Product Reports" />
+   <MyFashionLayout>
+ <div class="p-6">
+
+        <h1 class="text-2xl font-bold">
+            Product Reports
+        </h1>
+
+        <p class="mt-2 text-gray-500">
+            Product performance reports.
+        </p>
+
+    </div>
+   </MyFashionLayout>
+   
+
+</template>
