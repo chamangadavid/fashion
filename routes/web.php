@@ -15,6 +15,7 @@ use App\Http\Controllers\MyFashions\CustomerController;
 use App\Http\Controllers\MyFashions\ReportController;
 use App\Http\Controllers\MyFashions\FashionUserController;
 use App\Http\Controllers\MyFashions\FashionSettingsController;
+use App\Http\Controllers\MyFashions\ProductCategoryController;
 use App\Http\Controllers\ShopController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -251,8 +252,13 @@ Route::prefix('fashion')->group(function () {
 
     Route::get('/products', [ProductController::class, 'index'])->name('fashion.products.index');
     Route::get('/products/create', [ProductController::class, 'create'])->name('fashion.products.create');
+    Route::post('/products/store', [ProductController::class, 'store'])->name('store');
     Route::get('/products/categories', [ProductController::class, 'categories'])->name('fashion.products.categories');
     Route::get('/products/inventory', [ProductController::class, 'inventory'])->name('fashion.products.inventory');
+    Route::get('/products/{product}', [ProductController::class, 'show'])->name('show');
+    Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('edit');
+    Route::put('/products/{product}', [ProductController::class, 'update'])->name('update');
+    Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('destroy');
 
 
     /*
@@ -264,6 +270,21 @@ Route::prefix('fashion')->group(function () {
     Route::get('/collections', [CollectionController::class, 'index'])->name('fashion.collections.index');
     Route::get('/collections/create', [CollectionController::class, 'create'])->name('fashion.collections.create');
     Route::get('/collections/featured', [CollectionController::class, 'featured'])->name('fashion.collections.featured');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | PRODUCT CATEGORIES
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/products/categories', [ProductCategoryController::class, 'index'])->name('fashion.products.categories');
+    Route::post('/products/categories', [ProductCategoryController::class, 'store'])->name('fashion.products.categories.store');
+    Route::put('/products/categories/{category}', [ProductCategoryController::class, 'update'])->name('fashion.products.categories.update');
+    Route::delete('/products/categories/{category}', [ProductCategoryController::class, 'destroy'])->name('fashion.products.categories.destroy');
+    Route::patch('/products/categories/{category}/toggle-status', [ProductCategoryController::class, 'toggleStatus'])->name('fashion.products.categories.toggle-status');
+    Route::patch('/products/categories/{category}/toggle-featured', [ProductCategoryController::class, 'toggleFeatured'])->name('fashion.products.categories.toggle-featured');
+
 
 
     /*

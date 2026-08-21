@@ -2,48 +2,82 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Product extends Model
 {
     
+use HasFactory;
+
     protected $fillable = [
-        'category_id',
+        'product_category_id',
         'name',
         'slug',
+        'sku',
         'description',
         'price',
         'sale_price',
-        'stock',
-        'sku',
-        'main_image',
-        'is_featured',
+        'cost_price',
+        'stock_quantity',
+        'low_stock_threshold',
+        'image',
         'is_active',
+        'is_featured',
     ];
 
-    protected $casts = [
+   protected $casts = [
         'price' => 'decimal:2',
         'sale_price' => 'decimal:2',
-        'is_featured' => 'boolean',
+        'cost_price' => 'decimal:2',
         'is_active' => 'boolean',
+        'is_featured' => 'boolean',
+        'stock_quantity' => 'integer',
+        'low_stock_threshold' => 'integer',
     ];
 
-    public function category(): BelongsTo
+     /*
+    |--------------------------------------------------------------------------
+    | CATEGORY
+    |--------------------------------------------------------------------------
+    */
+
+    // public function category()
+    // {
+    //     return $this->belongsTo(ProductCategory::class);
+    // }
+
+     public function category()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(
+            ProductCategory::class,
+            'product_category_id'
+        );
     }
 
-    public function getCurrentPriceAttribute()
+    /*
+    |--------------------------------------------------------------------------
+    | AUTOMATIC SLUG
+    |--------------------------------------------------------------------------
+    */
+
+    protected static function boot()
     {
-        return $this->sale_price ?? $this->price;
+        parent::boot();
+
+        static::creating(function ($product) {
+
+            if (empty($product->slug)) {
+
+                $product->slug = Str::slug($product->name);
+
+            }
+
+        });
     }
 
-    public function images(): HasMany
-    {
-        return $this->hasMany(ProductImage::class)
-            ->orderBy('sort_order');
-    }
+
+
 
 }

@@ -12,24 +12,28 @@ import MyFashionLayout from '@/Layouts/MyFashionLayout.vue';
 
             <div class="page-header">
 
-                <h1>
-                    Inventory
-                </h1>
+                <div>
 
-                <p>
-                    Monitor product stock and inventory levels.
-                </p>
+                    <h1>
+                        Product Categories
+                    </h1>
+
+                    <p>
+                        Manage your fashion product categories.
+                    </p>
+
+                </div>
 
             </div>
 
             <div class="content-card">
 
                 <h2>
-                    Inventory Management
+                    Categories
                 </h2>
 
                 <p>
-                    Your product inventory will appear here.
+                    Product categories will be managed here.
                 </p>
 
             </div>
@@ -64,6 +68,7 @@ import MyFashionLayout from '@/Layouts/MyFashionLayout.vue';
 
 </style>
 
+
 <!-- <script setup>
 
 import MyFashionLayout from '@/Layouts/MyFashionLayout.vue';
@@ -79,21 +84,22 @@ defineProps({
 </script>
 
 <template>
- <Head title="Product Inventory" />
-
-    <MyFashionLayout>
- <div class="p-6">
+    
+    <Head title="Product " />
+     <MyFashionLayout>
+<div class="p-6">
 
         <h1 class="text-2xl font-bold">
-            Product Inventory
+            Product Categories
         </h1>
 
         <p class="mt-2 text-gray-500">
-            Manage product stock and inventory.
+            Manage your product categories.
         </p>
 
     </div>
-    </MyFashionLayout>
-   
+     </MyFashionLayout>
+
+    
 
 </template> -->

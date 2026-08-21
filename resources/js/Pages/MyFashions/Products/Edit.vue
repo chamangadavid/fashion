@@ -1,30 +1,15 @@
-<!-- resources/js/Pages/MyFashions/Products/Create.vue -->
-
 <script setup>
 
 import MyFashionLayout from '@/Layouts/MyFashionLayout.vue';
-
-import {
-    Link,
-    useForm,
-} from '@inertiajs/vue3';
-
-import {
-    ArrowLeftOutlined,
-    SaveOutlined,
-    UploadOutlined,
-} from '@ant-design/icons-vue';
-
-import { ref } from 'vue';
-
-
-/*
-|--------------------------------------------------------------------------
-| PROPS
-|--------------------------------------------------------------------------
-*/
+import { Head, Link, useForm } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 const props = defineProps({
+
+    product: {
+        type: Object,
+        required: true,
+    },
 
     categories: {
         type: Array,
@@ -42,31 +27,40 @@ const props = defineProps({
 
 const form = useForm({
 
-    product_category_id: '',
+    product_category_id:
+        props.product.product_category_id ?? '',
 
-    name: '',
+    name:
+        props.product.name ?? '',
 
-    sku: '',
+    sku:
+        props.product.sku ?? '',
 
-    description: '',
+    description:
+        props.product.description ?? '',
 
-    price: '',
+    price:
+        props.product.price ?? '',
 
-    compare_price: '',
+    sale_price:
+        props.product.sale_price ?? '',
 
-    cost_price: '',
+    cost_price:
+        props.product.cost_price ?? '',
 
-    stock_quantity: 0,
+    stock_quantity:
+        props.product.stock_quantity ?? 0,
 
-    low_stock_threshold: 5,
+    low_stock_threshold:
+        props.product.low_stock_threshold ?? 5,
+
+    is_active:
+        Boolean(props.product.is_active),
+
+    is_featured:
+        Boolean(props.product.is_featured),
 
     image: null,
-
-    
-
-    status: 'active',
-
-    featured: false,
 
 });
 
@@ -77,20 +71,42 @@ const form = useForm({
 |--------------------------------------------------------------------------
 */
 
-const imagePreview = ref(null);
+const imagePreview = computed(() => {
+
+    if (form.image) {
+
+        return URL.createObjectURL(form.image);
+
+    }
+
+    if (props.product.image) {
+
+        return `/storage/${props.product.image}`;
+
+    }
+
+    return null;
+
+});
 
 
-const handleImageUpload = (event) => {
+/*
+|--------------------------------------------------------------------------
+| IMAGE SELECT
+|--------------------------------------------------------------------------
+*/
 
-    const file = event.target.files[0];
+const handleImageChange = (event) => {
+
+    const file = event.target.files?.[0];
 
     if (!file) {
+
         return;
+
     }
 
     form.image = file;
-
-    imagePreview.value = URL.createObjectURL(file);
 
 };
 
@@ -103,21 +119,24 @@ const handleImageUpload = (event) => {
 
 const submit = () => {
 
-    form.post('/fashion/products/store', {
+    form
+        .transform((data) => ({
+            ...data,
+            _method: 'PUT',
+        }))
+        .post(`/fashion/products/${props.product.id}`, {
 
-        forceFormData: true,
+            forceFormData: true,
 
-        preserveScroll: true,
+            preserveScroll: true,
 
-        onSuccess: () => {
+            onSuccess: () => {
 
-            form.reset();
+                // Inertia will redirect from the controller.
 
-            imagePreview.value = null;
+            },
 
-        },
-
-    });
+        });
 
 };
 
@@ -126,62 +145,51 @@ const submit = () => {
 
 <template>
 
+    <Head :title="`Edit ${product.name}`" />
+
     <MyFashionLayout>
 
-        <div class="product-create-page">
-
+        <div class="page">
 
             <!-- =====================================================
-                 PAGE HEADER
+                 HEADER
             ====================================================== -->
 
             <div class="page-header">
 
                 <div>
 
-                    <div class="breadcrumb">
-
-                        <Link href="/products">
-                            Products
-                        </Link>
-
-                        <span>
-                            /
-                        </span>
-
-                        <span>
-                            Add Product
-                        </span>
-
-                    </div>
-
-
                     <h1>
-                        Add Product
+                        Edit Product
                     </h1>
 
                     <p>
-                        Create a new fashion product.
+                        Update product information, pricing,
+                        inventory and image.
                     </p>
 
                 </div>
 
 
-                <Link
-                    href="/products"
-                    class="back-button"
-                >
+                <div class="header-actions">
 
-                    <ArrowLeftOutlined />
+                    <Link
+                        :href="`/fashion/products/${product.id}`"
+                        class="secondary-button"
+                    >
+                        View Product
+                    </Link>
 
-                    <span>
+                    <Link
+                        href="/fashion/products"
+                        class="secondary-button"
+                    >
                         Back to Products
-                    </span>
+                    </Link>
 
-                </Link>
+                </div>
 
             </div>
-
 
 
             <!-- =====================================================
@@ -190,9 +198,8 @@ const submit = () => {
 
             <form
                 @submit.prevent="submit"
-                enctype="multipart/form-data"
+                class="product-form"
             >
-
 
                 <!-- =================================================
                      BASIC INFORMATION
@@ -200,7 +207,7 @@ const submit = () => {
 
                 <div class="content-card">
 
-                    <div class="section-header">
+                    <div class="card-header">
 
                         <div>
 
@@ -209,7 +216,7 @@ const submit = () => {
                             </h2>
 
                             <p>
-                                Enter the basic information about your product.
+                                Basic information about your product.
                             </p>
 
                         </div>
@@ -219,10 +226,9 @@ const submit = () => {
 
                     <div class="form-grid">
 
-
                         <!-- PRODUCT NAME -->
 
-                        <div class="form-group full-width">
+                        <div class="form-group">
 
                             <label>
                                 Product Name
@@ -232,19 +238,18 @@ const submit = () => {
                             <input
                                 v-model="form.name"
                                 type="text"
-                                placeholder="e.g. Elegant Evening Dress"
-                                class="form-control"
+                                placeholder="Enter product name"
+                                class="form-input"
                             />
 
-                            <div
+                            <small
                                 v-if="form.errors.name"
                                 class="error"
                             >
                                 {{ form.errors.name }}
-                            </div>
+                            </small>
 
                         </div>
-
 
 
                         <!-- SKU -->
@@ -260,18 +265,17 @@ const submit = () => {
                                 v-model="form.sku"
                                 type="text"
                                 placeholder="e.g. DRESS-001"
-                                class="form-control"
+                                class="form-input"
                             />
 
-                            <div
+                            <small
                                 v-if="form.errors.sku"
                                 class="error"
                             >
                                 {{ form.errors.sku }}
-                            </div>
+                            </small>
 
                         </div>
-
 
 
                         <!-- CATEGORY -->
@@ -280,11 +284,12 @@ const submit = () => {
 
                             <label>
                                 Category
+                                <span>*</span>
                             </label>
 
                             <select
                                 v-model="form.product_category_id"
-                                class="form-control"
+                                class="form-input"
                             >
 
                                 <option value="">
@@ -301,15 +306,14 @@ const submit = () => {
 
                             </select>
 
-                            <div
+                            <small
                                 v-if="form.errors.product_category_id"
                                 class="error"
                             >
                                 {{ form.errors.product_category_id }}
-                            </div>
+                            </small>
 
                         </div>
-
 
 
                         <!-- DESCRIPTION -->
@@ -323,16 +327,16 @@ const submit = () => {
                             <textarea
                                 v-model="form.description"
                                 rows="5"
-                                placeholder="Describe the product..."
-                                class="form-control"
+                                placeholder="Describe your product..."
+                                class="form-input"
                             ></textarea>
 
-                            <div
+                            <small
                                 v-if="form.errors.description"
                                 class="error"
                             >
                                 {{ form.errors.description }}
-                            </div>
+                            </small>
 
                         </div>
 
@@ -341,14 +345,13 @@ const submit = () => {
                 </div>
 
 
-
                 <!-- =================================================
                      PRICING
                 ================================================== -->
 
                 <div class="content-card">
 
-                    <div class="section-header">
+                    <div class="card-header">
 
                         <div>
 
@@ -357,7 +360,7 @@ const submit = () => {
                             </h2>
 
                             <p>
-                                Set the selling and cost prices.
+                                Set your product prices.
                             </p>
 
                         </div>
@@ -367,17 +370,16 @@ const submit = () => {
 
                     <div class="form-grid">
 
-
                         <!-- PRICE -->
 
                         <div class="form-group">
 
                             <label>
-                                Selling Price
+                                Price
                                 <span>*</span>
                             </label>
 
-                            <div class="input-with-prefix">
+                            <div class="input-prefix">
 
                                 <span>
                                     ZMW
@@ -393,33 +395,32 @@ const submit = () => {
 
                             </div>
 
-                            <div
+                            <small
                                 v-if="form.errors.price"
                                 class="error"
                             >
                                 {{ form.errors.price }}
-                            </div>
+                            </small>
 
                         </div>
 
 
-
-                        <!-- COMPARE PRICE -->
+                        <!-- SALE PRICE -->
 
                         <div class="form-group">
 
                             <label>
-                                Compare Price
+                                Sale Price
                             </label>
 
-                            <div class="input-with-prefix">
+                            <div class="input-prefix">
 
                                 <span>
                                     ZMW
                                 </span>
 
                                 <input
-                                    v-model="form.compare_price"
+                                    v-model="form.sale_price"
                                     type="number"
                                     min="0"
                                     step="0.01"
@@ -428,15 +429,14 @@ const submit = () => {
 
                             </div>
 
-                            <div
-                                v-if="form.errors.compare_price"
+                            <small
+                                v-if="form.errors.sale_price"
                                 class="error"
                             >
-                                {{ form.errors.compare_price }}
-                            </div>
+                                {{ form.errors.sale_price }}
+                            </small>
 
                         </div>
-
 
 
                         <!-- COST PRICE -->
@@ -447,7 +447,7 @@ const submit = () => {
                                 Cost Price
                             </label>
 
-                            <div class="input-with-prefix">
+                            <div class="input-prefix">
 
                                 <span>
                                     ZMW
@@ -463,12 +463,12 @@ const submit = () => {
 
                             </div>
 
-                            <div
+                            <small
                                 v-if="form.errors.cost_price"
                                 class="error"
                             >
                                 {{ form.errors.cost_price }}
-                            </div>
+                            </small>
 
                         </div>
 
@@ -477,14 +477,13 @@ const submit = () => {
                 </div>
 
 
-
                 <!-- =================================================
                      INVENTORY
                 ================================================== -->
 
                 <div class="content-card">
 
-                    <div class="section-header">
+                    <div class="card-header">
 
                         <div>
 
@@ -493,7 +492,7 @@ const submit = () => {
                             </h2>
 
                             <p>
-                                Manage product stock levels.
+                                Manage product stock.
                             </p>
 
                         </div>
@@ -503,31 +502,30 @@ const submit = () => {
 
                     <div class="form-grid">
 
-
                         <!-- STOCK -->
 
                         <div class="form-group">
 
                             <label>
                                 Stock Quantity
+                                <span>*</span>
                             </label>
 
                             <input
                                 v-model="form.stock_quantity"
                                 type="number"
                                 min="0"
-                                class="form-control"
+                                class="form-input"
                             />
 
-                            <div
+                            <small
                                 v-if="form.errors.stock_quantity"
                                 class="error"
                             >
                                 {{ form.errors.stock_quantity }}
-                            </div>
+                            </small>
 
                         </div>
-
 
 
                         <!-- LOW STOCK -->
@@ -542,205 +540,14 @@ const submit = () => {
                                 v-model="form.low_stock_threshold"
                                 type="number"
                                 min="0"
-                                class="form-control"
+                                class="form-input"
                             />
 
-                            <div
+                            <small
                                 v-if="form.errors.low_stock_threshold"
                                 class="error"
                             >
                                 {{ form.errors.low_stock_threshold }}
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-
-                <!-- =================================================
-                     PRODUCT IMAGE
-                ================================================== -->
-
-                <div class="content-card">
-
-                    <div class="section-header">
-
-                        <div>
-
-                            <h2>
-                                Product Image
-                            </h2>
-
-                            <p>
-                                Upload the main image for this product.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="image-upload-area">
-
-
-                        <div
-                            v-if="imagePreview"
-                            class="image-preview"
-                        >
-
-                            <img
-                                :src="imagePreview"
-                                alt="Product preview"
-                            />
-
-                        </div>
-
-
-                        <label
-                            v-else
-                            class="upload-box"
-                        >
-
-                            <UploadOutlined />
-
-                            <strong>
-                                Upload Product Image
-                            </strong>
-
-                            <span>
-                                PNG, JPG or JPEG
-                            </span>
-
-                            <input
-                                type="file"
-                                accept="image/png,image/jpeg,image/jpg"
-                                @change="handleImageUpload"
-                            />
-
-                        </label>
-
-
-                        <div
-                            v-if="imagePreview"
-                            class="change-image"
-                        >
-
-                            <label>
-
-                                <UploadOutlined />
-
-                                Change Image
-
-                                <input
-                                    type="file"
-                                    accept="image/png,image/jpeg,image/jpg"
-                                    @change="handleImageUpload"
-                                />
-
-                            </label>
-
-                        </div>
-
-
-                        <div
-                            v-if="form.errors.image"
-                            class="error"
-                        >
-                            {{ form.errors.image }}
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-
-                <!-- =================================================
-                     STATUS
-                ================================================== -->
-
-                <div class="content-card">
-
-                    <div class="section-header">
-
-                        <div>
-
-                            <h2>
-                                Product Status
-                            </h2>
-
-                            <p>
-                                Control how this product appears in your store.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="form-grid">
-
-
-                        <!-- STATUS -->
-
-                        <div class="form-group">
-
-                            <label>
-                                Status
-                            </label>
-
-                            <select
-                                v-model="form.status"
-                                class="form-control"
-                            >
-
-                                <option value="active">
-                                    Active
-                                </option>
-
-                                <option value="draft">
-                                    Draft
-                                </option>
-
-                                <option value="out_of_stock">
-                                    Out of Stock
-                                </option>
-
-                            </select>
-
-                            <div
-                                v-if="form.errors.status"
-                                class="error"
-                            >
-                                {{ form.errors.status }}
-                            </div>
-
-                        </div>
-
-
-
-                        <!-- FEATURED -->
-
-                        <div class="form-group checkbox-group">
-
-                            <label class="checkbox-label">
-
-                                <input
-                                    v-model="form.featured"
-                                    type="checkbox"
-                                />
-
-                                <span>
-                                    Featured Product
-                                </span>
-
-                            </label>
-
-                            <small>
-                                Display this product in featured sections.
                             </small>
 
                         </div>
@@ -750,15 +557,165 @@ const submit = () => {
                 </div>
 
 
+                <!-- =================================================
+                     IMAGE
+                ================================================== -->
+
+                <div class="content-card">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h2>
+                                Product Image
+                            </h2>
+
+                            <p>
+                                Upload a new image or keep the current image.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="image-section">
+
+                        <!-- PREVIEW -->
+
+                        <div
+                            v-if="imagePreview"
+                            class="image-preview"
+                        >
+
+                            <img
+                                :src="imagePreview"
+                                alt="Product image"
+                            />
+
+                        </div>
+
+
+                        <div class="image-upload">
+
+                            <label>
+                                Change Product Image
+                            </label>
+
+                            <input
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp"
+                                @change="handleImageChange"
+                                class="file-input"
+                            />
+
+                            <small>
+                                JPG, PNG or WEBP. Maximum recommended size
+                                2MB.
+                            </small>
+
+                            <small
+                                v-if="form.errors.image"
+                                class="error"
+                            >
+                                {{ form.errors.image }}
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
 
                 <!-- =================================================
-                     FORM ACTIONS
+                     STATUS
+                ================================================== -->
+
+                <div class="content-card">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h2>
+                                Product Status
+                            </h2>
+
+                            <p>
+                                Control product visibility and promotion.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="switches">
+
+                        <!-- ACTIVE -->
+
+                        <label class="switch-row">
+
+                            <input
+                                v-model="form.is_active"
+                                type="checkbox"
+                            />
+
+                            <div>
+
+                                <strong>
+                                    Active Product
+                                </strong>
+
+                                <span>
+                                    Customers can see and purchase
+                                    this product.
+                                </span>
+
+                            </div>
+
+                        </label>
+
+
+                        <!-- FEATURED -->
+
+                        <label class="switch-row">
+
+                            <input
+                                v-model="form.is_featured"
+                                type="checkbox"
+                            />
+
+                            <div>
+
+                                <strong>
+                                    Featured Product
+                                </strong>
+
+                                <span>
+                                    Display this product in featured
+                                    product sections.
+                                </span>
+
+                            </div>
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     ACTIONS
                 ================================================== -->
 
                 <div class="form-actions">
 
                     <Link
-                        href="/products"
+                        href="/fashion/products"
                         class="cancel-button"
                     >
                         Cancel
@@ -771,20 +728,17 @@ const submit = () => {
                         :disabled="form.processing"
                     >
 
-                        <SaveOutlined />
+                        <span v-if="form.processing">
+                            Updating...
+                        </span>
 
-                        <span>
-                            {{
-                                form.processing
-                                    ? 'Saving...'
-                                    : 'Save Product'
-                            }}
+                        <span v-else>
+                            Update Product
                         </span>
 
                     </button>
 
                 </div>
-
 
             </form>
 
@@ -797,39 +751,18 @@ const submit = () => {
 
 <style scoped>
 
-.product-create-page {
+.page {
     padding: 10px;
-    max-width: 1200px;
-    margin: 0 auto;
+    max-width: 1100px;
+    margin: auto;
 }
-
-
-/*
-|--------------------------------------------------------------------------
-| HEADER
-|--------------------------------------------------------------------------
-*/
 
 .page-header {
     display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    margin-bottom: 25px;
-    gap: 20px;
-}
-
-.breadcrumb {
-    display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 10px;
-    font-size: 13px;
-    color: #777;
-}
-
-.breadcrumb a {
-    color: #111827;
-    text-decoration: none;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 25px;
 }
 
 .page-header h1 {
@@ -840,64 +773,54 @@ const submit = () => {
 }
 
 .page-header p {
-    margin: 5px 0 0;
-    color: #777;
+    margin-top: 6px;
+    color: #6b7280;
 }
 
-.back-button {
+.header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.secondary-button {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border: 1px solid #ddd;
+    padding: 9px 16px;
+    border: 1px solid #d1d5db;
     border-radius: 8px;
     text-decoration: none;
-    color: #333;
+    color: #374151;
     background: white;
 }
 
-.back-button:hover {
-    background: #f8f8f8;
+.secondary-button:hover {
+    background: #f9fafb;
 }
-
-
-/*
-|--------------------------------------------------------------------------
-| CONTENT CARD
-|--------------------------------------------------------------------------
-*/
 
 .content-card {
     background: white;
-    padding: 28px;
     border-radius: 12px;
+    padding: 28px;
     margin-bottom: 20px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
 }
 
-.section-header {
-    margin-bottom: 24px;
+.card-header {
+    margin-bottom: 22px;
 }
 
-.section-header h2 {
+.card-header h2 {
     margin: 0;
     font-size: 19px;
     font-weight: 700;
     color: #111827;
 }
 
-.section-header p {
-    margin: 5px 0 0;
-    color: #777;
+.card-header p {
+    margin-top: 5px;
+    color: #6b7280;
     font-size: 14px;
 }
-
-
-/*
-|--------------------------------------------------------------------------
-| FORM
-|--------------------------------------------------------------------------
-*/
 
 .form-grid {
     display: grid;
@@ -915,7 +838,7 @@ const submit = () => {
 }
 
 .form-group label {
-    margin-bottom: 8px;
+    margin-bottom: 7px;
     font-size: 14px;
     font-weight: 600;
     color: #374151;
@@ -925,231 +848,160 @@ const submit = () => {
     color: #dc2626;
 }
 
-.form-control {
+.form-input {
     width: 100%;
     box-sizing: border-box;
     padding: 11px 13px;
     border: 1px solid #d1d5db;
     border-radius: 8px;
-    background: white;
-    color: #111827;
-    font-size: 14px;
     outline: none;
-    transition: .2s;
+    background: white;
+    font-size: 14px;
 }
 
-.form-control:focus {
+.form-input:focus {
     border-color: #111827;
-    box-shadow: 0 0 0 3px rgba(17, 24, 39, .08);
+    box-shadow: 0 0 0 2px rgba(17, 24, 39, .08);
 }
 
-textarea.form-control {
+textarea.form-input {
     resize: vertical;
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| MONEY INPUT
-|--------------------------------------------------------------------------
-*/
-
-.input-with-prefix {
+.input-prefix {
     display: flex;
-    align-items: stretch;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
-.input-with-prefix span {
+.input-prefix span {
     display: flex;
     align-items: center;
-    padding: 0 13px;
+    padding: 0 12px;
     background: #f3f4f6;
-    border: 1px solid #d1d5db;
-    border-right: none;
-    border-radius: 8px 0 0 8px;
+    color: #6b7280;
     font-size: 13px;
-    color: #555;
 }
 
-.input-with-prefix input {
-    flex: 1;
-    min-width: 0;
-    padding: 11px 13px;
-    border: 1px solid #d1d5db;
-    border-radius: 0 8px 8px 0;
-    outline: none;
-    font-size: 14px;
-}
-
-.input-with-prefix input:focus {
-    border-color: #111827;
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| IMAGE UPLOAD
-|--------------------------------------------------------------------------
-*/
-
-.image-upload-area {
+.input-prefix input {
     width: 100%;
+    padding: 11px 13px;
+    border: 0;
+    outline: none;
 }
 
-.upload-box {
-    min-height: 220px;
-    border: 2px dashed #d1d5db;
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: .2s;
-}
-
-.upload-box:hover {
-    border-color: #111827;
-    background: #fafafa;
-}
-
-.upload-box :deep(svg) {
-    font-size: 30px;
-    margin-bottom: 10px;
-}
-
-.upload-box strong {
-    font-size: 15px;
-    color: #111827;
-}
-
-.upload-box span {
+.error {
     margin-top: 5px;
-    color: #888;
-    font-size: 13px;
+    color: #dc2626;
+    font-size: 12px;
 }
 
-.upload-box input,
-.change-image input {
-    display: none;
+.image-section {
+    display: flex;
+    align-items: center;
+    gap: 30px;
 }
 
 .image-preview {
-    width: 100%;
-    max-width: 400px;
-    margin: 0 auto;
+    width: 180px;
+    height: 180px;
     border-radius: 12px;
     overflow: hidden;
-    border: 1px solid #ddd;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    flex-shrink: 0;
 }
 
 .image-preview img {
-    display: block;
     width: 100%;
-    height: 300px;
+    height: 100%;
     object-fit: cover;
 }
 
-.change-image {
-    text-align: center;
-    margin-top: 12px;
+.image-upload {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
-.change-image label {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
+.image-upload label {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.image-upload small {
+    color: #6b7280;
+}
+
+.file-input {
+    padding: 10px;
+    border: 1px dashed #d1d5db;
+    border-radius: 8px;
+}
+
+.switches {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.switch-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
     cursor: pointer;
-    color: #111827;
+}
+
+.switch-row input {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    accent-color: #111827;
+}
+
+.switch-row div {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.switch-row strong {
     font-size: 14px;
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| CHECKBOX
-|--------------------------------------------------------------------------
-*/
-
-.checkbox-group {
-    justify-content: center;
-}
-
-.checkbox-label {
-    display: flex !important;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-}
-
-.checkbox-label input {
-    width: 17px;
-    height: 17px;
-}
-
-.checkbox-group small {
-    margin-left: 27px;
-    color: #888;
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| ERRORS
-|--------------------------------------------------------------------------
-*/
-
-.error {
-    margin-top: 6px;
-    color: #dc2626;
+.switch-row span {
     font-size: 13px;
+    color: #6b7280;
 }
-
-
-/*
-|--------------------------------------------------------------------------
-| ACTIONS
-|--------------------------------------------------------------------------
-*/
 
 .form-actions {
     display: flex;
     justify-content: flex-end;
-    align-items: center;
     gap: 12px;
-    margin-top: 10px;
     margin-bottom: 30px;
 }
 
 .cancel-button,
 .save-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    min-height: 42px;
-    padding: 0 20px;
+    padding: 11px 20px;
     border-radius: 8px;
     font-size: 14px;
     font-weight: 600;
-    cursor: pointer;
     text-decoration: none;
+    cursor: pointer;
 }
 
 .cancel-button {
-    border: 1px solid #d1d5db;
-    color: #374151;
     background: white;
+    color: #374151;
+    border: 1px solid #d1d5db;
 }
 
 .save-button {
-    border: none;
+    border: 0;
     background: #111827;
     color: white;
-}
-
-.save-button:hover {
-    background: #000;
 }
 
 .save-button:disabled {
@@ -1157,18 +1009,20 @@ textarea.form-control {
     cursor: not-allowed;
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| RESPONSIVE
-|--------------------------------------------------------------------------
-*/
-
 @media (max-width: 768px) {
 
     .page-header {
-        align-items: flex-start;
         flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .header-actions {
+        width: 100%;
+    }
+
+    .secondary-button {
+        flex: 1;
+        justify-content: center;
     }
 
     .form-grid {
@@ -1179,18 +1033,9 @@ textarea.form-control {
         grid-column: auto;
     }
 
-    .content-card {
-        padding: 20px;
-    }
-
-    .form-actions {
-        flex-direction: column-reverse;
-        align-items: stretch;
-    }
-
-    .cancel-button,
-    .save-button {
-        width: 100%;
+    .image-section {
+        flex-direction: column;
+        align-items: flex-start;
     }
 
 }
