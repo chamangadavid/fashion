@@ -16,6 +16,8 @@ use App\Http\Controllers\MyFashions\ReportController;
 use App\Http\Controllers\MyFashions\FashionUserController;
 use App\Http\Controllers\MyFashions\FashionSettingsController;
 use App\Http\Controllers\MyFashions\ProductCategoryController;
+use App\Http\Controllers\MyFashions\StockAdjustmentController;
+use App\Http\Controllers\MyFashions\InventoryAuditController;
 use App\Http\Controllers\ShopController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -260,6 +262,31 @@ Route::prefix('fashion')->group(function () {
     Route::put('/products/{product}', [ProductController::class, 'update'])->name('update');
     Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('destroy');
 
+
+    Route::post(
+    '/products/{product}/stock-adjustment',
+    [StockAdjustmentController::class, 'store']
+)->name('fashion.products.stock-adjustment');
+
+
+
+/*
+|--------------------------------------------------------------------------
+| INVENTORY AUDIT
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/products/inventory/audit',
+    [InventoryAuditController::class, 'index']
+)->name('fashion.products.inventory.audit');
+
+
+// Inventory Audit Details
+Route::get(
+    '/products/inventory/audit/{audit}',
+    [InventoryAuditController::class, 'auditDetails']
+)->name('fashion.products.inventory.audit.details');
 
     /*
     |--------------------------------------------------------------------------

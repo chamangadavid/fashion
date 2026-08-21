@@ -209,6 +209,7 @@ const navigation = [
                 label: "Inventory",
                 href: "/fashion/products/inventory",
             },
+
         ],
     },
 

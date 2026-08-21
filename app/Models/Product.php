@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
@@ -43,11 +44,6 @@ use HasFactory;
     |--------------------------------------------------------------------------
     */
 
-    // public function category()
-    // {
-    //     return $this->belongsTo(ProductCategory::class);
-    // }
-
      public function category()
     {
         return $this->belongsTo(
@@ -55,6 +51,16 @@ use HasFactory;
             'product_category_id'
         );
     }
+
+    public function stockAdjustments()
+{
+    return $this->hasMany(StockAdjustment::class);
+}
+
+public function inventoryAudits(): HasMany
+{
+    return $this->hasMany(InventoryAudit::class);
+}
 
     /*
     |--------------------------------------------------------------------------
