@@ -1,9 +1,9 @@
+<!-- resources/js/Pages/MyFashions/Orders/Index.vue -->
+
 <script setup>
 
 import MyFashionLayout from '@/Layouts/MyFashionLayout.vue'
-
 import { Head, Link, router } from '@inertiajs/vue3'
-
 import { computed, ref } from 'vue'
 
 
@@ -54,7 +54,7 @@ const statusFilter = ref(
     props.filters?.status || ''
 )
 
-const paymentMethodFilter = ref(
+const paymentFilter = ref(
     props.filters?.payment_method || ''
 )
 
@@ -70,6 +70,165 @@ const orderData = computed(() => {
     return props.orders?.data || []
 
 })
+
+
+/*
+|--------------------------------------------------------------------------
+| APPLY FILTERS
+|--------------------------------------------------------------------------
+*/
+
+const applyFilters = () => {
+
+    router.get(
+        '/fashion/orders',
+        {
+
+            search:
+                search.value || undefined,
+
+            status:
+                statusFilter.value || undefined,
+
+            payment_method:
+                paymentFilter.value || undefined,
+
+        },
+        {
+
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+
+        }
+    )
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| CLEAR FILTERS
+|--------------------------------------------------------------------------
+*/
+
+const clearFilters = () => {
+
+    search.value = ''
+    statusFilter.value = ''
+    paymentFilter.value = ''
+
+    router.get(
+        '/fashion/orders',
+        {},
+        {
+
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+
+        }
+    )
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| PAGINATION
+|--------------------------------------------------------------------------
+*/
+
+const goToPage = (url) => {
+
+    if (!url) {
+        return
+    }
+
+    router.get(
+        url,
+        {},
+        {
+
+            preserveState: true,
+            preserveScroll: true,
+
+        }
+    )
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| FORMAT DATE
+|--------------------------------------------------------------------------
+*/
+
+const formatDate = (date) => {
+
+    if (!date) {
+        return '-'
+    }
+
+    return new Date(date).toLocaleDateString(
+        'en-GB',
+        {
+
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+
+        }
+    )
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| FORMAT PAYMENT METHOD
+|--------------------------------------------------------------------------
+*/
+
+const paymentMethod = (method) => {
+
+    switch (method) {
+
+        case 'cash_on_delivery':
+            return 'Cash on Delivery'
+
+        case 'mobile_money':
+            return 'Mobile Money'
+
+        case 'card':
+            return 'Visa / Card'
+
+        default:
+            return method || '-'
+
+    }
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| FORMAT STATUS
+|--------------------------------------------------------------------------
+*/
+
+const statusLabel = (status) => {
+
+    if (!status) {
+        return '-'
+    }
+
+    return status
+        .replaceAll('_', ' ')
+        .replace(/\b\w/g, char => char.toUpperCase())
+
+}
 
 
 /*
@@ -105,172 +264,6 @@ const completedCount = computed(() => {
 })
 
 
-/*
-|--------------------------------------------------------------------------
-| APPLY FILTERS
-|--------------------------------------------------------------------------
-*/
-
-const applyFilters = () => {
-
-    router.get(
-        '/fashion/orders',
-        {
-            search: search.value || undefined,
-
-            status:
-                statusFilter.value !== ''
-                    ? statusFilter.value
-                    : undefined,
-
-            payment_method:
-                paymentMethodFilter.value !== ''
-                    ? paymentMethodFilter.value
-                    : undefined,
-        },
-        {
-            preserveState: true,
-            preserveScroll: true,
-            replace: true,
-        }
-    )
-
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| CLEAR FILTERS
-|--------------------------------------------------------------------------
-*/
-
-const clearFilters = () => {
-
-    search.value = ''
-
-    statusFilter.value = ''
-
-    paymentMethodFilter.value = ''
-
-    router.get(
-        '/fashion/orders',
-        {},
-        {
-            preserveState: true,
-            preserveScroll: true,
-            replace: true,
-        }
-    )
-
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| PAGINATION
-|--------------------------------------------------------------------------
-*/
-
-const goToPage = (url) => {
-
-    if (!url) {
-        return
-    }
-
-    router.get(
-        url,
-        {},
-        {
-            preserveState: true,
-            preserveScroll: true,
-        }
-    )
-
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| PAYMENT METHOD
-|--------------------------------------------------------------------------
-*/
-
-const paymentMethodLabel = (method) => {
-
-    switch (method) {
-
-        case 'cash_on_delivery':
-            return 'Cash on Delivery'
-
-        case 'mobile_money':
-            return 'Mobile Money'
-
-        case 'card':
-            return 'Visa / Card'
-
-        default:
-            return method || '-'
-
-    }
-
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| STATUS LABEL
-|--------------------------------------------------------------------------
-*/
-
-const statusLabel = (status) => {
-
-    if (!status) {
-        return '-'
-    }
-
-    return status
-        .replaceAll('_', ' ')
-        .replace(/\b\w/g, char => char.toUpperCase())
-
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| FORMAT DATE
-|--------------------------------------------------------------------------
-*/
-
-const formatDate = (date) => {
-
-    if (!date) {
-        return '-'
-    }
-
-    return new Date(date).toLocaleDateString(
-        'en-GB',
-        {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric',
-        }
-    )
-
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| FORMAT CURRENCY
-|--------------------------------------------------------------------------
-*/
-
-const formatAmount = (amount) => {
-
-    return Number(amount || 0).toFixed(2)
-
-}
-
 </script>
 
 
@@ -297,24 +290,10 @@ const formatAmount = (amount) => {
                     </h1>
 
                     <p>
-                        Manage and process all customer orders.
+                        Manage customer orders, payments and order status.
                     </p>
 
                 </div>
-
-
-                <Link
-                    href="/fashion/orders/pending"
-                    class="btn-primary"
-                >
-
-                    <span class="btn-icon">
-                        🛒
-                    </span>
-
-                    Pending Orders
-
-                </Link>
 
             </div>
 
@@ -400,7 +379,7 @@ const formatAmount = (amount) => {
                             Payment
                         </label>
 
-                        <select v-model="paymentMethodFilter">
+                        <select v-model="paymentFilter">
 
                             <option value="">
                                 All Payments
@@ -462,7 +441,7 @@ const formatAmount = (amount) => {
                 <div>
 
                     <strong>
-                        {{ orders.total || 0 }}
+                        {{ orders.total || orderData.length }}
                     </strong>
 
                     <span>
@@ -521,7 +500,9 @@ const formatAmount = (amount) => {
             <div class="content-card">
 
 
-                <!-- TABLE -->
+                <!-- =================================================
+                     TABLE
+                ================================================== -->
 
                 <div
                     v-if="orderData.length"
@@ -529,6 +510,7 @@ const formatAmount = (amount) => {
                 >
 
                     <table class="orders-table">
+
 
                         <thead>
 
@@ -571,6 +553,7 @@ const formatAmount = (amount) => {
                         </thead>
 
 
+
                         <tbody>
 
                             <tr
@@ -585,14 +568,11 @@ const formatAmount = (amount) => {
 
                                     <div class="order-cell">
 
-                                        <Link
-                                            :href="`/fashion/orders/${order.id}`"
-                                            class="order-number"
-                                        >
+                                        <strong>
                                             {{ order.order_number }}
-                                        </Link>
+                                        </strong>
 
-                                        <span class="order-id">
+                                        <span>
                                             #{{ order.id }}
                                         </span>
 
@@ -634,7 +614,7 @@ const formatAmount = (amount) => {
 
                                 <td>
 
-                                    <span class="item-count">
+                                    <span class="items-badge">
 
                                         {{ order.items?.length || 0 }}
 
@@ -657,7 +637,7 @@ const formatAmount = (amount) => {
                                     <strong class="amount">
 
                                         ZMW
-                                        {{ formatAmount(order.total_amount) }}
+                                        {{ Number(order.total_amount || 0).toFixed(2) }}
 
                                     </strong>
 
@@ -671,7 +651,7 @@ const formatAmount = (amount) => {
 
                                     <span class="payment-badge">
 
-                                        {{ paymentMethodLabel(order.payment_method) }}
+                                        {{ paymentMethod(order.payment_method) }}
 
                                     </span>
 
@@ -684,10 +664,8 @@ const formatAmount = (amount) => {
                                 <td>
 
                                     <span
-                                        :class="[
-                                            'status-badge',
-                                            `status-${order.status}`
-                                        ]"
+                                        class="status-badge"
+                                        :class="`status-${order.status}`"
                                     >
 
                                         <span class="status-dot"></span>
@@ -732,6 +710,7 @@ const formatAmount = (amount) => {
 
                                 </td>
 
+
                             </tr>
 
                         </tbody>
@@ -763,10 +742,10 @@ const formatAmount = (amount) => {
 
                         {{
                             search ||
-                            statusFilter !== '' ||
-                            paymentMethodFilter !== ''
+                            statusFilter ||
+                            paymentFilter
                                 ? 'Try changing your search or filters.'
-                                : 'There are currently no customer orders.'
+                                : 'Customer orders will appear here once they are placed.'
                         }}
 
                     </p>
@@ -775,8 +754,8 @@ const formatAmount = (amount) => {
                     <button
                         v-if="
                             search ||
-                            statusFilter !== '' ||
-                            paymentMethodFilter !== ''
+                            statusFilter ||
+                            paymentFilter
                         "
                         type="button"
                         class="clear-empty-button"
@@ -831,14 +810,14 @@ const formatAmount = (amount) => {
                     <div class="pagination">
 
                         <button
-                            v-for="(link, index) in orders.links"
-                            :key="index"
+                            v-for="link in orders.links"
+                            :key="link.label"
                             type="button"
                             :disabled="!link.url"
                             :class="[
                                 'page-button',
                                 {
-                                    active: link.active,
+                                    active: link.active
                                 }
                             ]"
                             @click="goToPage(link.url)"
@@ -851,6 +830,7 @@ const formatAmount = (amount) => {
                     </div>
 
                 </div>
+
 
             </div>
 
@@ -872,7 +852,6 @@ const formatAmount = (amount) => {
 .orders-page {
 
     padding: 10px;
-
     width: 100%;
 
 }
@@ -887,13 +866,9 @@ const formatAmount = (amount) => {
 .page-header {
 
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
-
     gap: 20px;
-
     margin-bottom: 25px;
 
 }
@@ -901,11 +876,8 @@ const formatAmount = (amount) => {
 .page-header h1 {
 
     margin: 0;
-
     font-size: 28px;
-
     font-weight: 700;
-
     color: #111827;
 
 }
@@ -913,63 +885,8 @@ const formatAmount = (amount) => {
 .page-header p {
 
     margin: 6px 0 0;
-
     color: #6b7280;
-
     font-size: 14px;
-
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| PRIMARY BUTTON
-|--------------------------------------------------------------------------
-*/
-
-.btn-primary {
-
-    display: inline-flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    gap: 8px;
-
-    padding: 10px 17px;
-
-    background: #111827;
-
-    color: white;
-
-    border-radius: 8px;
-
-    text-decoration: none;
-
-    border: none;
-
-    font-size: 13px;
-
-    font-weight: 600;
-
-    cursor: pointer;
-
-    transition: .2s ease;
-
-}
-
-.btn-primary:hover {
-
-    background: #075c59;
-
-}
-
-.btn-icon {
-
-    font-size: 16px;
-
-    line-height: 1;
 
 }
 
@@ -983,15 +900,10 @@ const formatAmount = (amount) => {
 .filter-card {
 
     background: white;
-
     border-radius: 12px;
-
     padding: 20px;
-
     margin-bottom: 18px;
-
     border: 1px solid #edf0f2;
-
     box-shadow: 0 2px 10px rgba(0, 0, 0, .04);
 
 }
@@ -999,15 +911,8 @@ const formatAmount = (amount) => {
 .filter-grid {
 
     display: grid;
-
-    grid-template-columns:
-        minmax(250px, 1fr)
-        180px
-        200px
-        auto;
-
+    grid-template-columns: minmax(250px, 1fr) 180px 180px auto;
     align-items: end;
-
     gap: 15px;
 
 }
@@ -1015,13 +920,9 @@ const formatAmount = (amount) => {
 .filter-group label {
 
     display: block;
-
     margin-bottom: 7px;
-
     color: #374151;
-
     font-size: 12px;
-
     font-weight: 600;
 
 }
@@ -1030,21 +931,13 @@ const formatAmount = (amount) => {
 .filter-group select {
 
     width: 100%;
-
     height: 40px;
-
     padding: 0 12px;
-
     border: 1px solid #dfe3e8;
-
     border-radius: 7px;
-
     background: white;
-
     color: #374151;
-
     font-size: 13px;
-
     outline: none;
 
 }
@@ -1053,9 +946,7 @@ const formatAmount = (amount) => {
 .filter-group select:focus {
 
     border-color: #075c59;
-
-    box-shadow:
-        0 0 0 3px rgba(7, 92, 89, .08);
+    box-shadow: 0 0 0 3px rgba(7, 92, 89, .08);
 
 }
 
@@ -1074,15 +965,10 @@ const formatAmount = (amount) => {
 .search-icon {
 
     position: absolute;
-
     left: 12px;
-
     top: 50%;
-
     transform: translateY(-50%);
-
     font-size: 13px;
-
     opacity: .6;
 
 }
@@ -1090,7 +976,6 @@ const formatAmount = (amount) => {
 .filter-actions {
 
     display: flex;
-
     gap: 8px;
 
 }
@@ -1099,15 +984,10 @@ const formatAmount = (amount) => {
 .clear-button {
 
     height: 40px;
-
     padding: 0 17px;
-
     border-radius: 7px;
-
     font-size: 12px;
-
     font-weight: 600;
-
     cursor: pointer;
 
 }
@@ -1115,9 +995,7 @@ const formatAmount = (amount) => {
 .filter-button {
 
     border: none;
-
     background: #111827;
-
     color: white;
 
 }
@@ -1131,9 +1009,7 @@ const formatAmount = (amount) => {
 .clear-button {
 
     border: 1px solid #dfe3e8;
-
     background: white;
-
     color: #555;
 
 }
@@ -1154,12 +1030,8 @@ const formatAmount = (amount) => {
 .summary-row {
 
     display: grid;
-
-    grid-template-columns:
-        repeat(4, 1fr);
-
+    grid-template-columns: repeat(4, 1fr);
     gap: 15px;
-
     margin-bottom: 18px;
 
 }
@@ -1167,11 +1039,8 @@ const formatAmount = (amount) => {
 .summary-row > div {
 
     background: white;
-
     border: 1px solid #edf0f2;
-
     border-radius: 10px;
-
     padding: 15px 18px;
 
 }
@@ -1179,11 +1048,8 @@ const formatAmount = (amount) => {
 .summary-row strong {
 
     display: block;
-
     color: #111827;
-
     font-size: 22px;
-
     font-weight: 700;
 
 }
@@ -1191,11 +1057,8 @@ const formatAmount = (amount) => {
 .summary-row span {
 
     display: block;
-
     margin-top: 3px;
-
     color: #777;
-
     font-size: 11px;
 
 }
@@ -1210,13 +1073,9 @@ const formatAmount = (amount) => {
 .content-card {
 
     background: white;
-
     border-radius: 12px;
-
     border: 1px solid #edf0f2;
-
     box-shadow: 0 2px 10px rgba(0, 0, 0, .04);
-
     overflow: hidden;
 
 }
@@ -1231,7 +1090,6 @@ const formatAmount = (amount) => {
 .table-wrapper {
 
     width: 100%;
-
     overflow-x: auto;
 
 }
@@ -1239,9 +1097,7 @@ const formatAmount = (amount) => {
 .orders-table {
 
     width: 100%;
-
     min-width: 1100px;
-
     border-collapse: collapse;
 
 }
@@ -1249,21 +1105,13 @@ const formatAmount = (amount) => {
 .orders-table th {
 
     padding: 14px 16px;
-
     background: #f9fafb;
-
     border-bottom: 1px solid #e5e7eb;
-
     color: #6b7280;
-
     font-size: 10px;
-
     font-weight: 700;
-
     letter-spacing: .4px;
-
     text-align: left;
-
     white-space: nowrap;
 
 }
@@ -1271,13 +1119,9 @@ const formatAmount = (amount) => {
 .orders-table td {
 
     padding: 14px 16px;
-
     border-bottom: 1px solid #f0f1f2;
-
     color: #374151;
-
     font-size: 12px;
-
     vertical-align: middle;
 
 }
@@ -1291,44 +1135,24 @@ const formatAmount = (amount) => {
 
 /*
 |--------------------------------------------------------------------------
-| ORDER
+| ORDER CELL
 |--------------------------------------------------------------------------
 */
 
-.order-cell {
-
-    min-width: 145px;
-
-}
-
-.order-number {
+.order-cell strong {
 
     display: block;
-
     color: #111827;
-
-    font-size: 13px;
-
+    font-size: 12px;
     font-weight: 700;
 
-    text-decoration: none;
-
 }
 
-.order-number:hover {
-
-    color: #075c59;
-
-}
-
-.order-id {
+.order-cell span {
 
     display: block;
-
     margin-top: 4px;
-
     color: #9ca3af;
-
     font-size: 10px;
 
 }
@@ -1340,30 +1164,20 @@ const formatAmount = (amount) => {
 |--------------------------------------------------------------------------
 */
 
-.customer-cell {
-
-    min-width: 190px;
-
-}
-
 .customer-cell strong {
 
     display: block;
-
     color: #111827;
-
     font-size: 12px;
+    font-weight: 600;
 
 }
 
 .customer-cell span {
 
     display: block;
-
     margin-top: 3px;
-
     color: #9ca3af;
-
     font-size: 10px;
 
 }
@@ -1375,22 +1189,15 @@ const formatAmount = (amount) => {
 |--------------------------------------------------------------------------
 */
 
-.item-count {
+.items-badge {
 
     display: inline-flex;
-
     padding: 5px 9px;
-
     background: #f3f4f6;
-
     border-radius: 6px;
-
     color: #374151;
-
     font-size: 10px;
-
     font-weight: 600;
-
     white-space: nowrap;
 
 }
@@ -1405,9 +1212,8 @@ const formatAmount = (amount) => {
 .amount {
 
     color: #111827;
-
     font-size: 12px;
-
+    font-weight: 700;
     white-space: nowrap;
 
 }
@@ -1422,19 +1228,12 @@ const formatAmount = (amount) => {
 .payment-badge {
 
     display: inline-flex;
-
     padding: 5px 9px;
-
     background: #f3f4f6;
-
     border-radius: 6px;
-
     color: #374151;
-
     font-size: 10px;
-
     font-weight: 600;
-
     white-space: nowrap;
 
 }
@@ -1449,19 +1248,12 @@ const formatAmount = (amount) => {
 .status-badge {
 
     display: inline-flex;
-
     align-items: center;
-
     gap: 6px;
-
     padding: 5px 9px;
-
     border-radius: 20px;
-
     font-size: 10px;
-
     font-weight: 600;
-
     white-space: nowrap;
 
 }
@@ -1469,11 +1261,8 @@ const formatAmount = (amount) => {
 .status-dot {
 
     width: 6px;
-
     height: 6px;
-
     border-radius: 50%;
-
     background: currentColor;
 
 }
@@ -1481,7 +1270,6 @@ const formatAmount = (amount) => {
 .status-pending {
 
     background: #fff7ed;
-
     color: #c2410c;
 
 }
@@ -1489,7 +1277,6 @@ const formatAmount = (amount) => {
 .status-processing {
 
     background: #eff6ff;
-
     color: #2563eb;
 
 }
@@ -1497,7 +1284,6 @@ const formatAmount = (amount) => {
 .status-completed {
 
     background: #ecfdf3;
-
     color: #15803d;
 
 }
@@ -1505,7 +1291,6 @@ const formatAmount = (amount) => {
 .status-cancelled {
 
     background: #fef2f2;
-
     color: #dc2626;
 
 }
@@ -1520,9 +1305,7 @@ const formatAmount = (amount) => {
 .date {
 
     color: #6b7280;
-
     white-space: nowrap;
-
     font-size: 11px;
 
 }
@@ -1543,11 +1326,8 @@ const formatAmount = (amount) => {
 .actions {
 
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
     gap: 6px;
 
 }
@@ -1555,27 +1335,16 @@ const formatAmount = (amount) => {
 .action-button {
 
     width: 32px;
-
     height: 32px;
-
     display: inline-flex;
-
     align-items: center;
-
     justify-content: center;
-
     border: 1px solid #e5e7eb;
-
     border-radius: 7px;
-
     background: white;
-
     text-decoration: none;
-
     cursor: pointer;
-
     font-size: 12px;
-
     transition: .2s ease;
 
 }
@@ -1589,7 +1358,6 @@ const formatAmount = (amount) => {
 .action-button.view:hover {
 
     background: #eff6ff;
-
     border-color: #bfdbfe;
 
 }
@@ -1604,7 +1372,6 @@ const formatAmount = (amount) => {
 .empty-state {
 
     padding: 80px 25px;
-
     text-align: center;
 
 }
@@ -1612,21 +1379,13 @@ const formatAmount = (amount) => {
 .empty-icon {
 
     width: 65px;
-
     height: 65px;
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
     margin: 0 auto 15px;
-
     border-radius: 50%;
-
     background: #f3f4f6;
-
     font-size: 28px;
 
 }
@@ -1634,9 +1393,7 @@ const formatAmount = (amount) => {
 .empty-state h2 {
 
     margin: 0 0 8px;
-
     color: #111827;
-
     font-size: 19px;
 
 }
@@ -1644,13 +1401,9 @@ const formatAmount = (amount) => {
 .empty-state p {
 
     max-width: 450px;
-
     margin: 0 auto 20px;
-
     color: #777;
-
     font-size: 12px;
-
     line-height: 1.6;
 
 }
@@ -1658,15 +1411,10 @@ const formatAmount = (amount) => {
 .clear-empty-button {
 
     padding: 9px 16px;
-
     border: 1px solid #ddd;
-
     border-radius: 7px;
-
     background: white;
-
     color: #555;
-
     cursor: pointer;
 
 }
@@ -1681,15 +1429,10 @@ const formatAmount = (amount) => {
 .pagination-wrapper {
 
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
-
     gap: 20px;
-
     padding: 16px 18px;
-
     border-top: 1px solid #edf0f2;
 
 }
@@ -1697,7 +1440,6 @@ const formatAmount = (amount) => {
 .pagination-info {
 
     color: #777;
-
     font-size: 11px;
 
 }
@@ -1711,9 +1453,7 @@ const formatAmount = (amount) => {
 .pagination {
 
     display: flex;
-
     align-items: center;
-
     gap: 4px;
 
 }
@@ -1721,21 +1461,13 @@ const formatAmount = (amount) => {
 .page-button {
 
     min-width: 32px;
-
     height: 32px;
-
     padding: 0 8px;
-
     border: 1px solid #e5e7eb;
-
     border-radius: 6px;
-
     background: white;
-
     color: #555;
-
     font-size: 11px;
-
     cursor: pointer;
 
 }
@@ -1749,9 +1481,7 @@ const formatAmount = (amount) => {
 .page-button.active {
 
     border-color: #111827;
-
     background: #111827;
-
     color: white;
 
 }
@@ -1759,7 +1489,6 @@ const formatAmount = (amount) => {
 .page-button:disabled {
 
     cursor: not-allowed;
-
     opacity: .45;
 
 }
@@ -1785,6 +1514,12 @@ const formatAmount = (amount) => {
 
     }
 
+    .summary-row {
+
+        grid-template-columns: repeat(2, 1fr);
+
+    }
+
 }
 
 
@@ -1805,7 +1540,6 @@ const formatAmount = (amount) => {
     .page-header {
 
         align-items: flex-start;
-
         flex-direction: column;
 
     }
@@ -1813,12 +1547,6 @@ const formatAmount = (amount) => {
     .page-header h1 {
 
         font-size: 24px;
-
-    }
-
-    .btn-primary {
-
-        width: 100%;
 
     }
 
@@ -1850,7 +1578,6 @@ const formatAmount = (amount) => {
     .pagination-wrapper {
 
         align-items: flex-start;
-
         flex-direction: column;
 
     }
@@ -1858,9 +1585,7 @@ const formatAmount = (amount) => {
     .pagination {
 
         width: 100%;
-
         overflow-x: auto;
-
         padding-bottom: 3px;
 
     }

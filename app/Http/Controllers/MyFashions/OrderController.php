@@ -17,36 +17,264 @@ class OrderController extends Controller
 /**
      * All Orders
      */
-    public function index()
+    // public function index()
+    // {
+    //     return Inertia::render('MyFashions/Orders/Index');
+    // }
+
+    /**
+     * Display all orders
+     */
+    // public function index()
+    // {
+    //     $orders = Order::with('items')
+    //         ->latest()
+    //         ->get();
+
+    //     return Inertia::render('MyFashions/Orders/Index', [
+    //         'orders' => $orders,
+    //     ]);
+    // }
+
+
+    public function index(Request $request)
     {
-        return Inertia::render('MyFashions/Orders/Index');
+        $query = Order::with('items')
+            ->latest();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('order_number', 'like', "%{$search}%")
+                ->orWhere('customer_email', 'like', "%{$search}%")
+                ->orWhere('shipping_first_name', 'like', "%{$search}%")
+                ->orWhere('shipping_last_name', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('payment_method')) {
+            $query->where('payment_method', $request->payment_method);
+        }
+
+        $orders = $query->paginate(10)->withQueryString();
+
+        return Inertia::render('MyFashions/Orders/Index', [
+            'orders' => $orders,
+            'filters' => [
+                'search' => $request->search ?? '',
+                'status' => $request->status ?? '',
+                'payment_method' => $request->payment_method ?? '',
+            ],
+        ]);
     }
+
+    public function pending(Request $request)
+{
+    $query = Order::with('items')
+        ->where('status', 'pending')
+        ->latest();
+
+    if ($request->filled('search')) {
+
+        $search = $request->search;
+
+        $query->where(function ($q) use ($search) {
+
+            $q->where('order_number', 'like', "%{$search}%")
+                ->orWhere('customer_email', 'like', "%{$search}%")
+                ->orWhere('shipping_first_name', 'like', "%{$search}%")
+                ->orWhere('shipping_last_name', 'like', "%{$search}%");
+
+        });
+    }
+
+    $orders = $query
+        ->paginate(10)
+        ->withQueryString();
+
+    return Inertia::render('MyFashions/Orders/Pending', [
+
+        'orders' => $orders,
+
+        'filters' => [
+            'search' => $request->search ?? '',
+        ],
+
+    ]);
+}
+
+public function processing(Request $request)
+{
+    $query = Order::with('items')
+        ->where('status', 'processing')
+        ->latest();
+
+    if ($request->filled('search')) {
+
+        $search = $request->search;
+
+        $query->where(function ($q) use ($search) {
+
+            $q->where('order_number', 'like', "%{$search}%")
+                ->orWhere('customer_email', 'like', "%{$search}%")
+                ->orWhere('shipping_first_name', 'like', "%{$search}%")
+                ->orWhere('shipping_last_name', 'like', "%{$search}%");
+
+        });
+    }
+
+    $orders = $query
+        ->paginate(10)
+        ->withQueryString();
+
+    return Inertia::render('MyFashions/Orders/Processing', [
+
+        'orders' => $orders,
+
+        'filters' => [
+            'search' => $request->search ?? '',
+        ],
+
+    ]);
+}
+
+public function completed(Request $request)
+{
+    $query = Order::with('items')
+        ->where('status', 'completed')
+        ->latest();
+
+    if ($request->filled('search')) {
+
+        $search = $request->search;
+
+        $query->where(function ($q) use ($search) {
+
+            $q->where('order_number', 'like', "%{$search}%")
+                ->orWhere('customer_email', 'like', "%{$search}%")
+                ->orWhere('shipping_first_name', 'like', "%{$search}%")
+                ->orWhere('shipping_last_name', 'like', "%{$search}%");
+
+        });
+    }
+
+    $orders = $query
+        ->paginate(10)
+        ->withQueryString();
+
+    return Inertia::render('MyFashions/Orders/Completed', [
+
+        'orders' => $orders,
+
+        'filters' => [
+            'search' => $request->search ?? '',
+        ],
+
+    ]);
+}
+
+    /**
+ * Display pending orders
+ */
+// public function pending()
+// {
+//     $orders = Order::with('items')
+//         ->where('status', 'pending')
+//         ->latest()
+//         ->get();
+
+//     return Inertia::render('MyFashions/Orders/Pending', [
+//         'orders' => $orders,
+//     ]);
+// }
+
+/**
+ * Display processing orders
+ */
+// public function processing()
+// {
+//     $orders = Order::with('items')
+//         ->where('status', 'processing')
+//         ->latest()
+//         ->get();
+
+//     return Inertia::render('MyFashions/Orders/Processing', [
+//         'orders' => $orders,
+//     ]);
+// }
+
+/**
+ * Display completed orders
+ */
+// public function completed()
+// {
+//     $orders = Order::with('items')
+//         ->where('status', 'completed')
+//         ->latest()
+//         ->get();
+
+//     return Inertia::render('MyFashions/Orders/Completed', [
+//         'orders' => $orders,
+//     ]);
+// }
+
+/**
+ * Display a single order
+ */
+public function show(Order $order)
+{
+    $order->load([
+        'items.product',
+    ]);
+
+    return Inertia::render('MyFashions/Orders/ViewOrder', [
+        'order' => $order,
+    ]);
+}
+
+// public function show(Order $order)
+// {
+//     $order->load([
+//         'items.product',
+//     ]);
+
+//     return Inertia::render('MyFashions/Orders/View', [
+//         'order' => $order,
+//     ]);
+// }
+
+
 
 
     /**
      * Pending Orders
      */
-    public function pending()
-    {
-        return Inertia::render('MyFashions/Orders/Pending');
-    }
+    // public function pending()
+    // {
+    //     return Inertia::render('MyFashions/Orders/Pending');
+    // }
 
     /**
      * Processing Orders
      */
-    public function processing()
-    {
-        return Inertia::render('MyFashions/Orders/Processing');
-    }
+    // public function processing()
+    // {
+    //     return Inertia::render('MyFashions/Orders/Processing');
+    // }
 
 
     /**
      * Completed Orders
      */
-    public function completed()
-    {
-        return Inertia::render('MyFashions/Orders/Completed');
-    }
+    // public function completed()
+    // {
+    //     return Inertia::render('MyFashions/Orders/Completed');
+    // }
 
      /**
      * Place order
@@ -368,6 +596,244 @@ class OrderController extends Controller
             'order' => $order,
         ]);
     }
+
+
+    public function updateStatus(Request $request, Order $order)
+{
+    $validated = $request->validate([
+        'status' => [
+            'required',
+            'in:pending,processing,completed,cancelled',
+        ],
+    ]);
+
+    $newStatus = $validated['status'];
+    $oldStatus = $order->status;
+
+    /*
+    |--------------------------------------------------------------------------
+    | NO CHANGE
+    |--------------------------------------------------------------------------
+    */
+
+    if ($oldStatus === $newStatus) {
+
+        return back()->with(
+            'info',
+            'Order status is already ' . $newStatus . '.'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | ALLOWED STATUS FLOW
+    |--------------------------------------------------------------------------
+    */
+
+    $allowedTransitions = [
+
+        'pending' => [
+            'processing',
+            'cancelled',
+        ],
+
+        'processing' => [
+            'completed',
+            'cancelled',
+        ],
+
+        'completed' => [],
+
+        'cancelled' => [],
+
+    ];
+
+    if (
+        !in_array(
+            $newStatus,
+            $allowedTransitions[$oldStatus] ?? [],
+            true
+        )
+    ) {
+
+        return back()->withErrors([
+            'status' =>
+                "Cannot change order from {$oldStatus} to {$newStatus}.",
+        ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | CANCELLATION
+    |--------------------------------------------------------------------------
+    */
+
+    if ($newStatus === 'cancelled') {
+
+        DB::transaction(function () use ($order) {
+
+            $order->load('items');
+
+            foreach ($order->items as $item) {
+
+                $product = Product::lockForUpdate()
+                    ->find($item->product_id);
+
+                if (!$product) {
+
+                    throw new \Exception(
+                        "Product {$item->product_name} no longer exists."
+                    );
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | RESTORE STOCK
+                |--------------------------------------------------------------------------
+                */
+
+                $product->increment(
+                    'stock_quantity',
+                    $item->quantity
+                );
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | UPDATE ORDER
+            |--------------------------------------------------------------------------
+            */
+
+            $order->update([
+                'status' => 'cancelled',
+            ]);
+        });
+
+        return back()->with(
+            'success',
+            'Order cancelled and stock restored successfully.'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | NORMAL STATUS UPDATE
+    |--------------------------------------------------------------------------
+    */
+
+    $order->update([
+        'status' => $newStatus,
+    ]);
+
+    return back()->with(
+        'success',
+        'Order status updated successfully.'
+    );
+}
+
+
+
+//     public function updateStatus(Request $request, Order $order)
+// {
+//     $validated = $request->validate([
+//         'status' => [
+//             'required',
+//             'in:pending,processing,completed,cancelled',
+//         ],
+//     ]);
+
+//     $newStatus = $validated['status'];
+//     $oldStatus = $order->status;
+
+//     // Nothing to do
+//     if ($oldStatus === $newStatus) {
+//         return back()->with('info', 'Order status is already ' . $newStatus . '.');
+//     }
+
+//     /*
+//     |--------------------------------------------------------------------------
+//     | CANCEL ORDER
+//     |--------------------------------------------------------------------------
+//     |
+//     | Stock was already deducted when the order was placed.
+//     |
+//     | Therefore:
+//     | pending/processing/completed -> cancelled
+//     | restores stock.
+//     |
+//     | We do NOT restore stock if the order is already cancelled.
+//     |
+//     */
+
+//     if ($newStatus === 'cancelled') {
+
+//         // Do not allow cancelling an already cancelled order
+//         if ($oldStatus === 'cancelled') {
+//             return back()->with(
+//                 'info',
+//                 'This order has already been cancelled.'
+//             );
+//         }
+
+//         DB::transaction(function () use ($order) {
+
+//             $order->load('items');
+
+//             foreach ($order->items as $item) {
+
+//                 $product = Product::lockForUpdate()
+//                     ->find($item->product_id);
+
+//                 if (!$product) {
+//                     throw new \Exception(
+//                         "Product {$item->product_name} no longer exists."
+//                     );
+//                 }
+
+//                 /*
+//                 |--------------------------------------------------------------------------
+//                 | RESTORE STOCK
+//                 |--------------------------------------------------------------------------
+//                 */
+
+//                 $product->increment(
+//                     'stock_quantity',
+//                     $item->quantity
+//                 );
+//             }
+
+//             /*
+//             |--------------------------------------------------------------------------
+//             | UPDATE ORDER STATUS
+//             |--------------------------------------------------------------------------
+//             */
+
+//             $order->update([
+//                 'status' => 'cancelled',
+//             ]);
+//         });
+
+//         return back()->with(
+//             'success',
+//             'Order cancelled and stock restored successfully.'
+//         );
+//     }
+
+//     /*
+//     |--------------------------------------------------------------------------
+//     | NORMAL STATUS UPDATE
+//     |--------------------------------------------------------------------------
+//     */
+
+//     $order->update([
+//         'status' => $newStatus,
+//     ]);
+
+//     return back()->with(
+//         'success',
+//         'Order status updated successfully.'
+//     );
+// }
 
 
 
