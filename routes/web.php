@@ -261,32 +261,10 @@ Route::prefix('fashion')->group(function () {
     Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('edit');
     Route::put('/products/{product}', [ProductController::class, 'update'])->name('update');
     Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('destroy');
+    Route::post('/products/{product}/stock-adjustment', [StockAdjustmentController::class, 'store'])->name('fashion.products.stock-adjustment');
+    Route::get('/products/inventory/audit', [InventoryAuditController::class, 'index'])->name('fashion.products.inventory.audit');
+    Route::get('/products/inventory/audit/product/{product}', [InventoryAuditController::class, 'productAuditDetails'])->name('fashion.products.inventory.audit.product');
 
-
-    Route::post(
-    '/products/{product}/stock-adjustment',
-    [StockAdjustmentController::class, 'store']
-)->name('fashion.products.stock-adjustment');
-
-
-
-/*
-|--------------------------------------------------------------------------
-| INVENTORY AUDIT
-|--------------------------------------------------------------------------
-*/
-
-Route::get(
-    '/products/inventory/audit',
-    [InventoryAuditController::class, 'index']
-)->name('fashion.products.inventory.audit');
-
-
-// Inventory Audit Details
-Route::get(
-    '/products/inventory/audit/{audit}',
-    [InventoryAuditController::class, 'auditDetails']
-)->name('fashion.products.inventory.audit.details');
 
     /*
     |--------------------------------------------------------------------------
@@ -294,12 +272,77 @@ Route::get(
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/collections', [CollectionController::class, 'index'])->name('fashion.collections.index');
-    Route::get('/collections/create', [CollectionController::class, 'create'])->name('fashion.collections.create');
-    Route::get('/collections/featured', [CollectionController::class, 'featured'])->name('fashion.collections.featured');
+    Route::get('/collections', [CollectionController::class, 'index'])
+    ->name('fashion.collections.index');
+
+Route::get('/collections/create', [CollectionController::class, 'create'])
+    ->name('fashion.collections.create');
+
+Route::post('/collections/store', [CollectionController::class, 'store'])
+    ->name('store');
+
+Route::get('/collections/featured', [CollectionController::class, 'featured'])
+    ->name('fashion.collections.featured');
 
 
-    /*
+/*
+|--------------------------------------------------------------------------
+| COLLECTION PRODUCTS
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/collections/{collection}/products',
+    [CollectionController::class, 'products']
+)->name('products');
+
+Route::post(
+    '/collections/{collection}/products',
+    [CollectionController::class, 'assignProducts']
+)->name('products.assign');
+
+
+/*
+|--------------------------------------------------------------------------
+| COLLECTION CRUD
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/collections/{collection}',
+    [CollectionController::class, 'show']
+)->name('show');
+
+Route::get(
+    '/collections/{collection}/edit',
+    [CollectionController::class, 'edit']
+)->name('edit');
+
+Route::put(
+    '/collections/{collection}',
+    [CollectionController::class, 'update']
+)->name('update');
+
+Route::delete(
+    '/collections/{collection}',
+    [CollectionController::class, 'destroy']
+)->name('destroy');
+
+
+
+    // Route::get('/collections', [CollectionController::class, 'index'])->name('fashion.collections.index');
+    // Route::get('/collections/create', [CollectionController::class, 'create'])->name('fashion.collections.create');
+    // Route::post('/collections/store', [CollectionController::class, 'store'])->name('store');
+    // Route::get('/collections/featured', [CollectionController::class, 'featured'])->name('fashion.collections.featured');
+    // Route::get('/collections/{collection}/products', [CollectionController::class, 'products'])->name('products');
+    // Route::post('/collections/{collection}/products', [CollectionController::class, 'assignProducts'])->name('products.assign');
+    // Route::get('/collections/{collection}', [CollectionController::class, 'show'])->name('show');
+    // Route::get('/collections/{collection}/edit', [CollectionController::class, 'edit'])->name('edit');
+    // Route::put('/collections/{collection}', [CollectionController::class, 'update'])->name('update');
+    // Route::delete('/collections/{collection}', [CollectionController::class, 'destroy'])->name('destroy');
+  
+  
+   /*
     |--------------------------------------------------------------------------
     | PRODUCT CATEGORIES
     |--------------------------------------------------------------------------

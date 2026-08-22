@@ -17,8 +17,8 @@
 
       <!-- Company Name with Gradient -->
       <div class="company-info">
-        <h1 class="company-name">Fashion Style</h1>
-        <p class="company-tagline">Discover your signature style</p>
+        <h1 class="company-name">IN STYLE ASARA</h1>
+        <p class="company-tagline">Fashion | Wine | Life Style</p>
       </div>
 
     </div>

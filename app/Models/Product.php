@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
@@ -53,13 +54,23 @@ use HasFactory;
     }
 
     public function stockAdjustments()
-{
-    return $this->hasMany(StockAdjustment::class);
-}
+    {
+        return $this->hasMany(StockAdjustment::class);
+    }
 
-public function inventoryAudits(): HasMany
+    public function inventoryAudits(): HasMany
+    {
+        return $this->hasMany(InventoryAudit::class);
+    }
+
+    public function collections(): BelongsToMany
 {
-    return $this->hasMany(InventoryAudit::class);
+    return $this->belongsToMany(
+        Collection::class,
+        'collection_product'
+    )
+    ->withPivot('sort_order')
+    ->withTimestamps();
 }
 
     /*

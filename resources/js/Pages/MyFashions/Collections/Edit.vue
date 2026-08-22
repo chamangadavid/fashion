@@ -7,47 +7,44 @@ import { computed } from 'vue'
 const props = defineProps({
     collection: {
         type: Object,
-        default: null
+        required: true
     }
 })
 
 const form = useForm({
-    name: '',
-    slug: '',
-    description: '',
+    name: props.collection.name ?? '',
+    slug: props.collection.slug ?? '',
+    description: props.collection.description ?? '',
     image: null,
-    is_active: true,
-    is_featured: false,
-    sort_order: 0,
+    is_active: Boolean(props.collection.is_active),
+    is_featured: Boolean(props.collection.is_featured),
+    sort_order: props.collection.sort_order ?? 0,
 })
 
 const imagePreview = computed(() => {
 
-    if (!form.image) {
-        return null
+    if (form.image) {
+        return URL.createObjectURL(form.image)
     }
 
-    return URL.createObjectURL(form.image)
+    if (props.collection.image) {
+        return `/storage/${props.collection.image}`
+    }
+
+    return null
 
 })
 
-const generateSlug = () => {
-
-    form.slug = form.name
-        .toLowerCase()
-        .trim()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/--+/g, '-')
-
-}
-
 const submit = () => {
 
-    form.post('/fashion/collections/store', {
-        forceFormData: true,
-        preserveScroll: true,
-    })
+    form.post(
+        `/fashion/collections/${props.collection.id}`,
+        {
+            forceFormData: true,
+            preserveScroll: true,
+            _method: 'PUT',
+        }
+    )
 
 }
 
@@ -55,24 +52,22 @@ const submit = () => {
 
 <template>
 
-    <Head title="Create Collection" />
+    <Head title="Edit Collection" />
 
     <MyFashionLayout>
 
         <div class="page">
-
-            <!-- HEADER -->
 
             <div class="page-header">
 
                 <div>
 
                     <h1>
-                        Create Collection
+                        Edit Collection
                     </h1>
 
                     <p>
-                        Create a new fashion collection.
+                        Update collection information.
                     </p>
 
                 </div>
@@ -87,8 +82,6 @@ const submit = () => {
             </div>
 
 
-            <!-- FORM -->
-
             <form
                 @submit.prevent="submit"
                 class="content-card"
@@ -99,7 +92,7 @@ const submit = () => {
                 </h2>
 
                 <p class="section-description">
-                    Add the basic information for your collection.
+                    Update the details of this collection.
                 </p>
 
 
@@ -115,8 +108,6 @@ const submit = () => {
                     <input
                         v-model="form.name"
                         type="text"
-                        placeholder="e.g. Women's Collection"
-                        @blur="generateSlug"
                     />
 
                     <div
@@ -135,18 +126,12 @@ const submit = () => {
 
                     <label>
                         Slug
-                        <span>*</span>
                     </label>
 
                     <input
                         v-model="form.slug"
                         type="text"
-                        placeholder="womens-collection"
                     />
-
-                    <small>
-                        Used in the collection URL.
-                    </small>
 
                     <div
                         v-if="form.errors.slug"
@@ -169,7 +154,6 @@ const submit = () => {
                     <textarea
                         v-model="form.description"
                         rows="5"
-                        placeholder="Describe this collection..."
                     ></textarea>
 
                     <div
@@ -203,7 +187,6 @@ const submit = () => {
                         {{ form.errors.image }}
                     </div>
 
-
                     <div
                         v-if="imagePreview"
                         class="image-preview"
@@ -211,7 +194,7 @@ const submit = () => {
 
                         <img
                             :src="imagePreview"
-                            alt="Collection preview"
+                            alt="Collection image"
                         />
 
                     </div>
@@ -223,8 +206,6 @@ const submit = () => {
 
                 <div class="settings-grid">
 
-                    <!-- ACTIVE -->
-
                     <div class="setting-box">
 
                         <div>
@@ -234,7 +215,7 @@ const submit = () => {
                             </strong>
 
                             <p>
-                                Make this collection visible in the store.
+                                Make this collection visible.
                             </p>
 
                         </div>
@@ -253,8 +234,6 @@ const submit = () => {
                     </div>
 
 
-                    <!-- FEATURED -->
-
                     <div class="setting-box">
 
                         <div>
@@ -264,7 +243,7 @@ const submit = () => {
                             </strong>
 
                             <p>
-                                Display this collection in featured areas.
+                                Show this collection as featured.
                             </p>
 
                         </div>
@@ -285,7 +264,7 @@ const submit = () => {
                 </div>
 
 
-                <!-- SORT ORDER -->
+                <!-- SORT -->
 
                 <div class="form-group">
 
@@ -298,10 +277,6 @@ const submit = () => {
                         type="number"
                         min="0"
                     />
-
-                    <small>
-                        Lower numbers appear first.
-                    </small>
 
                 </div>
 
@@ -325,8 +300,8 @@ const submit = () => {
 
                         {{
                             form.processing
-                                ? 'Creating...'
-                                : 'Create Collection'
+                                ? 'Updating...'
+                                : 'Update Collection'
                         }}
 
                     </button>
@@ -350,8 +325,8 @@ const submit = () => {
 
 .page-header {
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
     margin-bottom: 25px;
 }
 
@@ -362,11 +337,12 @@ const submit = () => {
 }
 
 .page-header p {
-    margin-top: 5px;
     color: #777;
+    margin-top: 5px;
 }
 
-.back-button {
+.back-button,
+.cancel-button {
     padding: 9px 16px;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -385,7 +361,6 @@ const submit = () => {
 
 .content-card h2 {
     margin: 0;
-    font-size: 20px;
 }
 
 .section-description {
@@ -400,8 +375,8 @@ const submit = () => {
 .form-group label {
     display: block;
     margin-bottom: 8px;
-    font-size: 14px;
     font-weight: 600;
+    font-size: 14px;
 }
 
 .form-group label span {
@@ -415,19 +390,11 @@ const submit = () => {
     padding: 11px 13px;
     border: 1px solid #ddd;
     border-radius: 8px;
-    font-size: 14px;
     outline: none;
 }
 
-.form-group input:focus,
-.form-group textarea:focus {
-    border-color: #075c59;
-}
-
-.form-group small {
-    display: block;
-    margin-top: 6px;
-    color: #888;
+.form-group textarea {
+    resize: vertical;
 }
 
 .error {
@@ -437,9 +404,9 @@ const submit = () => {
 }
 
 .image-preview {
-    margin-top: 15px;
     width: 220px;
     height: 160px;
+    margin-top: 15px;
     overflow: hidden;
     border-radius: 10px;
     background: #f5f5f5;
@@ -455,21 +422,15 @@ const submit = () => {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 15px;
-    margin-bottom: 22px;
 }
 
 .setting-box {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    gap: 20px;
+    align-items: center;
     padding: 18px;
     border: 1px solid #eee;
     border-radius: 10px;
-}
-
-.setting-box strong {
-    font-size: 14px;
 }
 
 .setting-box p {
@@ -482,7 +443,6 @@ const submit = () => {
     position: relative;
     width: 46px;
     height: 24px;
-    flex-shrink: 0;
 }
 
 .switch input {
@@ -495,7 +455,6 @@ const submit = () => {
     background: #ccc;
     border-radius: 30px;
     cursor: pointer;
-    transition: .3s;
 }
 
 .switch span::after {
@@ -503,11 +462,11 @@ const submit = () => {
     position: absolute;
     width: 18px;
     height: 18px;
-    left: 3px;
     top: 3px;
+    left: 3px;
     background: white;
     border-radius: 50%;
-    transition: .3s;
+    transition: .2s;
 }
 
 .switch input:checked + span {
@@ -527,22 +486,10 @@ const submit = () => {
     border-top: 1px solid #eee;
 }
 
-.cancel-button,
-.save-button {
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-size: 14px;
-    text-decoration: none;
-}
-
-.cancel-button {
-    border: 1px solid #ddd;
-    color: #333;
-    background: white;
-}
-
 .save-button {
     border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
     background: #111827;
     color: white;
     cursor: pointer;
@@ -550,55 +497,6 @@ const submit = () => {
 
 .save-button:disabled {
     opacity: .6;
-    cursor: not-allowed;
-}
-
-@media (max-width: 700px) {
-
-    .page-header {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .settings-grid {
-        grid-template-columns: 1fr;
-    }
-
 }
 
 </style>
-
-
-<!-- <script setup>
-
-import MyFashionLayout from '@/Layouts/MyFashionLayout.vue';
-import { Head } from '@inertiajs/vue3';
-
-const props = defineProps({
-    collections: {
-        type: Array,
-        default: () => [],
-    },
-});
-
-</script>
-
-<template>
-<Head title="Create" />
-<MyFashionLayout>
-    <div class="p-6">
-
-        <h1 class="text-2xl font-bold">
-            Create Collection
-        </h1>
-
-        <p class="mt-2 text-gray-500">
-            Create a new fashion collection.
-        </p>
-
-    </div>
-</MyFashionLayout>
-
-
-</template> -->

@@ -1,3 +1,4 @@
+<!-- resources\js\Pages\MyFashions\Collections\Featured.vue -->
 <script setup>
 
 import MyFashionLayout from '@/Layouts/MyFashionLayout.vue';

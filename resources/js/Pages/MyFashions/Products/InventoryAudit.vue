@@ -1,3 +1,4 @@
+<!-- resources\js\Pages\MyFashions\Products\InventoryAudit.vue -->
 <script setup>
 
 import MyFashionLayout from '@/Layouts/MyFashionLayout.vue';

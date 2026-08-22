@@ -5,6 +5,7 @@ namespace App\Http\Controllers\MyFashions;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\InventoryAudit;
+use App\Models\Product;
 use Inertia\Inertia;
 
 class InventoryAuditController extends Controller
@@ -109,50 +110,64 @@ class InventoryAuditController extends Controller
         );
     }
 
-    public function auditDetails(InventoryAudit $audit)
-{
-    $audit->load([
-        'product',
-        'user',
-    ]);
+    public function productAuditDetails(Product $product)
+    {
+        $audits = InventoryAudit::with([
+            'product',
+            'user',
+        ])
+        ->where('product_id', $product->id)
+        ->latest()
+        ->get();
 
-    return response()->json([
-        'success' => true,
-
-        'audit' => [
-            'id' => $audit->id,
+        return response()->json([
+            'success' => true,
 
             'product' => [
-                'id' => $audit->product?->id,
-                'name' => $audit->product?->name,
-                'sku' => $audit->product?->sku,
-                'image' => $audit->product?->image,
+                'id' => $product->id,
+                'name' => $product->name,
+                'sku' => $product->sku,
+                'image' => $product->image,
+                'stock_quantity' => $product->stock_quantity,
             ],
 
-            'user' => [
-                'id' => $audit->user?->id,
-                'name' => $audit->user?->name,
-                'email' => $audit->user?->email,
-            ],
+            'audits' => $audits->map(function ($audit) {
+                return [
+                    'id' => $audit->id,
 
-            'type' => $audit->type,
+                    'product' => [
+                        'id' => $audit->product?->id,
+                        'name' => $audit->product?->name,
+                        'sku' => $audit->product?->sku,
+                        'image' => $audit->product?->image,
+                    ],
 
-            'quantity_before' => $audit->quantity_before,
+                    'user' => [
+                        'id' => $audit->user?->id,
+                        'name' => $audit->user?->name,
+                        'email' => $audit->user?->email,
+                    ],
 
-            'quantity_change' => $audit->quantity_change,
+                    // CORRECT COLUMN NAMES
+                    'adjustment_type' => $audit->adjustment_type,
 
-            'quantity_after' => $audit->quantity_after,
+                    'previous_quantity' => $audit->previous_quantity,
 
-            'reason' => $audit->reason,
+                    'adjustment_quantity' => $audit->adjustment_quantity,
 
-            'notes' => $audit->notes,
+                    'new_quantity' => $audit->new_quantity,
 
-            'created_at' => $audit->created_at,
+                    'reason' => $audit->reason,
 
-            'updated_at' => $audit->updated_at,
-        ],
-    ]);
-}
+                    'notes' => $audit->notes,
+
+                    'created_at' => $audit->created_at,
+
+                    'updated_at' => $audit->updated_at,
+                ];
+            }),
+        ]);
+    }
 
 
 }

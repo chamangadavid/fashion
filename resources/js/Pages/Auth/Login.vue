@@ -29,7 +29,7 @@
                     <div class="absolute bottom-8 left-8 right-8 z-30">
                         <div class="bg-black/60 backdrop-blur-lg rounded-xl p-5 border border-[#FCE59A]/40 shadow-xl">
                             <p class="text-[#FCE59A] text-sm font-bold tracking-[0.25em]">
-                                FASHION STYLE
+                                IN STYLE ASARA
                             </p>
 
                             <p class="text-[#FFF1D1] text-xs mt-2 tracking-wide">
@@ -198,7 +198,7 @@
                     <!-- Bottom Brand -->
                     <div class="text-center mt-6">
                         <p class="text-[10px] tracking-[0.3em] text-[#B8860B]/70 uppercase">
-                            Fashion • Style • Confidence
+                            Fashion • Wine • Life Style
                         </p>
                     </div>
 

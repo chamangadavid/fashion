@@ -1,61 +1,45 @@
 <template>
     <GuestLayout>
+
         <Head title="Register" />
 
         <div
-            class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FFF7EB] via-[#FFF1D1] to-[#FCE59A]/30 p-4 md:p-8"
-        >
+            class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FFF7EB] via-[#FFF1D1] to-[#FCE59A]/30 p-4 md:p-8">
             <div
-                class="w-full max-w-5xl bg-[#FFF7EB]/95 backdrop-blur-sm shadow-2xl rounded-2xl overflow-hidden flex flex-col md:flex-row border border-[#D4AF37]/30"
-            >
+                class="w-full max-w-5xl bg-[#FFF7EB]/95 backdrop-blur-sm shadow-2xl rounded-2xl overflow-hidden flex flex-col md:flex-row border border-[#D4AF37]/30">
 
                 <!-- LEFT: IMAGE -->
                 <div class="hidden md:block md:w-1/2 relative overflow-hidden">
 
                     <!-- Luxury Gold Overlay -->
                     <div
-                        class="absolute inset-0 bg-gradient-to-br from-black/60 via-[#D4AF37]/20 to-black/70 mix-blend-multiply z-10"
-                    ></div>
+                        class="absolute inset-0 bg-gradient-to-br from-black/60 via-[#D4AF37]/20 to-black/70 mix-blend-multiply z-10">
+                    </div>
 
-                    <img
-                        src="/assets/login-details.jpg"
-                        alt="Register Visual"
-                        class="h-full w-full object-cover transform hover:scale-105 transition-transform duration-700"
-                    />
+                    <img src="/assets/login-details.jpg" alt="Register Visual"
+                        class="h-full w-full object-cover transform hover:scale-105 transition-transform duration-700" />
 
                     <!-- Dark Bottom Overlay -->
-                    <div
-                        class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 z-20"
-                    ></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 z-20"></div>
 
                     <!-- Decorative Fashion Card -->
                     <div class="absolute bottom-8 left-8 right-8 z-30">
-                        <div
-                            class="bg-black/60 backdrop-blur-lg rounded-xl p-5 border border-[#FCE59A]/40 shadow-xl"
-                        >
-                            <p
-                                class="text-[#FCE59A] text-sm font-bold tracking-[0.25em]"
-                            >
-                                FASHION STYLE
+                        <div class="bg-black/60 backdrop-blur-lg rounded-xl p-5 border border-[#FCE59A]/40 shadow-xl">
+                            <p class="text-[#FCE59A] text-sm font-bold tracking-[0.25em]">
+                                IN STYLE ASARA
                             </p>
 
-                            <p
-                                class="text-[#FFF1D1] text-xs mt-2 tracking-wide"
-                            >
+                            <p class="text-[#FFF1D1] text-xs mt-2 tracking-wide">
                                 Discover Your Signature Style
                             </p>
 
-                            <div
-                                class="mt-3 h-[2px] w-16 bg-gradient-to-r from-[#D4AF37] to-[#FCE59A]"
-                            ></div>
+                            <div class="mt-3 h-[2px] w-16 bg-gradient-to-r from-[#D4AF37] to-[#FCE59A]"></div>
                         </div>
                     </div>
                 </div>
 
                 <!-- RIGHT: FORM -->
-                <div
-                    class="w-full md:w-1/2 p-8 md:p-12 lg:p-16 overflow-y-auto max-h-[90vh] bg-[#FFF7EB]"
-                >
+                <div class="w-full md:w-1/2 p-8 md:p-12 lg:p-16 overflow-y-auto max-h-[90vh] bg-[#FFF7EB]">
 
                     <!-- Logo and Title -->
                     <div class="text-center mb-8">
@@ -65,36 +49,30 @@
                             <div class="relative group">
 
                                 <div
-                                    class="absolute -inset-4 bg-gradient-to-r from-[#D4AF37]/30 via-[#FCE59A]/20 to-[#D4AF37]/30 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                                ></div>
+                                    class="absolute -inset-4 bg-gradient-to-r from-[#D4AF37]/30 via-[#FCE59A]/20 to-[#D4AF37]/30 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                                </div>
 
-                                <img
-                                    src="/assets/aaib.png"
-                                    alt="Fashion Style"
-                                    class="relative h-16 w-auto z-10"
-                                />
+                                <img src="/assets/aaib.png" alt="Fashion Style" class="relative h-16 w-auto z-10" />
                             </div>
                         </div>
 
                         <!-- Title -->
                         <h2 class="text-3xl font-bold mb-2">
                             <span
-                                class="bg-gradient-to-r from-[#B8860B] via-[#D4AF37] to-[#FCE59A] bg-clip-text text-transparent"
-                            >
+                                class="bg-gradient-to-r from-[#B8860B] via-[#D4AF37] to-[#FCE59A] bg-clip-text text-transparent">
                                 Create Account
                             </span>
                         </h2>
 
                         <p class="text-gray-600 text-sm">
-                            Join the Fashion Style community and start your
+                            Join the In Style Asara community and start your
                             journey with us today!
                         </p>
 
                         <!-- Gold Divider -->
                         <div class="flex justify-center mt-4">
-                            <div
-                                class="h-[2px] w-20 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent"
-                            ></div>
+                            <div class="h-[2px] w-20 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent">
+                            </div>
                         </div>
                     </div>
 
@@ -103,248 +81,134 @@
 
                         <!-- Name -->
                         <div>
-                            <InputLabel
-                                for="name"
-                                value="Full Name"
-                                class="text-sm font-semibold text-gray-800 mb-1 block"
-                            />
+                            <InputLabel for="name" value="Full Name"
+                                class="text-sm font-semibold text-gray-800 mb-1 block" />
 
                             <div class="relative">
-                                <div
-                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-                                >
-                                    <svg
-                                        class="h-5 w-5 text-[#B8860B]"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                                        ></path>
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-[#B8860B]" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
+                                        </path>
                                     </svg>
                                 </div>
 
-                                <TextInput
-                                    id="name"
-                                    type="text"
+                                <TextInput id="name" type="text"
                                     class="mt-1 block w-full pl-10 rounded-lg border border-[#D4AF37]/40 bg-white p-3 focus:border-[#D4AF37] focus:ring focus:ring-[#FCE59A]/40 focus:ring-opacity-50 transition-all duration-200"
-                                    placeholder="Enter your full name"
-                                    v-model="form.name"
-                                    required
-                                    autofocus
-                                    autocomplete="name"
-                                />
+                                    placeholder="Enter your full name" v-model="form.name" required autofocus
+                                    autocomplete="name" />
                             </div>
 
-                            <InputError
-                                class="mt-1 text-red-500 text-sm"
-                                :message="form.errors.name"
-                            />
+                            <InputError class="mt-1 text-red-500 text-sm" :message="form.errors.name" />
                         </div>
 
                         <!-- Email -->
                         <div>
-                            <InputLabel
-                                for="email"
-                                value="Email Address"
-                                class="text-sm font-semibold text-gray-800 mb-1 block"
-                            />
+                            <InputLabel for="email" value="Email Address"
+                                class="text-sm font-semibold text-gray-800 mb-1 block" />
 
                             <div class="relative">
-                                <div
-                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-                                >
-                                    <svg
-                                        class="h-5 w-5 text-[#B8860B]"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
-                                        ></path>
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-[#B8860B]" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207">
+                                        </path>
                                     </svg>
                                 </div>
 
-                                <TextInput
-                                    id="email"
-                                    type="email"
+                                <TextInput id="email" type="email"
                                     class="mt-1 block w-full pl-10 rounded-lg border border-[#D4AF37]/40 bg-white p-3 focus:border-[#D4AF37] focus:ring focus:ring-[#FCE59A]/40 focus:ring-opacity-50 transition-all duration-200"
-                                    placeholder="example@email.com"
-                                    v-model="form.email"
-                                    required
-                                    autocomplete="username"
-                                />
+                                    placeholder="example@email.com" v-model="form.email" required
+                                    autocomplete="username" />
                             </div>
 
-                            <InputError
-                                class="mt-1 text-red-500 text-sm"
-                                :message="form.errors.email"
-                            />
+                            <InputError class="mt-1 text-red-500 text-sm" :message="form.errors.email" />
                         </div>
 
                         <!-- Password -->
                         <div>
-                            <InputLabel
-                                for="password"
-                                value="Password"
-                                class="text-sm font-semibold text-gray-800 mb-1 block"
-                            />
+                            <InputLabel for="password" value="Password"
+                                class="text-sm font-semibold text-gray-800 mb-1 block" />
 
                             <div class="relative">
-                                <div
-                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-                                >
-                                    <svg
-                                        class="h-5 w-5 text-[#B8860B]"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M12 15v2m-6-4h12a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6a2 2 0 012-2zm10-4V8a4 4 0 00-8 0v3h8z"
-                                        ></path>
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-[#B8860B]" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 15v2m-6-4h12a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6a2 2 0 012-2zm10-4V8a4 4 0 00-8 0v3h8z">
+                                        </path>
                                     </svg>
                                 </div>
 
-                                <TextInput
-                                    id="password"
-                                    type="password"
+                                <TextInput id="password" type="password"
                                     class="mt-1 block w-full pl-10 rounded-lg border border-[#D4AF37]/40 bg-white p-3 focus:border-[#D4AF37] focus:ring focus:ring-[#FCE59A]/40 focus:ring-opacity-50 transition-all duration-200"
-                                    placeholder="Create a strong password"
-                                    v-model="form.password"
-                                    required
-                                    autocomplete="new-password"
-                                />
+                                    placeholder="Create a strong password" v-model="form.password" required
+                                    autocomplete="new-password" />
                             </div>
 
-                            <InputError
-                                class="mt-1 text-red-500 text-sm"
-                                :message="form.errors.password"
-                            />
+                            <InputError class="mt-1 text-red-500 text-sm" :message="form.errors.password" />
                         </div>
 
                         <!-- Confirm Password -->
                         <div>
-                            <InputLabel
-                                for="password_confirmation"
-                                value="Confirm Password"
-                                class="text-sm font-semibold text-gray-800 mb-1 block"
-                            />
+                            <InputLabel for="password_confirmation" value="Confirm Password"
+                                class="text-sm font-semibold text-gray-800 mb-1 block" />
 
                             <div class="relative">
-                                <div
-                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-                                >
-                                    <svg
-                                        class="h-5 w-5 text-[#B8860B]"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                                        ></path>
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-[#B8860B]" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+                                        </path>
                                     </svg>
                                 </div>
 
-                                <TextInput
-                                    id="password_confirmation"
-                                    type="password"
+                                <TextInput id="password_confirmation" type="password"
                                     class="mt-1 block w-full pl-10 rounded-lg border border-[#D4AF37]/40 bg-white p-3 focus:border-[#D4AF37] focus:ring focus:ring-[#FCE59A]/40 focus:ring-opacity-50 transition-all duration-200"
-                                    placeholder="Confirm your password"
-                                    v-model="form.password_confirmation"
-                                    required
-                                    autocomplete="new-password"
-                                />
+                                    placeholder="Confirm your password" v-model="form.password_confirmation" required
+                                    autocomplete="new-password" />
                             </div>
 
-                            <InputError
-                                class="mt-1 text-red-500 text-sm"
-                                :message="form.errors.password_confirmation"
-                            />
+                            <InputError class="mt-1 text-red-500 text-sm"
+                                :message="form.errors.password_confirmation" />
                         </div>
 
                         <!-- Password Requirements -->
-                        <div
-                            class="bg-[#FFF1D1]/60 rounded-lg p-3 space-y-1 border border-[#D4AF37]/20"
-                        >
-                            <p
-                                class="text-xs font-semibold text-gray-800 mb-1"
-                            >
+                        <div class="bg-[#FFF1D1]/60 rounded-lg p-3 space-y-1 border border-[#D4AF37]/20">
+                            <p class="text-xs font-semibold text-gray-800 mb-1">
                                 Password Requirements:
                             </p>
 
                             <div class="flex flex-wrap gap-2 text-xs">
 
-                                <span
-                                    class="flex items-center gap-1 text-gray-600"
-                                >
-                                    <svg
-                                        class="w-3 h-3 text-[#D4AF37]"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M5 13l4 4L19 7"
-                                        ></path>
+                                <span class="flex items-center gap-1 text-gray-600">
+                                    <svg class="w-3 h-3 text-[#D4AF37]" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7"></path>
                                     </svg>
 
                                     At least 8 characters
                                 </span>
 
-                                <span
-                                    class="flex items-center gap-1 text-gray-600"
-                                >
-                                    <svg
-                                        class="w-3 h-3 text-[#D4AF37]"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M5 13l4 4L19 7"
-                                        ></path>
+                                <span class="flex items-center gap-1 text-gray-600">
+                                    <svg class="w-3 h-3 text-[#D4AF37]" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7"></path>
                                     </svg>
 
                                     Uppercase & lowercase
                                 </span>
 
-                                <span
-                                    class="flex items-center gap-1 text-gray-600"
-                                >
-                                    <svg
-                                        class="w-3 h-3 text-[#D4AF37]"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M5 13l4 4L19 7"
-                                        ></path>
+                                <span class="flex items-center gap-1 text-gray-600">
+                                    <svg class="w-3 h-3 text-[#D4AF37]" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7"></path>
                                     </svg>
 
                                     Contains numbers
@@ -354,73 +218,44 @@
                         </div>
 
                         <!-- Register Button -->
-                        <button
-                            type="submit"
+                        <button type="submit"
                             class="w-full bg-gradient-to-r from-[#000000] via-[#1c1608] to-[#D4AF37] hover:from-[#17130a] hover:via-[#D4AF37] hover:to-[#FCE59A] text-[#FFF7EB] hover:text-black py-3 rounded-lg font-semibold flex justify-center items-center gap-2 transition-all duration-300 shadow-lg hover:shadow-[#D4AF37]/40 transform hover:-translate-y-0.5"
                             :class="{
                                 'opacity-50 cursor-not-allowed':
                                     form.processing
-                            }"
-                            :disabled="form.processing"
-                        >
+                            }" :disabled="form.processing">
 
                             <!-- Loading -->
-                            <svg
-                                v-if="form.processing"
-                                class="animate-spin h-5 w-5 text-[#FCE59A]"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                            >
-                                <circle
-                                    class="opacity-25"
-                                    cx="12"
-                                    cy="12"
-                                    r="10"
-                                    stroke="currentColor"
-                                    stroke-width="4"
-                                ></circle>
+                            <svg v-if="form.processing" class="animate-spin h-5 w-5 text-[#FCE59A]"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                    stroke-width="4"></circle>
 
-                                <path
-                                    class="opacity-75"
-                                    fill="currentColor"
-                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                ></path>
+                                <path class="opacity-75" fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                </path>
                             </svg>
 
                             <span v-else>
                                 Create Account
                             </span>
 
-                            <svg
-                                v-if="!form.processing"
-                                class="w-5 h-5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M13 7l5 5m0 0l-5 5m5-5H6"
-                                ></path>
+                            <svg v-if="!form.processing" class="w-5 h-5" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
                             </svg>
 
                         </button>
                     </form>
 
                     <!-- Sign In Link -->
-                    <div
-                        class="mt-8 pt-6 border-t border-[#D4AF37]/20"
-                    >
+                    <div class="mt-8 pt-6 border-t border-[#D4AF37]/20">
                         <p class="text-sm text-center text-gray-600">
                             Already have an account?
 
-                            <Link
-                                href="/login"
-                                class="text-[#B8860B] hover:text-[#D4AF37] font-semibold ml-1 transition-colors duration-200"
-                            >
+                            <Link href="/login"
+                                class="text-[#B8860B] hover:text-[#D4AF37] font-semibold ml-1 transition-colors duration-200">
                                 Sign in here
                             </Link>
                         </p>
@@ -428,10 +263,8 @@
 
                     <!-- Brand -->
                     <div class="text-center mt-6">
-                        <p
-                            class="text-[10px] tracking-[0.3em] text-[#B8860B]/70 uppercase"
-                        >
-                            Fashion • Style • Confidence
+                        <p class="text-[10px] tracking-[0.3em] text-[#B8860B]/70 uppercase">
+                            Fashion • Wine • Life Style
                         </p>
                     </div>
 
@@ -464,7 +297,6 @@ const submit = () => {
 </script>
 
 <style scoped>
-
 /* Smooth animations */
 
 @keyframes fadeIn {
@@ -524,12 +356,10 @@ button:not(:disabled)::before {
     width: 50%;
     height: 100%;
 
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.18),
-        transparent
-    );
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.18),
+            transparent);
 
     transform: skewX(-20deg);
 
@@ -559,5 +389,4 @@ button:not(:disabled):hover::before {
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
     background: rgba(212, 175, 55, 0.7);
 }
-
 </style>

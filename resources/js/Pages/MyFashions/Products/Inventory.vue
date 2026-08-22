@@ -1,3 +1,4 @@
+<!-- resources\js\Pages\MyFashions\Products\Inventory.vue -->
 <script setup>
 
 import { ref, computed } from 'vue';
@@ -127,6 +128,8 @@ const selectedAudit = ref(null);
 
 const auditLoading = ref(false);
 
+const stockModalLoading = ref(null);
+
 /*
 |--------------------------------------------------------------------------
 | STOCK FORM
@@ -168,71 +171,57 @@ const stockReasons = [
 
 ];
 
-
-// const viewAuditDetails = async (audit) => {
-
-//     auditLoading.value = true;
-
-//     selectedAudit.value = null;
-
-//     auditDetailsModal.value = true;
-
-//     try {
-
-//         const response = await axios.get(
-//             `/fashion/products/inventory/audit/${audit.id}`
-//         );
-
-//         selectedAudit.value = response.data.audit;
-
-//     } catch (error) {
-
-//         console.error(
-//             'Failed to load audit details:',
-//             error
-//         );
-
-//         alert(
-//             'Unable to load audit details.'
-//         );
-
-//         auditDetailsModal.value = false;
-
-//     } finally {
-
-//         auditLoading.value = false;
-
-//     }
-// };
-
 const viewAuditDetails = async (product) => {
+
     if (!product?.id) {
-        console.error('No product selected for audit details.');
+        console.error(
+            'No product selected for audit details.'
+        );
         return;
     }
 
-    auditLoading.value = true;
-    selectedAudit.value = null;
+    // Open modal immediately
     auditDetailsModal.value = true;
 
+    // Show loading state
+    auditLoading.value = true;
+
+    // Clear previous audit
+    selectedAudit.value = null;
+
     try {
+
         const response = await axios.get(
-            `/fashion/products/inventory/audit/${product.id}`
+            `/fashion/products/inventory/audit/product/${product.id}`
         );
 
-        selectedAudit.value = response.data.audit;
+        console.log(
+            'Audit response:',
+            response.data
+        );
+
+        selectedAudit.value = {
+            product: response.data.product,
+            audits: response.data.audits ?? [],
+        };
 
     } catch (error) {
+
         console.error(
             'Failed to load audit details:',
             error
         );
 
-        alert('Unable to load audit details.');
-
         auditDetailsModal.value = false;
+
+        alert(
+            'Unable to load inventory history.'
+        );
+
     } finally {
+
         auditLoading.value = false;
+
     }
 };
 
@@ -251,24 +240,47 @@ const closeAuditDetails = () => {
 */
 
 const openStockModal = (product) => {
+    if (!product?.id) {
+        return;
+    }
 
-    selectedProduct.value = product;
+    stockModalLoading.value = true;
 
-    stockForm.value = {
+    // Small delay gives the user visual feedback
+    setTimeout(() => {
+        selectedProduct.value = product;
 
-        type: 'add',
+        stockForm.value = {
+            type: 'add',
+            quantity: '',
+            reason: 'New stock received',
+            notes: '',
+        };
 
-        quantity: '',
-
-        reason: 'New stock received',
-
-        notes: '',
-
-    };
-
-    showStockModal.value = true;
-
+        showStockModal.value = true;
+        stockModalLoading.value = false;
+    }, 300);
 };
+
+// const openStockModal = (product) => {
+
+//     selectedProduct.value = product;
+
+//     stockForm.value = {
+
+//         type: 'add',
+
+//         quantity: '',
+
+//         reason: 'New stock received',
+
+//         notes: '',
+
+//     };
+
+//     showStockModal.value = true;
+
+// };
 
 
 /*
@@ -480,6 +492,32 @@ const formatMoney = (amount) => {
 
     }).format(amount ?? 0);
 
+};
+
+const formatDate = (date) => {
+    if (!date) {
+        return '-';
+    }
+
+    return new Intl.DateTimeFormat('en-ZM', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+    }).format(new Date(date));
+};
+
+
+const adjustmentClass = (quantity) => {
+    const value = Number(quantity ?? 0);
+
+    if (value > 0) {
+        return 'positive';
+    }
+
+    if (value < 0) {
+        return 'negative';
+    }
+
+    return 'neutral';
 };
 
 
@@ -832,10 +870,7 @@ const goToPage = (url) => {
                 </div>
 
 
-                <Link
-                    href="/fashion/products/create"
-                    class="primary-button"
-                >
+                <Link href="/fashion/products/create" class="primary-button">
 
                     <PlusOutlined />
 
@@ -859,31 +894,20 @@ const goToPage = (url) => {
 
                     <SearchOutlined />
 
-                    <input
-                        v-model="search"
-                        type="text"
-                        placeholder="Search product or SKU..."
-                    />
+                    <input v-model="search" type="text" placeholder="Search product or SKU..." />
 
                 </div>
 
 
                 <!-- CATEGORY -->
 
-                <select
-                    v-model="categoryFilter"
-                    class="filter-select"
-                >
+                <select v-model="categoryFilter" class="filter-select">
 
                     <option value="">
                         All Categories
                     </option>
 
-                    <option
-                        v-for="category in categories"
-                        :key="category.id"
-                        :value="category.id"
-                    >
+                    <option v-for="category in categories" :key="category.id" :value="category.id">
 
                         {{ category.name }}
 
@@ -894,10 +918,7 @@ const goToPage = (url) => {
 
                 <!-- STATUS -->
 
-                <select
-                    v-model="statusFilter"
-                    class="filter-select"
-                >
+                <select v-model="statusFilter" class="filter-select">
 
                     <option value="">
                         All Status
@@ -916,10 +937,7 @@ const goToPage = (url) => {
 
                 <!-- FEATURED -->
 
-                <select
-                    v-model="featuredFilter"
-                    class="filter-select"
-                >
+                <select v-model="featuredFilter" class="filter-select">
 
                     <option value="">
                         All Products
@@ -938,10 +956,7 @@ const goToPage = (url) => {
 
                 <!-- STOCK -->
 
-                <select
-                    v-model="stockFilter"
-                    class="filter-select"
-                >
+                <select v-model="stockFilter" class="filter-select">
 
                     <option value="">
                         All Stock
@@ -962,11 +977,7 @@ const goToPage = (url) => {
                 </select>
 
 
-                <button
-                    type="button"
-                    class="clear-button"
-                    @click="clearFilters"
-                >
+                <button type="button" class="clear-button" @click="clearFilters">
 
                     <ReloadOutlined />
 
@@ -1057,10 +1068,7 @@ const goToPage = (url) => {
 
                         <tbody>
 
-                            <tr
-                                v-for="product in filteredProducts"
-                                :key="product.id"
-                            >
+                            <tr v-for="product in filteredProducts" :key="product.id">
 
 
                                 <!-- PRODUCT -->
@@ -1072,15 +1080,10 @@ const goToPage = (url) => {
 
                                         <div class="product-image">
 
-                                            <img
-                                                v-if="product.image"
-                                                :src="`/storage/${product.image}`"
-                                                :alt="product.name"
-                                            />
+                                            <img v-if="product.image" :src="`/storage/${product.image}`"
+                                                :alt="product.name" />
 
-                                            <InboxOutlined
-                                                v-else
-                                            />
+                                            <InboxOutlined v-else />
 
                                         </div>
 
@@ -1140,23 +1143,15 @@ const goToPage = (url) => {
                                             {{ product.stock_quantity }}
                                         </strong>
 
-                                        <span
-                                            class="stock-badge"
-                                            :class="
-                                                stockStatus(product).class
-                                            "
-                                        >
+                                        <span class="stock-badge" :class="stockStatus(product).class
+                                            ">
 
-                                            <CheckCircleOutlined
-                                                v-if="
-                                                    stockStatus(product).class ===
-                                                    'in-stock'
-                                                "
-                                            />
+                                            <CheckCircleOutlined v-if="
+                                                stockStatus(product).class ===
+                                                'in-stock'
+                                            " />
 
-                                            <ExclamationCircleOutlined
-                                                v-else
-                                            />
+                                            <ExclamationCircleOutlined v-else />
 
                                             {{
                                                 stockStatus(product).label
@@ -1173,14 +1168,10 @@ const goToPage = (url) => {
 
                                 <td>
 
-                                    <span
-                                        class="status-badge"
-                                        :class="
-                                            product.is_active
-                                                ? 'active'
-                                                : 'inactive'
-                                        "
-                                    >
+                                    <span class="status-badge" :class="product.is_active
+                                        ? 'active'
+                                        : 'inactive'
+                                        ">
 
                                         {{
                                             product.is_active
@@ -1197,13 +1188,10 @@ const goToPage = (url) => {
 
                                 <td>
 
-                                    <span
-                                        class="featured-badge"
-                                        :class="{
-                                            featured:
-                                                product.is_featured
-                                        }"
-                                    >
+                                    <span class="featured-badge" :class="{
+                                        featured:
+                                            product.is_featured
+                                    }">
 
                                         {{
                                             product.is_featured
@@ -1225,11 +1213,8 @@ const goToPage = (url) => {
 
                                         <!-- VIEW -->
 
-                                        <Link
-                                            :href="`/fashion/products/${product.id}`"
-                                            class="action-button view"
-                                            title="View"
-                                        >
+                                        <Link :href="`/fashion/products/${product.id}`" class="action-button view"
+                                            title="View">
 
                                             <EyeOutlined />
 
@@ -1238,11 +1223,8 @@ const goToPage = (url) => {
 
                                         <!-- EDIT -->
 
-                                        <Link
-                                            :href="`/fashion/products/${product.id}/edit`"
-                                            class="action-button edit"
-                                            title="Edit"
-                                        >
+                                        <Link :href="`/fashion/products/${product.id}/edit`" class="action-button edit"
+                                            title="Edit">
 
                                             <EditOutlined />
 
@@ -1251,43 +1233,36 @@ const goToPage = (url) => {
 
                                         <!-- ADJUST STOCK -->
 
-                                        <button
-                                            type="button"
-                                            class="action-button stock"
-                                            title="Adjust Stock"
-                                            @click="
-                                                openStockModal(product)
-                                            "
-                                        >
+                                        <!-- <button type="button" class="action-button stock" title="Adjust Stock" @click="
+                                            openStockModal(product)
+                                            ">
 
                                             <PlusCircleOutlined />
 
+                                        </button> -->
+
+                                        <!-- ADJUST STOCK -->
+
+                                        <button type="button" class="action-button stock" title="Adjust Stock"
+                                            :disabled="stockModalLoading" @click="openStockModal(product)">
+                                            <span v-if="stockModalLoading" class="button-spinner"></span>
+
+                                            <PlusCircleOutlined v-else />
                                         </button>
 
-                                        <!-- <button
-    type="button"
-    class="action-button view"
-
-    @click="viewAuditDetails(product)"
->
-    <HistoryOutlined />
-</button> -->
+                                        <button type="button" class="action-button view" title="View Audit Details"
+                                            @click="viewAuditDetails(product)">
+                                            <HistoryOutlined />
+                                        </button>
 
 
                                         <!-- DELETE -->
 
-                                        <button
-                                            type="button"
-                                            class="action-button delete"
-                                            title="Delete"
-                                            :disabled="
-                                                deletingProduct ===
-                                                product.id
-                                            "
-                                            @click="
+                                        <button type="button" class="action-button delete" title="Delete" :disabled="deletingProduct ===
+                                            product.id
+                                            " @click="
                                                 deleteProduct(product)
-                                            "
-                                        >
+                                                ">
 
                                             <DeleteOutlined />
 
@@ -1302,16 +1277,11 @@ const goToPage = (url) => {
 
                             <!-- EMPTY -->
 
-                            <tr
-                                v-if="
-                                    filteredProducts.length === 0
-                                "
-                            >
+                            <tr v-if="
+                                filteredProducts.length === 0
+                            ">
 
-                                <td
-                                    colspan="8"
-                                    class="empty-cell"
-                                >
+                                <td colspan="8" class="empty-cell">
 
                                     <InboxOutlined />
 
@@ -1339,27 +1309,16 @@ const goToPage = (url) => {
                      PAGINATION
                 ================================================== -->
 
-                <div
-                    v-if="
-                        products.links &&
-                        products.links.length > 3
-                    "
-                    class="pagination"
-                >
+                <div v-if="
+                    products.links &&
+                    products.links.length > 3
+                " class="pagination">
 
-                    <button
-                        v-for="(link, index) in products.links"
-                        :key="index"
-                        :disabled="!link.url"
-                        :class="{
-                            active: link.active
-                        }"
-                        @click="goToPage(link.url)"
-                    >
+                    <button v-for="(link, index) in products.links" :key="index" :disabled="!link.url" :class="{
+                        active: link.active
+                    }" @click="goToPage(link.url)">
 
-                        <span
-                            v-html="link.label"
-                        ></span>
+                        <span v-html="link.label"></span>
 
                     </button>
 
@@ -1371,78 +1330,53 @@ const goToPage = (url) => {
 
 
         <!-- =========================================================
-             STOCK ADJUSTMENT MODAL
-        ========================================================== -->
+     STOCK ADJUSTMENT MODAL
+========================================================= -->
 
-        <div
-            v-if="showStockModal"
-            class="modal-overlay"
-            @click.self="closeStockModal"
-        >
-
+        <div v-if="showStockModal" class="modal-overlay" @click.self="closeStockModal">
             <div class="stock-modal">
 
-
-                <!-- MODAL HEADER -->
+                <!-- =================================================
+             MODAL HEADER
+        ================================================== -->
 
                 <div class="modal-header">
 
                     <div>
-
                         <h2>
                             Adjust Stock
                         </h2>
 
-                        <p
-                            v-if="selectedProduct"
-                        >
-
+                        <p v-if="selectedProduct">
                             {{ selectedProduct.name }}
-
                         </p>
-
                     </div>
 
-
-                    <button
-                        type="button"
-                        class="close-button"
-                        @click="closeStockModal"
-                    >
-
+                    <button type="button" class="close-button" @click="closeStockModal">
                         <CloseOutlined />
-
                     </button>
 
                 </div>
 
 
-                <!-- MODAL BODY -->
+                <!-- =================================================
+             MODAL BODY
+        ================================================== -->
 
                 <div class="modal-body">
 
-
-                    <!-- PRODUCT INFO -->
+                    <!-- =============================================
+                 PRODUCT INFORMATION
+            ============================================== -->
 
                     <div class="product-summary">
 
                         <div class="modal-product-image">
 
-                            <img
-                                v-if="
-                                    selectedProduct?.image
-                                "
-                                :src="
-                                    `/storage/${selectedProduct.image}`
-                                "
-                                :alt="
-                                    selectedProduct?.name
-                                "
-                            />
+                            <img v-if="selectedProduct?.image" :src="`/storage/${selectedProduct.image}`"
+                                :alt="selectedProduct?.name" />
 
-                            <InboxOutlined
-                                v-else
-                            />
+                            <InboxOutlined v-else />
 
                         </div>
 
@@ -1463,7 +1397,9 @@ const goToPage = (url) => {
                     </div>
 
 
-                    <!-- CURRENT STOCK -->
+                    <!-- =============================================
+                 CURRENT STOCK
+            ============================================== -->
 
                     <div class="current-stock-box">
 
@@ -1478,7 +1414,9 @@ const goToPage = (url) => {
                     </div>
 
 
-                    <!-- ADJUSTMENT TYPE -->
+                    <!-- =============================================
+                 ADJUSTMENT TYPE
+            ============================================== -->
 
                     <div class="form-group">
 
@@ -1486,10 +1424,7 @@ const goToPage = (url) => {
                             Adjustment Type
                         </label>
 
-                        <select
-                            v-model="stockForm.type"
-                            class="form-control"
-                        >
+                        <select v-model="stockForm.type" class="form-control">
 
                             <option value="add">
                                 Add Stock
@@ -1508,7 +1443,9 @@ const goToPage = (url) => {
                     </div>
 
 
-                    <!-- QUANTITY -->
+                    <!-- =============================================
+                 QUANTITY
+            ============================================== -->
 
                     <div class="form-group">
 
@@ -1516,28 +1453,19 @@ const goToPage = (url) => {
                             Quantity
                         </label>
 
-                        <input
-                            v-model="stockForm.quantity"
-                            type="number"
-                            min="0"
-                            step="1"
-                            class="form-control"
-                            placeholder="Enter quantity"
-                        />
+                        <input v-model="stockForm.quantity" type="number" min="0" step="1" class="form-control"
+                            placeholder="Enter quantity" />
 
-                        <small
-                            v-if="stockError"
-                            class="form-error"
-                        >
-
+                        <small v-if="stockError" class="form-error">
                             {{ stockError }}
-
                         </small>
 
                     </div>
 
 
-                    <!-- REASON -->
+                    <!-- =============================================
+                 REASON
+            ============================================== -->
 
                     <div class="form-group">
 
@@ -1545,19 +1473,10 @@ const goToPage = (url) => {
                             Reason
                         </label>
 
-                        <select
-                            v-model="stockForm.reason"
-                            class="form-control"
-                        >
+                        <select v-model="stockForm.reason" class="form-control">
 
-                            <option
-                                v-for="reason in stockReasons"
-                                :key="reason"
-                                :value="reason"
-                            >
-
+                            <option v-for="reason in stockReasons" :key="reason" :value="reason">
                                 {{ reason }}
-
                             </option>
 
                         </select>
@@ -1565,7 +1484,9 @@ const goToPage = (url) => {
                     </div>
 
 
-                    <!-- NOTES -->
+                    <!-- =============================================
+                 NOTES
+            ============================================== -->
 
                     <div class="form-group">
 
@@ -1573,24 +1494,19 @@ const goToPage = (url) => {
                             Notes
                         </label>
 
-                        <textarea
-                            v-model="stockForm.notes"
-                            rows="3"
-                            class="form-control"
-                            placeholder="Optional notes..."
-                        ></textarea>
+                        <textarea v-model="stockForm.notes" rows="3" class="form-control"
+                            placeholder="Optional notes..."></textarea>
 
                     </div>
 
 
-                    <!-- NEW STOCK -->
+                    <!-- =============================================
+                 NEW STOCK PREVIEW
+            ============================================== -->
 
-                    <div
-                        class="new-stock-box"
-                        :class="{
-                            danger: newStock < 0
-                        }"
-                    >
+                    <div class="new-stock-box" :class="{
+                        danger: newStock < 0
+                    }">
 
                         <div>
 
@@ -1621,365 +1537,21 @@ const goToPage = (url) => {
 
                 </div>
 
-                <!-- Inventory Audit Details Modal -->
-                 <!-- =========================================================
-     AUDIT DETAILS MODAL
-========================================================= -->
 
-<div
-    v-if="auditDetailsModal"
-    class="modal-overlay"
-    @click.self="closeAuditDetails"
->
-
-    <div class="audit-details-modal">
-
-        <!-- HEADER -->
-
-        <div class="modal-header">
-
-            <div>
-
-                <h2>
-                    Inventory Audit Details
-                </h2>
-
-                <p>
-                    Complete history for this stock adjustment
-                </p>
-
-            </div>
-
-            <button
-                type="button"
-                class="modal-close"
-                @click="closeAuditDetails"
-            >
-                ×
-            </button>
-
-        </div>
-
-
-        <!-- LOADING -->
-
-        <div
-            v-if="auditLoading"
-            class="audit-loading"
-        >
-
-            <div class="loading-spinner"></div>
-
-            <p>
-                Loading audit details...
-            </p>
-
-        </div>
-
-
-        <!-- CONTENT -->
-
-        <div
-            v-else-if="selectedAudit"
-            class="audit-details-content"
-        >
-
-            <!-- PRODUCT -->
-
-            <div class="audit-section">
-
-                <h3>
-                    Product
-                </h3>
-
-                <div class="product-details">
-
-                    <div class="product-image">
-
-                        <img
-                            v-if="selectedAudit.product?.image"
-                            :src="`/storage/${selectedAudit.product.image}`"
-                            :alt="selectedAudit.product.name"
-                        />
-
-                        <div
-                            v-else
-                            class="no-image"
-                        >
-                            No Image
-                        </div>
-
-                    </div>
-
-                    <div class="product-information">
-
-                        <strong>
-                            {{ selectedAudit.product?.name }}
-                        </strong>
-
-                        <span>
-                            SKU:
-                            {{ selectedAudit.product?.sku }}
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- STOCK MOVEMENT -->
-
-            <div class="audit-section">
-
-                <h3>
-                    Stock Movement
-                </h3>
-
-                <div class="stock-history">
-
-                    <div class="stock-box">
-
-                        <span>
-                            Stock Before
-                        </span>
-
-                        <strong>
-                            {{ selectedAudit.quantity_before }}
-                        </strong>
-
-                    </div>
-
-
-                    <div class="movement-arrow">
-
-                        <span
-                            :class="{
-                                increase:
-                                    Number(selectedAudit.quantity_change) > 0,
-
-                                decrease:
-                                    Number(selectedAudit.quantity_change) < 0
-                            }"
-                        >
-
-                            {{
-                                Number(selectedAudit.quantity_change) > 0
-                                    ? '+'
-                                    : ''
-                            }}
-
-                            {{ selectedAudit.quantity_change }}
-
-                        </span>
-
-                    </div>
-
-
-                    <div class="stock-box">
-
-                        <span>
-                            Stock After
-                        </span>
-
-                        <strong>
-                            {{ selectedAudit.quantity_after }}
-                        </strong>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- AUDIT INFORMATION -->
-
-            <div class="audit-section">
-
-                <h3>
-                    Adjustment Information
-                </h3>
-
-                <div class="audit-information-grid">
-
-                    <div>
-
-                        <span>
-                            Adjustment Type
-                        </span>
-
-                        <strong>
-                            {{ selectedAudit.type }}
-                        </strong>
-
-                    </div>
-
-
-                    <div>
-
-                        <span>
-                            Quantity Changed
-                        </span>
-
-                        <strong
-                            :class="{
-                                positive:
-                                    Number(selectedAudit.quantity_change) > 0,
-
-                                negative:
-                                    Number(selectedAudit.quantity_change) < 0
-                            }"
-                        >
-
-                            {{
-                                Number(selectedAudit.quantity_change) > 0
-                                    ? '+'
-                                    : ''
-                            }}
-
-                            {{ selectedAudit.quantity_change }}
-
-                        </strong>
-
-                    </div>
-
-
-                    <div>
-
-                        <span>
-                            Reason
-                        </span>
-
-                        <strong>
-                            {{ selectedAudit.reason || 'N/A' }}
-                        </strong>
-
-                    </div>
-
-
-                    <div>
-
-                        <span>
-                            Date
-                        </span>
-
-                        <strong>
-
-                            {{
-                                new Date(
-                                    selectedAudit.created_at
-                                ).toLocaleString()
-                            }}
-
-                        </strong>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- NOTES -->
-
-            <div
-                v-if="selectedAudit.notes"
-                class="audit-section"
-            >
-
-                <h3>
-                    Notes
-                </h3>
-
-                <div class="audit-notes">
-
-                    {{ selectedAudit.notes }}
-
-                </div>
-
-            </div>
-
-
-            <!-- USER -->
-
-            <div class="audit-section">
-
-                <h3>
-                    Performed By
-                </h3>
-
-                <div class="performed-by">
-
-                    <div class="user-avatar">
-
-                        <UserOutlined />
-
-                    </div>
-
-                    <div>
-
-                        <strong>
-                            {{ selectedAudit.user?.name }}
-                        </strong>
-
-                        <span>
-                            {{ selectedAudit.user?.email }}
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- FOOTER -->
-
-        <div class="modal-footer">
-
-            <button
-                type="button"
-                class="close-button"
-                @click="closeAuditDetails"
-            >
-                Close
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-                <!-- MODAL FOOTER -->
+                <!-- =================================================
+             STOCK MODAL FOOTER
+        ================================================== -->
 
                 <div class="modal-footer">
 
-                    <button
-                        type="button"
-                        class="cancel-button"
-                        @click="closeStockModal"
-                    >
-
+                    <button type="button" class="cancel-button" @click="closeStockModal">
                         Cancel
-
                     </button>
 
 
-                    <button
-                        type="button"
-                        class="submit-button"
-                        :disabled="
-                            !stockForm.quantity ||
-                            !!stockError
-                        "
-                        @click="submitStockAdjustment"
-                    >
+                    <button type="button" class="submit-button" :disabled="!stockForm.quantity ||
+                        !!stockError
+                        " @click="submitStockAdjustment">
 
                         <PlusCircleOutlined />
 
@@ -1990,7 +1562,383 @@ const goToPage = (url) => {
                 </div>
 
             </div>
+        </div>
 
+
+        <!-- =========================================================
+     INVENTORY AUDIT DETAILS MODAL
+========================================================= -->
+
+        <div v-if="auditDetailsModal" class="modal-overlay" @click.self="closeAuditDetails">
+            <div class="modal audit-modal">
+
+                <!-- =================================================
+             AUDIT MODAL HEADER
+        ================================================== -->
+
+                <div class="modal-header">
+
+                    <div>
+
+                        <h2>
+                            Inventory History
+                        </h2>
+
+                        <p v-if="selectedAudit?.product">
+
+                            {{ selectedAudit.product.name }}
+
+                            <span>
+                                — {{ selectedAudit.product.sku }}
+                            </span>
+
+                        </p>
+
+                    </div>
+
+
+                    <button type="button" class="close-button" @click="closeAuditDetails">
+
+                        <CloseOutlined />
+
+                    </button>
+
+                </div>
+
+
+                <!-- =================================================
+             AUDIT LOADING
+        ================================================== -->
+
+                <div v-if="auditLoading" class="audit-loading">
+
+                    <div class="loading-spinner">
+                        Loading...
+                    </div>
+
+                    <p>
+                        Loading inventory history...
+                    </p>
+
+                </div>
+
+
+                <!-- =================================================
+             AUDIT CONTENT
+        ================================================== -->
+
+                <div v-else-if="selectedAudit" class="audit-content">
+
+                    <!-- =============================================
+                 PRODUCT INFORMATION
+            ============================================== -->
+
+                    <div class="audit-section">
+
+                        <h3>
+                            Product
+                        </h3>
+
+
+                        <div class="product-details">
+
+                            <!-- PRODUCT IMAGE -->
+
+                            <div class="product-image">
+
+                                <img v-if="selectedAudit.product?.image"
+                                    :src="`/storage/${selectedAudit.product.image}`"
+                                    :alt="selectedAudit.product.name" />
+
+                                <div v-else class="no-image">
+                                    No Image
+                                </div>
+
+                            </div>
+
+
+                            <!-- PRODUCT DETAILS -->
+
+                            <div class="product-information">
+
+                                <strong>
+                                    {{
+                                        selectedAudit.product?.name
+                                        ?? 'Unknown Product'
+                                    }}
+                                </strong>
+
+
+                                <span>
+                                    SKU:
+                                    {{
+                                        selectedAudit.product?.sku
+                                        ?? '-'
+                                    }}
+                                </span>
+
+
+                                <span>
+                                    Current Stock:
+                                    {{
+                                        selectedAudit.product?.stock_quantity
+                                        ?? 0
+                                    }}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =============================================
+                 STOCK HISTORY
+            ============================================== -->
+
+                    <div class="audit-section">
+
+                        <h3>
+                            Stock History
+                        </h3>
+
+
+                        <!-- =========================================
+                     NO AUDIT RECORDS
+                ========================================== -->
+
+                        <div v-if="!selectedAudit.audits?.length" class="empty-audit">
+
+                            <HistoryOutlined />
+
+                            <p>
+                                No inventory adjustments have been
+                                recorded for this product yet.
+                            </p>
+
+                        </div>
+
+
+                        <!-- =========================================
+                     AUDIT RECORDS
+                ========================================== -->
+
+                        <div v-else class="audit-history">
+
+                            <div v-for="audit in selectedAudit.audits" :key="audit.id" class="audit-item">
+
+                                <!-- =================================
+                             AUDIT HEADER
+                        ================================== -->
+
+                                <div class="audit-item-header">
+
+                                    <strong>
+
+                                        {{
+                                            audit.adjustment_type
+                                            ?? audit.type
+                                            ?? 'Stock Adjustment'
+                                        }}
+
+                                    </strong>
+
+
+                                    <span>
+
+                                        {{
+                                            formatDate(
+                                                audit.created_at
+                                            )
+                                        }}
+
+                                    </span>
+
+                                </div>
+
+
+                                <!-- =================================
+                             STOCK MOVEMENT
+                        ================================== -->
+
+                                <div class="stock-history">
+
+                                    <!-- PREVIOUS -->
+
+                                    <div class="stock-box">
+
+                                        <span>
+                                            Previous
+                                        </span>
+
+                                        <strong>
+                                            {{
+                                                audit.previous_quantity
+                                                ?? 0
+                                            }}
+                                        </strong>
+
+                                    </div>
+
+
+                                    <!-- ARROW / CHANGE -->
+
+                                    <div class="movement-arrow">
+
+                                        <span :class="adjustmentClass(
+                                            audit.adjustment_quantity
+                                            ??
+                                            audit.quantity_change
+                                            ??
+                                            audit.quantity
+                                        )
+                                            ">
+
+                                            {{
+                                                (
+                                                    audit.adjustment_quantity
+                                                    ??
+                                                    audit.quantity_change
+                                                    ??
+                                                    audit.quantity
+                                                    ??
+                                                    0
+                                                ) > 0
+                                                    ? '+'
+                                                    : ''
+                                            }}
+
+                                            {{
+                                                audit.adjustment_quantity
+                                                ??
+                                                audit.quantity_change
+                                                ??
+                                                audit.quantity
+                                                ??
+                                                0
+                                            }}
+
+                                        </span>
+
+                                    </div>
+
+
+                                    <!-- NEW STOCK -->
+
+                                    <div class="stock-box">
+
+                                        <span>
+                                            New Stock
+                                        </span>
+
+                                        <strong>
+                                            {{
+                                                audit.new_quantity
+                                                ?? 0
+                                            }}
+                                        </strong>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- =================================
+                             AUDIT INFORMATION
+                        ================================== -->
+
+                                <div class="audit-information-grid">
+
+                                    <!-- REASON -->
+
+                                    <div>
+
+                                        <span>
+                                            Reason
+                                        </span>
+
+                                        <strong>
+                                            {{
+                                                audit.reason
+                                                ?? '-'
+                                            }}
+                                        </strong>
+
+                                    </div>
+
+
+                                    <!-- USER -->
+
+                                    <div>
+
+                                        <span>
+                                            User
+                                        </span>
+
+                                        <strong>
+                                            {{
+                                                audit.user?.name
+                                                ?? 'System'
+                                            }}
+                                        </strong>
+
+                                    </div>
+
+
+                                    <!-- REFERENCE -->
+
+                                    <div v-if="audit.reference">
+
+                                        <span>
+                                            Reference
+                                        </span>
+
+                                        <strong>
+                                            {{ audit.reference }}
+                                        </strong>
+
+                                    </div>
+
+
+                                    <!-- NOTES -->
+
+                                    <div v-if="audit.notes">
+
+                                        <span>
+                                            Notes
+                                        </span>
+
+                                        <strong>
+                                            {{ audit.notes }}
+                                        </strong>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+             AUDIT MODAL FOOTER
+        ================================================== -->
+
+                <div class="modal-footer">
+
+                    <button type="button" class="cancel-button" @click="closeAuditDetails">
+                        Close
+                    </button>
+
+                </div>
+
+            </div>
         </div>
 
     </MyFashionLayout>
@@ -1999,7 +1947,6 @@ const goToPage = (url) => {
 
 
 <style scoped>
-
 .inventory-page {
     padding: 10px;
 }
@@ -2056,7 +2003,7 @@ const goToPage = (url) => {
     padding: 16px;
     border-radius: 12px;
     margin-bottom: 20px;
-    box-shadow: 0 2px 10px rgba(0,0,0,.05);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
 }
 
 .search-box {
@@ -2106,7 +2053,7 @@ const goToPage = (url) => {
 .content-card {
     background: white;
     border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,.05);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
     overflow: hidden;
 }
 
@@ -2267,54 +2214,127 @@ td {
    AUDIT DETAILS MODAL
 ========================================================= */
 
+/* =========================================================
+   MODAL OVERLAY
+========================================================= */
+
 .modal-overlay {
     position: fixed;
     inset: 0;
-    z-index: 9999;
+
+    width: 100%;
+    height: 100%;
+
+    background: rgba(0, 0, 0, 0.65);
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    padding: 20px;
+    padding: 24px;
 
-    background: rgba(0, 0, 0, 0.55);
-}
-
-.audit-details-modal {
-    width: 100%;
-    max-width: 750px;
-    max-height: 90vh;
+    z-index: 9999;
 
     overflow-y: auto;
+}
+
+
+/* =========================================================
+   GENERAL MODAL
+========================================================= */
+
+.modal {
+    position: relative;
+
+    width: 100%;
+    max-width: 850px;
+
+    max-height: 90vh;
 
     background: #ffffff;
+
+    color: #1f2937;
+
     border-radius: 16px;
 
     box-shadow:
-        0 20px 50px rgba(0, 0, 0, 0.20);
+        0 25px 50px rgba(0, 0, 0, 0.25);
+
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
 }
 
-/* HEADER */
+
+/* =========================================================
+   AUDIT MODAL
+========================================================= */
+
+.audit-modal {
+    width: 100%;
+    max-width: 850px;
+
+    background: #ffffff;
+}
+
+
+/* =========================================================
+   STOCK MODAL
+========================================================= */
+
+.stock-modal {
+    position: relative;
+
+    width: 100%;
+    max-width: 600px;
+
+    max-height: 90vh;
+
+    background: #ffffff;
+
+    color: #1f2937;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 25px 50px rgba(0, 0, 0, 0.25);
+
+    overflow-y: auto;
+}
+
+
+/* =========================================================
+   MODAL HEADER
+========================================================= */
 
 .modal-header {
     display: flex;
-    align-items: flex-start;
+
+    align-items: center;
+
     justify-content: space-between;
 
-    padding: 24px;
+    gap: 20px;
 
-    border-bottom: 1px solid #eee;
+    padding: 20px 24px;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #e5e7eb;
 }
+
 
 .modal-header h2 {
     margin: 0;
 
-    font-size: 21px;
+    font-size: 20px;
+
     font-weight: 700;
 
     color: #111827;
 }
+
 
 .modal-header p {
     margin: 5px 0 0;
@@ -2324,50 +2344,689 @@ td {
     font-size: 14px;
 }
 
-.modal-close {
-    width: 34px;
-    height: 34px;
+
+.modal-header p span {
+    color: #9ca3af;
+}
+
+
+/* =========================================================
+   CLOSE BUTTON
+========================================================= */
+
+.close-button {
+    width: 38px;
+
+    height: 38px;
 
     border: none;
+
     border-radius: 8px;
 
     background: #f3f4f6;
 
-    color: #374151;
+    color: #4b5563;
 
-    font-size: 24px;
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
 
     cursor: pointer;
+
+    font-size: 18px;
+
+    flex-shrink: 0;
 }
 
-.modal-close:hover {
+
+.close-button:hover {
     background: #e5e7eb;
+
+    color: #111827;
 }
 
 
-/* CONTENT */
+/* =========================================================
+   MODAL BODY
+========================================================= */
 
-.audit-details-content {
+.modal-body {
     padding: 24px;
+
+    background: #ffffff;
 }
+
+
+/* =========================================================
+   AUDIT CONTENT
+========================================================= */
+
+.audit-content {
+    padding: 24px;
+
+    background: #ffffff;
+
+    overflow-y: auto;
+}
+
+
+/* =========================================================
+   AUDIT SECTION
+========================================================= */
 
 .audit-section {
-    margin-bottom: 25px;
+    margin-bottom: 24px;
 }
 
-.audit-section:last-child {
-    margin-bottom: 0;
-}
 
 .audit-section h3 {
-    margin: 0 0 14px;
+    margin: 0 0 16px;
 
-    font-size: 15px;
+    font-size: 16px;
+
     font-weight: 700;
 
     color: #111827;
 }
 
+
+/* =========================================================
+   PRODUCT DETAILS
+========================================================= */
+
+.product-details {
+    display: flex;
+
+    align-items: center;
+
+    gap: 16px;
+
+    padding: 16px;
+
+    background: #f9fafb;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 12px;
+}
+
+
+.product-details .product-image {
+    width: 70px;
+
+    height: 70px;
+
+    flex-shrink: 0;
+
+    border-radius: 10px;
+
+    overflow: hidden;
+
+    background: #f3f4f6;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+
+.product-details .product-image img {
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+}
+
+
+.no-image {
+    color: #9ca3af;
+
+    font-size: 12px;
+
+    text-align: center;
+}
+
+
+.product-information {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+
+.product-information strong {
+    font-size: 16px;
+
+    color: #111827;
+}
+
+
+.product-information span {
+    font-size: 13px;
+
+    color: #6b7280;
+}
+
+
+/* =========================================================
+   CURRENT STOCK
+========================================================= */
+
+.current-stock-box {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 16px;
+
+    margin-bottom: 20px;
+
+    background: #f9fafb;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 10px;
+}
+
+
+.current-stock-box span {
+    color: #6b7280;
+
+    font-size: 14px;
+}
+
+
+.current-stock-box strong {
+    font-size: 24px;
+
+    color: #111827;
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+
+.form-group label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    color: #374151;
+}
+
+
+.form-control {
+    width: 100%;
+
+    padding: 11px 13px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    color: #111827;
+
+    font-size: 14px;
+
+    outline: none;
+
+    box-sizing: border-box;
+}
+
+
+.form-control:focus {
+    border-color: #6366f1;
+
+    box-shadow:
+        0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+
+.form-error {
+    display: block;
+
+    margin-top: 6px;
+
+    color: #dc2626;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   NEW STOCK
+========================================================= */
+
+.new-stock-box {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 16px;
+
+    margin-top: 20px;
+
+    background: #f0fdf4;
+
+    border: 1px solid #bbf7d0;
+
+    border-radius: 10px;
+}
+
+
+.new-stock-box>div {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+}
+
+
+.new-stock-box span {
+    font-weight: 600;
+
+    color: #166534;
+}
+
+
+.new-stock-box small {
+    color: #4b5563;
+}
+
+
+.new-stock-box strong {
+    font-size: 24px;
+
+    color: #166534;
+}
+
+
+.new-stock-box.danger {
+    background: #fef2f2;
+
+    border-color: #fecaca;
+}
+
+
+.new-stock-box.danger span,
+.new-stock-box.danger strong {
+    color: #dc2626;
+}
+
+
+/* =========================================================
+   AUDIT HISTORY
+========================================================= */
+
+.audit-history {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 14px;
+}
+
+
+.audit-item {
+    padding: 18px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 12px;
+}
+
+
+.audit-item-header {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 16px;
+}
+
+
+.audit-item-header strong {
+    color: #111827;
+
+    font-size: 15px;
+}
+
+
+.audit-item-header span {
+    color: #6b7280;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   STOCK HISTORY
+========================================================= */
+
+.stock-history {
+    display: grid;
+
+    grid-template-columns: 1fr auto 1fr;
+
+    align-items: center;
+
+    gap: 16px;
+
+    margin-bottom: 18px;
+}
+
+
+.stock-box {
+    padding: 14px;
+
+    background: #f9fafb;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 10px;
+
+    text-align: center;
+}
+
+
+.stock-box span {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #6b7280;
+
+    font-size: 12px;
+}
+
+
+.stock-box strong {
+    display: block;
+
+    color: #111827;
+
+    font-size: 22px;
+}
+
+
+.movement-arrow {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-width: 70px;
+}
+
+
+.movement-arrow span {
+    font-size: 18px;
+
+    font-weight: 700;
+}
+
+
+.movement-arrow .positive {
+    color: #16a34a;
+}
+
+
+.movement-arrow .negative {
+    color: #dc2626;
+}
+
+
+.movement-arrow .neutral {
+    color: #6b7280;
+}
+
+
+/* =========================================================
+   AUDIT INFORMATION
+========================================================= */
+
+.audit-information-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 12px;
+
+    padding-top: 14px;
+
+    border-top: 1px solid #e5e7eb;
+}
+
+
+.audit-information-grid>div {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+}
+
+
+.audit-information-grid span {
+    color: #6b7280;
+
+    font-size: 12px;
+}
+
+
+.audit-information-grid strong {
+    color: #374151;
+
+    font-size: 14px;
+
+    word-break: break-word;
+}
+
+
+/* =========================================================
+   EMPTY AUDIT
+========================================================= */
+
+.empty-audit {
+    padding: 40px 20px;
+
+    text-align: center;
+
+    background: #f9fafb;
+
+    border: 1px dashed #d1d5db;
+
+    border-radius: 12px;
+
+    color: #6b7280;
+}
+
+
+.empty-audit .anticon {
+    display: block;
+
+    margin-bottom: 10px;
+
+    font-size: 32px;
+
+    color: #9ca3af;
+}
+
+
+.empty-audit p {
+    margin: 0;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.audit-loading {
+    padding: 60px 20px;
+
+    text-align: center;
+
+    background: #ffffff;
+
+    color: #6b7280;
+}
+
+
+.audit-loading p {
+    margin: 12px 0 0;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.modal-footer {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    padding: 16px 24px;
+
+    background: #ffffff;
+
+    border-top: 1px solid #e5e7eb;
+}
+
+
+.cancel-button {
+    padding: 10px 18px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    color: #374151;
+
+    cursor: pointer;
+
+    font-size: 14px;
+}
+
+
+.cancel-button:hover {
+    background: #f9fafb;
+}
+
+
+.submit-button {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    padding: 10px 18px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #111827;
+
+    color: #ffffff;
+
+    cursor: pointer;
+
+    font-size: 14px;
+}
+
+
+.submit-button:hover {
+    background: #374151;
+}
+
+
+.submit-button:disabled {
+    opacity: 0.5;
+
+    cursor: not-allowed;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .modal-overlay {
+        padding: 12px;
+    }
+
+    .modal,
+    .stock-modal,
+    .audit-modal {
+        max-height: 95vh;
+
+        border-radius: 12px;
+    }
+
+    .stock-history {
+        grid-template-columns: 1fr;
+    }
+
+    .movement-arrow {
+        transform: rotate(90deg);
+    }
+
+    .audit-information-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .product-details {
+        align-items: flex-start;
+    }
+
+}
 
 /* PRODUCT */
 
@@ -2504,7 +3163,7 @@ td {
     gap: 15px;
 }
 
-.audit-information-grid > div {
+.audit-information-grid>div {
     display: flex;
     flex-direction: column;
 
@@ -2824,7 +3483,7 @@ td {
     align-items: center;
     justify-content: center;
     padding: 20px;
-    background: rgba(0,0,0,.55);
+    background: rgba(0, 0, 0, .55);
 }
 
 .stock-modal {
@@ -2834,7 +3493,7 @@ td {
     overflow-y: auto;
     background: white;
     border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .25);
 }
 
 
@@ -3095,5 +3754,4 @@ td {
     }
 
 }
-
 </style>

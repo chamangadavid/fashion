@@ -5,6 +5,7 @@ namespace App\Http\Controllers\MyFashions;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\StockAdjustment;
+use App\Models\InventoryAudit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -150,6 +151,40 @@ class StockAdjustmentController extends Controller
                 'notes' => $validated['notes'] ?? null,
 
             ]);
+
+            /*
+            |--------------------------------------------------------------------------
+            | RECORD INVENTORY AUDIT
+            |--------------------------------------------------------------------------
+            */
+            
+            InventoryAudit::create([
+                'product_id' => $product->id,
+
+                'user_id' => Auth::id(),
+
+                'adjustment_type' => match ($validated['type']) {
+                    'add' => 'restock',
+                    'remove' => 'correction',
+                    'set' => 'correction',
+                    default => 'other',
+                },
+
+                'previous_quantity' => $previousQuantity,
+
+                'adjustment_quantity' => match ($validated['type']) {
+                    'add' => $validated['quantity'],
+                    'remove' => -$validated['quantity'],
+                    'set' => $validated['quantity'] - $previousQuantity,
+                },
+
+                'new_quantity' => $newQuantity,
+
+                'reason' => $validated['reason'],
+
+                'notes' => $validated['notes'] ?? null,
+            ]);
+
         });
 
 

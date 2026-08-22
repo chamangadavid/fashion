@@ -1,3 +1,4 @@
+<!-- resources\js\Pages\Site\Collections\Index.vue -->
 <script setup>
 import { Head, Link } from "@inertiajs/vue3";
 import Header from "@/Components/Header.vue";
