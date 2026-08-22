@@ -64,15 +64,20 @@ use HasFactory;
     }
 
     public function collections(): BelongsToMany
-{
-    return $this->belongsToMany(
-        Collection::class,
-        'collection_product'
-    )
-    ->withPivot('sort_order')
-    ->withTimestamps();
-}
+    {
+        return $this->belongsToMany(
+            Collection::class,
+            'collection_product'
+        )
+        ->withPivot('sort_order')
+        ->withTimestamps();
+    }
 
+
+    public function orderItems(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
+    }
     /*
     |--------------------------------------------------------------------------
     | AUTOMATIC SLUG

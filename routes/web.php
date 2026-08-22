@@ -18,6 +18,7 @@ use App\Http\Controllers\MyFashions\FashionSettingsController;
 use App\Http\Controllers\MyFashions\ProductCategoryController;
 use App\Http\Controllers\MyFashions\StockAdjustmentController;
 use App\Http\Controllers\MyFashions\InventoryAuditController;
+use App\Http\Controllers\MyFashions\CheckoutController;
 use App\Http\Controllers\MyFashions\CartController;
 use App\Http\Controllers\ShopController;
 use Illuminate\Foundation\Application;
@@ -93,13 +94,9 @@ Route::get('/shop/{slug}', [ShopController::class, 'category'])->name('shop.cate
 */
 
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-
 Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
-
 Route::put('/cart/{product}', [CartController::class, 'update'])->name('cart.update');
-
 Route::delete('/cart/{product}', [CartController::class, 'remove'])->name('cart.remove');
-
 Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
 
 
@@ -236,6 +233,17 @@ Route::middleware('auth')->group(function () {
 
 
 
+      /*
+        |--------------------------------------------------------------------------
+        | CHECKOUT-allowing checkout only for authenticated customers:
+        |--------------------------------------------------------------------------
+        */
+
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+
+    Route::post('/checkout', [OrderController::class, 'store'])->name('checkout.store');
+    Route::get('/checkout/confirmation/{order}', [OrderController::class, 'confirmation'])->name('checkout.confirmation');
+
 
     /*
 |--------------------------------------------------------------------------
@@ -333,7 +341,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/customers', [CustomerController::class, 'index'])->name('fashion.customers.index');
         Route::get('/customers/groups', [CustomerController::class, 'groups'])->name('fashion.customers.groups');
         Route::get('/customers/vip', [CustomerController::class, 'vip'])->name('fashion.customers.vip');
-
 
         /*
         |--------------------------------------------------------------------------

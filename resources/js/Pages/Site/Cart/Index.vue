@@ -260,9 +260,16 @@ const clearBag = () => {
                         CLEAR BAG
                     </button>
 
-                    <button class="checkout-button">
+                    <!-- <button class="checkout-button">
+                        PROCEED TO CHECKOUT
+                    </button> -->
+
+                  <Link href="/checkout">
+                        <!-- PROCEED TO CHECKOUT -->
+                        <button class="checkout-button">
                         PROCEED TO CHECKOUT
                     </button>
+                    </Link>
 
 
                     <Link
