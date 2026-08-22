@@ -18,6 +18,7 @@ use App\Http\Controllers\MyFashions\FashionSettingsController;
 use App\Http\Controllers\MyFashions\ProductCategoryController;
 use App\Http\Controllers\MyFashions\StockAdjustmentController;
 use App\Http\Controllers\MyFashions\InventoryAuditController;
+use App\Http\Controllers\MyFashions\CartController;
 use App\Http\Controllers\ShopController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -64,12 +65,42 @@ Route::get('/dashboard', function () {
 */
 
 //Collection Api
-Route::get('/collections', function () {
-    return Inertia::render('Site/Collections/Index');
-})->name('collections.index');
+// Route::get('/collections', function () {
+//     return Inertia::render('Site/Collections/Index');
+// })->name('collections.index');
 
+
+Route::get('/collections', [CollectionController::class, 'publicIndex'])->name('collections.index');
+Route::get('/collections/{collection:slug}', [CollectionController::class, 'publicShow'])->name('collections.show');
+Route::get('/products/{product:slug}', [ProductController::class, 'publicShow'])->name('products.show');
 
 Route::get('/shop/{slug}', [ShopController::class, 'category'])->name('shop.category');
+
+
+
+
+
+
+
+
+
+
+//public 
+/*
+|--------------------------------------------------------------------------
+| SHOPPING CART
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+
+Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
+
+Route::put('/cart/{product}', [CartController::class, 'update'])->name('cart.update');
+
+Route::delete('/cart/{product}', [CartController::class, 'remove'])->name('cart.remove');
+
+Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
 
 
 
@@ -128,15 +159,6 @@ Route::get('/press-releases', function () {
 Route::get('/announcement', function () {
     return Inertia::render('Site/Announcements');
 })->name('announcementsPage');
-
-//details page for management team members
-// Route::get('/management-team/{id}', function ($id) {
-//     $member = Team::findOrFail($id);
-
-//     return Inertia::render('Site/ManagementTeamDetails', [
-//         'member' => $member
-//     ]);
-// });
 
 
 //public
@@ -221,170 +243,133 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('fashion')->group(function () {
+    Route::prefix('fashion')->group(function () {
+        
+        /*
+        |--------------------------------------------------------------------------
+        | ORDERS
+        |--------------------------------------------------------------------------
+        */
 
+        Route::get('/orders', [OrderController::class, 'index'])->name('fashion.orders.index');
+        Route::get('/orders/pending', [OrderController::class, 'pending'])->name('fashion.orders.pending');
+        Route::get('/orders/processing', [OrderController::class, 'processing'])->name('fashion.orders.processing');
+        Route::get('/orders/completed', [OrderController::class, 'completed'])->name('fashion.orders.completed');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | PRODUCTS
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/products', [ProductController::class, 'index'])->name('fashion.products.index');
+        Route::get('/products/create', [ProductController::class, 'create'])->name('fashion.products.create');
+        Route::post('/products/store', [ProductController::class, 'store'])->name('store');
+        Route::get('/products/categories', [ProductController::class, 'categories'])->name('fashion.products.categories');
+        Route::get('/products/inventory', [ProductController::class, 'inventory'])->name('fashion.products.inventory');
+        Route::get('/products/{product}', [ProductController::class, 'show'])->name('show');
+        Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('edit');
+        Route::put('/products/{product}', [ProductController::class, 'update'])->name('update');
+        Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('destroy');
+        Route::post('/products/{product}/stock-adjustment', [StockAdjustmentController::class, 'store'])->name('fashion.products.stock-adjustment');
+        Route::get('/products/inventory/audit', [InventoryAuditController::class, 'index'])->name('fashion.products.inventory.audit');
+        Route::get('/products/inventory/audit/product/{product}', [InventoryAuditController::class, 'productAuditDetails'])->name('fashion.products.inventory.audit.product');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | COLLECTIONS
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/collections', [CollectionController::class, 'index'])->name('fashion.collections.index');
+        Route::get('/collections/create', [CollectionController::class, 'create'])->name('fashion.collections.create');
+        Route::post('/collections/store', [CollectionController::class, 'store'])->name('store');
+        Route::get('/collections/featured', [CollectionController::class, 'featured'])->name('fashion.collections.featured');
+
+        /*
+        |--------------------------------------------------------------------------
+        | COLLECTION PRODUCTS
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/collections/{collection}/products', [CollectionController::class, 'products'])->name('products');
+        Route::post('/collections/{collection}/products', [CollectionController::class, 'assignProducts'])->name('products.assign');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | COLLECTION CRUD
+        |--------------------------------------------------------------------------
+        */
+        Route::patch( '/collections/{collection}/toggle-featured', [CollectionController::class, 'toggleFeatured'])->name('fashion.collections.toggle-featured');
+        Route::get('/collections/{collection}', [CollectionController::class, 'show'])->name('show');
+        Route::get('/collections/{collection}/edit', [CollectionController::class, 'edit'])->name('edit');
+        Route::put('/collections/{collection}', [CollectionController::class, 'update'])->name('update');
+        Route::delete('/collections/{collection}', [CollectionController::class, 'destroy'])->name('destroy');
+    
     /*
-    |--------------------------------------------------------------------------
-    | DASHBOARD
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | PRODUCT CATEGORIES
+        |--------------------------------------------------------------------------
+        */
 
-    // Route::get('/', [DashboardController::class,
-    //     'fashionDashboard'
-    // ])->name('fashion.index');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | ORDERS
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get('/orders', [OrderController::class, 'index'])->name('fashion.orders.index');
-    Route::get('/orders/pending', [OrderController::class, 'pending'])->name('fashion.orders.pending');
-    Route::get('/orders/processing', [OrderController::class, 'processing'])->name('fashion.orders.processing');
-    Route::get('/orders/completed', [OrderController::class, 'completed'])->name('fashion.orders.completed');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | PRODUCTS
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get('/products', [ProductController::class, 'index'])->name('fashion.products.index');
-    Route::get('/products/create', [ProductController::class, 'create'])->name('fashion.products.create');
-    Route::post('/products/store', [ProductController::class, 'store'])->name('store');
-    Route::get('/products/categories', [ProductController::class, 'categories'])->name('fashion.products.categories');
-    Route::get('/products/inventory', [ProductController::class, 'inventory'])->name('fashion.products.inventory');
-    Route::get('/products/{product}', [ProductController::class, 'show'])->name('show');
-    Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('edit');
-    Route::put('/products/{product}', [ProductController::class, 'update'])->name('update');
-    Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('destroy');
-    Route::post('/products/{product}/stock-adjustment', [StockAdjustmentController::class, 'store'])->name('fashion.products.stock-adjustment');
-    Route::get('/products/inventory/audit', [InventoryAuditController::class, 'index'])->name('fashion.products.inventory.audit');
-    Route::get('/products/inventory/audit/product/{product}', [InventoryAuditController::class, 'productAuditDetails'])->name('fashion.products.inventory.audit.product');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | COLLECTIONS
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get('/collections', [CollectionController::class, 'index'])->name('fashion.collections.index');
-    Route::get('/collections/create', [CollectionController::class, 'create'])->name('fashion.collections.create');
-    Route::post('/collections/store', [CollectionController::class, 'store'])->name('store');
-    Route::get('/collections/featured', [CollectionController::class, 'featured'])->name('fashion.collections.featured');
-
-/*
-|--------------------------------------------------------------------------
-| COLLECTION PRODUCTS
-|--------------------------------------------------------------------------
-*/
-
-Route::get(
-    '/collections/{collection}/products',
-    [CollectionController::class, 'products']
-)->name('products');
-
-Route::post(
-    '/collections/{collection}/products',
-    [CollectionController::class, 'assignProducts']
-)->name('products.assign');
-
-
-/*
-|--------------------------------------------------------------------------
-| COLLECTION CRUD
-|--------------------------------------------------------------------------
-*/
-Route::patch( '/collections/{collection}/toggle-featured', [CollectionController::class, 'toggleFeatured'])->name('fashion.collections.toggle-featured');
-
-
-Route::get('/collections/{collection}', [CollectionController::class, 'show'])->name('show');
-
-Route::get('/collections/{collection}/edit', [CollectionController::class, 'edit'])->name('edit');
-
-Route::put('/collections/{collection}', [CollectionController::class, 'update'])->name('update');
-
-Route::delete('/collections/{collection}', [CollectionController::class, 'destroy'])->name('destroy');
+        Route::get('/products/categories', [ProductCategoryController::class, 'index'])->name('fashion.products.categories');
+        Route::post('/products/categories', [ProductCategoryController::class, 'store'])->name('fashion.products.categories.store');
+        Route::put('/products/categories/{category}', [ProductCategoryController::class, 'update'])->name('fashion.products.categories.update');
+        Route::delete('/products/categories/{category}', [ProductCategoryController::class, 'destroy'])->name('fashion.products.categories.destroy');
+        Route::patch('/products/categories/{category}/toggle-status', [ProductCategoryController::class, 'toggleStatus'])->name('fashion.products.categories.toggle-status');
+        Route::patch('/products/categories/{category}/toggle-featured', [ProductCategoryController::class, 'toggleFeatured'])->name('fashion.products.categories.toggle-featured');
 
 
 
-    // Route::get('/collections', [CollectionController::class, 'index'])->name('fashion.collections.index');
-    // Route::get('/collections/create', [CollectionController::class, 'create'])->name('fashion.collections.create');
-    // Route::post('/collections/store', [CollectionController::class, 'store'])->name('store');
-    // Route::get('/collections/featured', [CollectionController::class, 'featured'])->name('fashion.collections.featured');
-    // Route::get('/collections/{collection}/products', [CollectionController::class, 'products'])->name('products');
-    // Route::post('/collections/{collection}/products', [CollectionController::class, 'assignProducts'])->name('products.assign');
-    // Route::get('/collections/{collection}', [CollectionController::class, 'show'])->name('show');
-    // Route::get('/collections/{collection}/edit', [CollectionController::class, 'edit'])->name('edit');
-    // Route::put('/collections/{collection}', [CollectionController::class, 'update'])->name('update');
-    // Route::delete('/collections/{collection}', [CollectionController::class, 'destroy'])->name('destroy');
-  
-  
-   /*
-    |--------------------------------------------------------------------------
-    | PRODUCT CATEGORIES
-    |--------------------------------------------------------------------------
-    */
+        /*
+        |--------------------------------------------------------------------------
+        | CUSTOMERS
+        |--------------------------------------------------------------------------
+        */
 
-    Route::get('/products/categories', [ProductCategoryController::class, 'index'])->name('fashion.products.categories');
-    Route::post('/products/categories', [ProductCategoryController::class, 'store'])->name('fashion.products.categories.store');
-    Route::put('/products/categories/{category}', [ProductCategoryController::class, 'update'])->name('fashion.products.categories.update');
-    Route::delete('/products/categories/{category}', [ProductCategoryController::class, 'destroy'])->name('fashion.products.categories.destroy');
-    Route::patch('/products/categories/{category}/toggle-status', [ProductCategoryController::class, 'toggleStatus'])->name('fashion.products.categories.toggle-status');
-    Route::patch('/products/categories/{category}/toggle-featured', [ProductCategoryController::class, 'toggleFeatured'])->name('fashion.products.categories.toggle-featured');
+        Route::get('/customers', [CustomerController::class, 'index'])->name('fashion.customers.index');
+        Route::get('/customers/groups', [CustomerController::class, 'groups'])->name('fashion.customers.groups');
+        Route::get('/customers/vip', [CustomerController::class, 'vip'])->name('fashion.customers.vip');
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | REPORTS
+        |--------------------------------------------------------------------------
+        */
 
-    /*
-    |--------------------------------------------------------------------------
-    | CUSTOMERS
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get('/customers', [CustomerController::class, 'index'])->name('fashion.customers.index');
-    Route::get('/customers/groups', [CustomerController::class, 'groups'])->name('fashion.customers.groups');
-    Route::get('/customers/vip', [CustomerController::class, 'vip'])->name('fashion.customers.vip');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | REPORTS
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get('/reports/sales', [ReportController::class, 'sales'])->name('fashion.reports.sales');
-    Route::get('/reports/products', [ReportController::class, 'products'])->name('fashion.reports.products');
-    Route::get('/reports/customers', [ReportController::class, 'customers'])->name('fashion.reports.customers');
-    Route::get('/reports/revenue', [ReportController::class, 'revenue'])->name('fashion.reports.revenue');
+        Route::get('/reports/sales', [ReportController::class, 'sales'])->name('fashion.reports.sales');
+        Route::get('/reports/products', [ReportController::class, 'products'])->name('fashion.reports.products');
+        Route::get('/reports/customers', [ReportController::class, 'customers'])->name('fashion.reports.customers');
+        Route::get('/reports/revenue', [ReportController::class, 'revenue'])->name('fashion.reports.revenue');
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | USERS
-    |--------------------------------------------------------------------------
-    */
+        /*
+        |--------------------------------------------------------------------------
+        | USERS
+        |--------------------------------------------------------------------------
+        */
 
-    Route::get('/users', [FashionUserController::class, 'index'])->name('fashion.users.index');
-    Route::get('/users/create', [FashionUserController::class, 'create'])->name('fashion.users.create');
-    Route::get('/users/roles', [FashionUserController::class, 'roles'])->name('fashion.users.roles');
+        Route::get('/users', [FashionUserController::class, 'index'])->name('fashion.users.index');
+        Route::get('/users/create', [FashionUserController::class, 'create'])->name('fashion.users.create');
+        Route::get('/users/roles', [FashionUserController::class, 'roles'])->name('fashion.users.roles');
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | SETTINGS
-    |--------------------------------------------------------------------------
-    */
+        /*
+        |--------------------------------------------------------------------------
+        | SETTINGS
+        |--------------------------------------------------------------------------
+        */
 
-    Route::get('/settings', [FashionSettingsController::class, 'index'])->name('fashion.settings.index');
-    Route::get('/settings/store', [FashionSettingsController::class, 'store'])->name('fashion.settings.store');
-    Route::get('/settings/payments', [FashionSettingsController::class, 'payments'])->name('fashion.settings.payments');
-    Route::get('/settings/shipping', [FashionSettingsController::class, 'shipping'])->name('fashion.settings.shipping');
+        Route::get('/settings', [FashionSettingsController::class, 'index'])->name('fashion.settings.index');
+        Route::get('/settings/store', [FashionSettingsController::class, 'store'])->name('fashion.settings.store');
+        Route::get('/settings/payments', [FashionSettingsController::class, 'payments'])->name('fashion.settings.payments');
+        Route::get('/settings/shipping', [FashionSettingsController::class, 'shipping'])->name('fashion.settings.shipping');
 
-});
+    });
 
 
 

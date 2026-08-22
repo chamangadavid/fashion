@@ -483,175 +483,219 @@ class ProductController extends Controller
     // }
 
     public function inventory(Request $request)
-{
-    $query = Product::with('category')
-        ->orderBy('name');
+    {
+        $query = Product::with('category')
+            ->orderBy('name');
 
-    /*
-    |--------------------------------------------------------------------------
-    | SEARCH
-    |--------------------------------------------------------------------------
-    */
+        /*
+        |--------------------------------------------------------------------------
+        | SEARCH
+        |--------------------------------------------------------------------------
+        */
 
-    if ($request->filled('search')) {
+        if ($request->filled('search')) {
 
-        $search = $request->search;
+            $search = $request->search;
 
-        $query->where(function ($q) use ($search) {
+            $query->where(function ($q) use ($search) {
 
-            $q->where('name', 'like', "%{$search}%")
-                ->orWhere('sku', 'like', "%{$search}%");
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('sku', 'like', "%{$search}%");
 
-        });
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CATEGORY FILTER
-    |--------------------------------------------------------------------------
-    */
-
-    if ($request->filled('category_id')) {
-
-        $query->where(
-            'product_category_id',
-            $request->category_id
-        );
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | STOCK STATUS FILTER
-    |--------------------------------------------------------------------------
-    */
-
-    if ($request->filled('stock_status')) {
-
-        switch ($request->stock_status) {
-
-            case 'in_stock':
-
-                $query->where(
-                    'stock_quantity',
-                    '>',
-                    0
-                );
-
-                break;
-
-
-            case 'low_stock':
-
-                $query->whereColumn(
-                    'stock_quantity',
-                    '<=',
-                    'low_stock_threshold'
-                )
-                ->where(
-                    'stock_quantity',
-                    '>',
-                    0
-                );
-
-                break;
-
-
-            case 'out_of_stock':
-
-                $query->where(
-                    'stock_quantity',
-                    '<=',
-                    0
-                );
-
-                break;
+            });
 
         }
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | CATEGORY FILTER
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->filled('category_id')) {
+
+            $query->where(
+                'product_category_id',
+                $request->category_id
+            );
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | STOCK STATUS FILTER
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->filled('stock_status')) {
+
+            switch ($request->stock_status) {
+
+                case 'in_stock':
+
+                    $query->where(
+                        'stock_quantity',
+                        '>',
+                        0
+                    );
+
+                    break;
+
+
+                case 'low_stock':
+
+                    $query->whereColumn(
+                        'stock_quantity',
+                        '<=',
+                        'low_stock_threshold'
+                    )
+                    ->where(
+                        'stock_quantity',
+                        '>',
+                        0
+                    );
+
+                    break;
+
+
+                case 'out_of_stock':
+
+                    $query->where(
+                        'stock_quantity',
+                        '<=',
+                        0
+                    );
+
+                    break;
+
+            }
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | PAGINATION
+        |--------------------------------------------------------------------------
+        */
+
+        $products = $query
+            ->paginate(15)
+            ->withQueryString();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CATEGORIES
+        |--------------------------------------------------------------------------
+        */
+
+        $categories = ProductCategory::where(
+            'is_active',
+            true
+        )
+        ->orderBy('name')
+        ->get();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | INVENTORY SUMMARY
+        |--------------------------------------------------------------------------
+        */
+
+        $totalProducts = Product::count();
+
+        $totalStock = Product::sum(
+            'stock_quantity'
+        );
+
+        $lowStockProducts = Product::whereColumn(
+            'stock_quantity',
+            '<=',
+            'low_stock_threshold'
+        )
+        ->where(
+            'stock_quantity',
+            '>',
+            0
+        )
+        ->count();
+
+        $outOfStockProducts = Product::where(
+            'stock_quantity',
+            '<=',
+            0
+        )->count();
+
+
+        return Inertia::render(
+            'MyFashions/Products/Inventory',
+            [
+                'products' => $products,
+
+                'categories' => $categories,
+
+                'filters' => [
+                    'search' => $request->search,
+                    'category_id' => $request->category_id,
+                    'stock_status' => $request->stock_status,
+                ],
+
+                'summary' => [
+                    'total_products' => $totalProducts,
+                    'total_stock' => $totalStock,
+                    'low_stock' => $lowStockProducts,
+                    'out_of_stock' => $outOfStockProducts,
+                ],
+            ]
+        );
     }
 
+public function publicShow(Product $product)
+{
+    $product->load('category');
 
-    /*
-    |--------------------------------------------------------------------------
-    | PAGINATION
-    |--------------------------------------------------------------------------
-    */
+    return Inertia::render('Site/Products/Show', [
+        'product' => [
+            'id' => $product->id,
 
-    $products = $query
-        ->paginate(15)
-        ->withQueryString();
+            'name' => $product->name,
 
+            'slug' => $product->slug,
 
-    /*
-    |--------------------------------------------------------------------------
-    | CATEGORIES
-    |--------------------------------------------------------------------------
-    */
+            'sku' => $product->sku,
 
-    $categories = ProductCategory::where(
-        'is_active',
-        true
-    )
-    ->orderBy('name')
-    ->get();
+            'description' => $product->description,
 
+            'price' => $product->price,
 
-    /*
-    |--------------------------------------------------------------------------
-    | INVENTORY SUMMARY
-    |--------------------------------------------------------------------------
-    */
+            'sale_price' => $product->sale_price,
 
-    $totalProducts = Product::count();
+            'cost_price' => $product->cost_price,
 
-    $totalStock = Product::sum(
-        'stock_quantity'
-    );
+            'stock_quantity' => $product->stock_quantity,
 
-    $lowStockProducts = Product::whereColumn(
-        'stock_quantity',
-        '<=',
-        'low_stock_threshold'
-    )
-    ->where(
-        'stock_quantity',
-        '>',
-        0
-    )
-    ->count();
+            'image' => $product->image
+                ? asset('storage/' . $product->image)
+                : null,
 
-    $outOfStockProducts = Product::where(
-        'stock_quantity',
-        '<=',
-        0
-    )->count();
+            'is_active' => (bool) $product->is_active,
 
+            'is_featured' => (bool) $product->is_featured,
 
-    return Inertia::render(
-        'MyFashions/Products/Inventory',
-        [
-            'products' => $products,
-
-            'categories' => $categories,
-
-            'filters' => [
-                'search' => $request->search,
-                'category_id' => $request->category_id,
-                'stock_status' => $request->stock_status,
-            ],
-
-            'summary' => [
-                'total_products' => $totalProducts,
-                'total_stock' => $totalStock,
-                'low_stock' => $lowStockProducts,
-                'out_of_stock' => $outOfStockProducts,
-            ],
-        ]
-    );
+            'category' => $product->category
+                ? [
+                    'id' => $product->category->id,
+                    'name' => $product->category->name,
+                    'slug' => $product->category->slug,
+                ]
+                : null,
+        ],
+    ]);
 }
+
 
 }

@@ -1,6 +1,9 @@
 <!-- resources\js\Components\Header.vue -->
 <script setup>
-import { Link } from "@inertiajs/vue3";
+
+import { Link, usePage } from "@inertiajs/vue3";
+import { computed } from "vue";
+
 import { Tooltip } from "ant-design-vue";
 
 import {
@@ -16,10 +19,18 @@ import {
 } from "@ant-design/icons-vue";
 
 
+const page = usePage();
+
+const cartCount = computed(() => {
+    return Number(page.props.cartCount ?? 0);
+});
+
+
 defineProps({
     canLogin: Boolean,
     canRegister: Boolean,
 });
+
 </script>
 
 <template>
@@ -120,8 +131,16 @@ defineProps({
 
                 <a-tooltip title="Shopping Cart" placement="bottom">
 
-                    <Link href="/cart" class="header-icon" aria-label="Shopping Cart">
+                    <!-- <Link href="/cart" class="header-icon" aria-label="Shopping Cart">
                         <ShoppingOutlined />
+                    </Link> -->
+
+                    <Link href="/cart" class="header-icon cart-icon" aria-label="Shopping Cart">
+                        <ShoppingOutlined />
+
+                        <span v-if="cartCount > 0" class="cart-badge">
+                            {{ cartCount > 99 ? '99+' : cartCount }}
+                        </span>
                     </Link>
 
                 </a-tooltip>
@@ -129,38 +148,6 @@ defineProps({
             </div>
 
         </div>
-
-        <!-- ============================= -->
-        <!-- NAVIGATION -->
-        <!-- ============================= -->
-
-        <!-- <nav class="navigation">
-
-            <Link href="/">
-                HOME
-            </Link>
-
-            <Link href="#about">
-                ABOUT US
-            </Link>
-
-            <Link href="#products">
-                PRODUCTS
-            </Link>
-
-            <Link href="#farming">
-                OUR FARM
-            </Link>
-
-            <Link href="#news">
-                NEWS
-            </Link>
-
-            <Link href="#contact">
-                CONTACT
-            </Link>
-
-        </nav> -->
 
         <!-- ============================= -->
         <!-- NAVIGATION -->
@@ -422,6 +409,39 @@ defineProps({
 
 }
 
+/* Cart */
+.cart-icon {
+    position: relative;
+}
+
+.cart-badge {
+    position: absolute;
+
+    top: -7px;
+    right: -9px;
+
+    min-width: 16px;
+    height: 16px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 4px;
+
+    border-radius: 999px;
+
+    background: #075c59;
+
+    color: #fff;
+
+    font-size: 7px;
+
+    font-weight: 600;
+
+    line-height: 1;
+}
 
 /* =========================================
    NAVIGATION

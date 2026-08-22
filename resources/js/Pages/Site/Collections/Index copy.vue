@@ -6,13 +6,6 @@ import AppFooter from "@/Components/AppFooter.vue";
 import PaymentMethods from "@/Components/PaymentMethods.vue";
 
 
-const props = defineProps({
-    collections: {
-        type: Array,
-        default: () => [],
-    },
-});
-
 // =====================================================
 // COLLECTION CATEGORIES
 // =====================================================
@@ -45,191 +38,189 @@ const categories = [
 // COLLECTIONS
 // =====================================================
 
-// const collections = [
-//     {
-//         id: 1,
-//         category: "women",
-//         title: "The Women's Edit",
-//         subtitle: "Effortless silhouettes, timeless pieces and contemporary styles designed for every moment.",
-//         image: "/assets/collections/women/womens-main.png",
-//         href: "/clothing/women",
-//         featured: true,
+const collections = [
+    {
+        id: 1,
+        category: "women",
+        title: "The Women's Edit",
+        subtitle: "Effortless silhouettes, timeless pieces and contemporary styles designed for every moment.",
+        image: "/assets/collections/women/womens-main.png",
+        href: "/clothing/women",
+        featured: true,
 
-//         items: [
-//             {
-//                 title: "Dresses",
-//                 image: "/assets/collections/women/dresses.jpg", 
-//                 href: "/shop/dresses",
-//                 // href: "/clothing/women/dresses",
-//             },
+        items: [
+            {
+                title: "Dresses",
+                image: "/assets/collections/women/dresses.jpg", 
+                href: "/shop/dresses",
+                // href: "/clothing/women/dresses",
+            },
 
-//             {
-//                 title: "Tops & Blouses",
-//                 image:
-//                     "/assets/collections/women/tops.jpg",
-//                 href: "/clothing/women/tops",
-//             },
+            {
+                title: "Tops & Blouses",
+                image:
+                    "/assets/collections/women/tops.jpg",
+                href: "/clothing/women/tops",
+            },
 
-//             {
-//                 title: "Sets & Co-ords",
-//                 image:
-//                     "/assets/collections/women/sets.jpg",
-//                 href: "/clothing/women/sets",
-//             },
+            {
+                title: "Sets & Co-ords",
+                image:
+                    "/assets/collections/women/sets.jpg",
+                href: "/clothing/women/sets",
+            },
 
-//             {
-//                 title: "Denim",
-//                 image:
-//                     "/assets/collections/women/denim.jpg",
-//                 href: "/clothing/denim",
-//             },
-//         ],
-//     },
+            {
+                title: "Denim",
+                image:
+                    "/assets/collections/women/denim.jpg",
+                href: "/clothing/denim",
+            },
+        ],
+    },
 
-//     {
-//         id: 2,
-//         category: "men",
+    {
+        id: 2,
+        category: "men",
 
-//         title: "The Men's Collection",
+        title: "The Men's Collection",
 
-//         subtitle:
-//             "Modern essentials, refined tailoring and everyday pieces created for confident style.",
+        subtitle:
+            "Modern essentials, refined tailoring and everyday pieces created for confident style.",
 
-//         image:
-//             "/assets/collections/men/mens-main.jpg",
+        image:
+            "/assets/collections/men/mens-main.jpg",
 
-//         href: "/clothing/men",
+        href: "/clothing/men",
 
-//         featured: true,
+        featured: true,
 
-//         items: [
-//             {
-//                 title: "Jackets",
-//                 image:
-//                     "/assets/collections/men/jackets.jpg",
-//                 href: "/men/jackets",
-//             },
-//             {
-//                 title: "Shirts",
-//                 image:
-//                     "/assets/collections/men/shirts.jpg",
-//                 href: "/men/shirts",
-//             },
+        items: [
+            {
+                title: "Jackets",
+                image:
+                    "/assets/collections/men/jackets.jpg",
+                href: "/men/jackets",
+            },
+            {
+                title: "Shirts",
+                image:
+                    "/assets/collections/men/shirts.jpg",
+                href: "/men/shirts",
+            },
 
-//             {
-//                 title: "T-Shirts",
-//                 image:
-//                     "/assets/collections/men/tshirts.jpg",
-//                 href: "/men/t-shirts",
-//             },
+            {
+                title: "T-Shirts",
+                image:
+                    "/assets/collections/men/tshirts.jpg",
+                href: "/men/t-shirts",
+            },
 
-//             {
-//                 title: "Trousers",
-//                 image:
-//                     "/assets/collections/men/trousers.jpg",
-//                 href: "/men/trousers",
-//             },
+            {
+                title: "Trousers",
+                image:
+                    "/assets/collections/men/trousers.jpg",
+                href: "/men/trousers",
+            },
 
             
-//         ],
-//     },
+        ],
+    },
 
-//     {
-//         id: 3,
-//         category: "accessories",
+    {
+        id: 3,
+        category: "accessories",
 
-//         title: "Accessories",
+        title: "Accessories",
 
-//         subtitle:
-//             "Complete your look with carefully selected accessories that make every outfit memorable.",
+        subtitle:
+            "Complete your look with carefully selected accessories that make every outfit memorable.",
 
-//         image:
-//             "/assets/collections/accessories/accessories-main.jpg",
+        image:
+            "/assets/collections/accessories/accessories-main.jpg",
 
-//         href: "/accessories",
+        href: "/accessories",
 
-//         featured: true,
+        featured: true,
 
-//         items: [
-//             {
-//                 title: "Handbags",
-//                 image:
-//                     "/assets/collections/accessories/handbags.jpg",
-//                 href: "/accessories/handbags",
-//             },
+        items: [
+            {
+                title: "Handbags",
+                image:
+                    "/assets/collections/accessories/handbags.jpg",
+                href: "/accessories/handbags",
+            },
 
-//             {
-//                 title: "Shoes",
-//                 image:
-//                     "/assets/collections/accessories/shoes.jpg",
-//                 href: "/accessories/shoes",
-//             },
+            {
+                title: "Shoes",
+                image:
+                    "/assets/collections/accessories/shoes.jpg",
+                href: "/accessories/shoes",
+            },
 
-//             {
-//                 title: "Jewellery",
-//                 image:
-//                     "/assets/collections/accessories/jewellery.jpg",
-//                 href: "/accessories/jewellery",
-//             },
+            {
+                title: "Jewellery",
+                image:
+                    "/assets/collections/accessories/jewellery.jpg",
+                href: "/accessories/jewellery",
+            },
 
-//             {
-//                 title: "Sunglasses",
-//                 image:
-//                     "/assets/collections/accessories/sunglasses.jpg",
-//                 href: "/accessories/sunglasses",
-//             },
-//         ],
-//     },
+            {
+                title: "Sunglasses",
+                image:
+                    "/assets/collections/accessories/sunglasses.jpg",
+                href: "/accessories/sunglasses",
+            },
+        ],
+    },
 
-//     {
-//         id: 4,
-//         category: "beauty",
+    {
+        id: 4,
+        category: "beauty",
 
-//         title: "Beauty & Fragrance",
+        title: "Beauty & Fragrance",
 
-//         subtitle:
-//             "Discover fragrances, body care and beauty essentials created to complement your personal style.",
+        subtitle:
+            "Discover fragrances, body care and beauty essentials created to complement your personal style.",
 
-//         image:
-//             "/assets/collections/beauty/beauty-main.jpg",
+        image:
+            "/assets/collections/beauty/beauty-main.jpg",
 
-//         href: "/accessories/beauty",
+        href: "/accessories/beauty",
 
-//         featured: true,
+        featured: true,
 
-//         items: [
-//             {
-//                 title: "Ladies' Perfumes",
-//                 image:
-//                     "/assets/collections/beauty/ladies-perfume.jpg",
-//                 href: "/accessories/perfumes/ladies",
-//             },
+        items: [
+            {
+                title: "Ladies' Perfumes",
+                image:
+                    "/assets/collections/beauty/ladies-perfume.jpg",
+                href: "/accessories/perfumes/ladies",
+            },
 
-//             {
-//                 title: "Men's Perfumes",
-//                 image:
-//                     "/assets/collections/beauty/mens-perfume.jpg",
-//                 href: "/accessories/perfumes/men",
-//             },
+            {
+                title: "Men's Perfumes",
+                image:
+                    "/assets/collections/beauty/mens-perfume.jpg",
+                href: "/accessories/perfumes/men",
+            },
 
-//             {
-//                 title: "Body Lotions",
-//                 image:
-//                     "/assets/collections/beauty/lotions.jpg",
-//                 href: "/accessories/lotions",
-//             },
+            {
+                title: "Body Lotions",
+                image:
+                    "/assets/collections/beauty/lotions.jpg",
+                href: "/accessories/lotions",
+            },
 
-//             {
-//                 title: "Beauty Essentials",
-//                 image:
-//                     "/assets/collections/beauty/essentials.jpg",
-//                 href: "/accessories/beauty",
-//             },
-//         ],
-//     },
-// ];
-
-
+            {
+                title: "Beauty Essentials",
+                image:
+                    "/assets/collections/beauty/essentials.jpg",
+                href: "/accessories/beauty",
+            },
+        ],
+    },
+];
 </script>
 
 
@@ -325,7 +316,7 @@ const categories = [
         <main class="collections-container">
 
             <section
-                v-for="collection in props.collections"
+                v-for="collection in collections"
                 :key="collection.id"
                 :id="collection.category"
                 class="collection-section"

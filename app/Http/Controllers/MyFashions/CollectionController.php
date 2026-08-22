@@ -660,78 +660,143 @@ class CollectionController extends Controller
     }
 
 
-    // public function assignProducts(Request $request, Collection $collection) {
+public function publicIndex()
+{
+    $collections = Collection::query()
+        ->where('is_active', true)
+        ->with([
+            'products' => function ($query) {
+                $query->where('is_active', true)
+                    ->orderBy('name');
+            }
+        ])
+        ->orderBy('sort_order')
+        ->orderBy('name')
+        ->get()
+        ->map(function ($collection) {
 
-    //     $validated = $request->validate([
+            return [
+                'id' => $collection->id,
 
-    //         'product_ids' => [
-    //             'nullable',
-    //             'array',
-    //         ],
+                'category' => $collection->slug,
 
-    //         'product_ids.*' => [
-    //             'integer',
-    //             'exists:products,id',
-    //         ],
+                'title' => $collection->name,
 
+                'subtitle' => $collection->description,
+
+                'image' => $collection->image
+                    ? asset('storage/' . $collection->image)
+                    : null,
+
+                'href' => route(
+                    'collections.show',
+                    $collection->slug
+                ),
+
+                'featured' => (bool) $collection->is_featured,
+
+                'items' => $collection->products
+                    ->take(4)
+                    ->map(function ($product) {
+
+                        return [
+                            'title' => $product->name,
+
+                            'image' => $product->image
+                                ? asset('storage/' . $product->image)
+                                : null,
+
+                            'href' => route(
+                                'products.show',
+                                $product->slug
+                            ),
+                        ];
+
+                    })
+                    ->values(),
+
+            ];
+
+        })
+        ->values();
+
+    return Inertia::render('Site/Collections/Index', [
+            'collections' => $collections,
+        ]
+    );
+}
+
+    // public function publicIndex()
+    // {
+    //     $collections = Collection::query()
+    //         ->where('is_active', true)
+    //         ->with([
+    //             'products' => function ($query) {
+    //                 $query->where('is_active', true)
+    //                     ->orderBy('name');
+    //             }
+    //         ])
+    //         ->orderBy('sort_order')
+    //         ->orderBy('name')
+    //         ->get();
+
+    //     return Inertia::render('Site/Collections/Index', [
+    //         'collections' => $collections,
     //     ]);
-
-
-    //     /*
-    //     |--------------------------------------------------------------------------
-    //     | SYNC PRODUCTS
-    //     |--------------------------------------------------------------------------
-    //     */
-    //     $collection->products()->sync(
-    //         $validated['product_ids'] ?? []
-    //     );
-
-
-    //     return response()->json([
-
-    //         'success' => true,
-
-    //         'message' =>
-    //             'Products assigned to collection successfully.',
-
-    //         'collection_id' =>
-    //             $collection->id,
-
-    //         'product_ids' =>
-    //             $collection
-    //                 ->products()
-    //                 ->pluck('products.id'),
-
-    //     ]);
     // }
 
+public function publicShow(Collection $collection)
+{
+    $collection->load([
+        'products' => function ($query) {
+            $query->where('is_active', true)
+                ->orderBy('name');
+        }
+    ]);
 
-/**
-     * All Collections
-     */
-    // public function index()
-    // {
-    //     return Inertia::render('MyFashions/Collections/Index');
-    // }
+    return Inertia::render('Site/Collections/Show', [
+        'collection' => [
+            'id' => $collection->id,
+            'name' => $collection->name,
+            'slug' => $collection->slug,
+            'description' => $collection->description,
 
-    /**
-     * Create Collection
-     */
-    // public function create()
-    // {
-    //     return Inertia::render('MyFashions/Collections/Create');
-    // }
+            'image' => $collection->image
+                ? asset('storage/' . $collection->image)
+                : null,
 
-    /**
-     * Featured Collections
-     */
-    // public function featured()
-    // {
-    //     return Inertia::render('MyFashions/Collections/Featured');
-    // }
+            'is_featured' => (bool) $collection->is_featured,
 
+            'products' => $collection->products->map(function ($product) {
 
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'slug' => $product->slug,
 
+                    'sku' => $product->sku,
+
+                    'description' => $product->description,
+
+                    'price' => $product->price,
+
+                    'sale_price' => $product->sale_price,
+
+                    'image' => $product->image
+                        ? asset('storage/' . $product->image)
+                        : null,
+
+                    'is_active' => (bool) $product->is_active,
+
+                    'is_featured' => (bool) $product->is_featured,
+
+                    'stock_quantity' => $product->stock_quantity,
+                ];
+
+            })->values(),
+        ],
+    ]);
+}
 
 
 }
