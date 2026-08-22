@@ -272,18 +272,10 @@ Route::prefix('fashion')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/collections', [CollectionController::class, 'index'])
-    ->name('fashion.collections.index');
-
-Route::get('/collections/create', [CollectionController::class, 'create'])
-    ->name('fashion.collections.create');
-
-Route::post('/collections/store', [CollectionController::class, 'store'])
-    ->name('store');
-
-Route::get('/collections/featured', [CollectionController::class, 'featured'])
-    ->name('fashion.collections.featured');
-
+    Route::get('/collections', [CollectionController::class, 'index'])->name('fashion.collections.index');
+    Route::get('/collections/create', [CollectionController::class, 'create'])->name('fashion.collections.create');
+    Route::post('/collections/store', [CollectionController::class, 'store'])->name('store');
+    Route::get('/collections/featured', [CollectionController::class, 'featured'])->name('fashion.collections.featured');
 
 /*
 |--------------------------------------------------------------------------
@@ -307,26 +299,16 @@ Route::post(
 | COLLECTION CRUD
 |--------------------------------------------------------------------------
 */
+Route::patch( '/collections/{collection}/toggle-featured', [CollectionController::class, 'toggleFeatured'])->name('fashion.collections.toggle-featured');
 
-Route::get(
-    '/collections/{collection}',
-    [CollectionController::class, 'show']
-)->name('show');
 
-Route::get(
-    '/collections/{collection}/edit',
-    [CollectionController::class, 'edit']
-)->name('edit');
+Route::get('/collections/{collection}', [CollectionController::class, 'show'])->name('show');
 
-Route::put(
-    '/collections/{collection}',
-    [CollectionController::class, 'update']
-)->name('update');
+Route::get('/collections/{collection}/edit', [CollectionController::class, 'edit'])->name('edit');
 
-Route::delete(
-    '/collections/{collection}',
-    [CollectionController::class, 'destroy']
-)->name('destroy');
+Route::put('/collections/{collection}', [CollectionController::class, 'update'])->name('update');
+
+Route::delete('/collections/{collection}', [CollectionController::class, 'destroy'])->name('destroy');
 
 
 

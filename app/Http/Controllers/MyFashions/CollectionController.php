@@ -502,6 +502,22 @@ class CollectionController extends Controller
      * FEATURED COLLECTIONS
      * =========================================================
      */
+//     public function featured()
+// {
+//     $collections = Collection::withCount('products')
+//         ->where('is_featured', true)
+//         ->orderBy('sort_order')
+//         ->orderBy('name')
+//         ->get();
+
+//     return Inertia::render(
+//         'MyFashions/Collections/Featured',
+//         [
+//             'collections' => $collections,
+//         ]
+//     );
+// }
+
     public function featured()
     {
         $collections = Collection::query()
@@ -516,6 +532,21 @@ class CollectionController extends Controller
             [
                 'collections' => $collections,
             ]
+        );
+    }
+
+
+    public function toggleFeatured(Collection $collection)
+    {
+        $collection->update([
+            'is_featured' => ! $collection->is_featured,
+        ]);
+
+        return back()->with(
+            'success',
+            $collection->is_featured
+                ? 'Collection added to featured collections.'
+                : 'Collection removed from featured collections.'
         );
     }
 
