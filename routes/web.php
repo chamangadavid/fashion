@@ -20,6 +20,7 @@ use App\Http\Controllers\MyFashions\StockAdjustmentController;
 use App\Http\Controllers\MyFashions\InventoryAuditController;
 use App\Http\Controllers\MyFashions\CheckoutController;
 use App\Http\Controllers\MyFashions\CartController;
+use App\Http\Controllers\MyFashions\SettingsController;
 use App\Http\Controllers\ShopController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -368,8 +369,30 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/settings', [FashionSettingsController::class, 'index'])->name('fashion.settings.index');
         Route::get('/settings/store', [FashionSettingsController::class, 'store'])->name('fashion.settings.store');
-        Route::get('/settings/payments', [FashionSettingsController::class, 'payments'])->name('fashion.settings.payments');
+        //Route::get('/settings/payments', [FashionSettingsController::class, 'payments'])->name('fashion.settings.payments');
         Route::get('/settings/shipping', [FashionSettingsController::class, 'shipping'])->name('fashion.settings.shipping');
+
+        Route::post('/settings', [FashionSettingsController::class, 'update']);
+        // Route::post('/settings/payments', [FashionSettingsController::class, 'updatePayments'])->name('fashion.settings.payments');
+
+
+        /*
+|--------------------------------------------------------------------------
+| PAYMENT SETTINGS
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/settings/payments', [SettingsController::class, 'payments'])->name('fashion.settings.payments');
+
+
+Route::post('/settings/payments', [SettingsController::class, 'updatePayments'])->name('fashion.settings.payments.update');
+
+
+
+
+
+
+
 
     });
 

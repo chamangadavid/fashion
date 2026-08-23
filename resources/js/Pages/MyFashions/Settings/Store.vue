@@ -1,3 +1,4 @@
+<!-- resources\js\Pages\MyFashions\Settings\Store.vue -->
 <script setup>
 
 import MyFashionLayout from '@/Layouts/MyFashionLayout.vue';
