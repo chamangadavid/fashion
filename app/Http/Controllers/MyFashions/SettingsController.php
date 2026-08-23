@@ -10,7 +10,7 @@ use Inertia\Inertia;
 class SettingsController extends Controller
 {
     
-/*
+    /*
     |--------------------------------------------------------------------------
     | PAYMENT SETTINGS PAGE
     |--------------------------------------------------------------------------
@@ -193,6 +193,10 @@ class SettingsController extends Controller
 
             'card',
 
+            'shipping_enabled',
+
+            'free_shipping_enabled',
+
         ];
 
 
@@ -208,8 +212,6 @@ class SettingsController extends Controller
 
         return $setting->value;
     }
-
-
 
 
     /*
@@ -392,6 +394,135 @@ class SettingsController extends Controller
                 'Store settings updated successfully.'
             );
     }
+
+     /*
+    |--------------------------------------------------------------------------
+    | SHIPPING SETTINGS PAGE
+    |--------------------------------------------------------------------------
+    */
+
+    public function shipping()
+    {
+        $settings = [
+
+            'shipping_enabled' => $this->getSetting(
+                'shipping_enabled',
+                true
+            ),
+
+            'shipping_method' => $this->getSetting(
+                'shipping_method',
+                'flat_rate'
+            ),
+
+            'shipping_amount' => $this->getSetting(
+                'shipping_amount',
+                '0.00'
+            ),
+
+            'free_shipping_enabled' => $this->getSetting(
+                'free_shipping_enabled',
+                false
+            ),
+
+            'free_shipping_minimum' => $this->getSetting(
+                'free_shipping_minimum',
+                '0.00'
+            ),
+
+            'shipping_note' => $this->getSetting(
+                'shipping_note',
+                ''
+            ),
+
+        ];
+
+        return Inertia::render(
+            'MyFashions/Settings/Shipping',
+            [
+                'settings' => $settings,
+            ]
+        );
+    }
+
+
+     /*
+    |--------------------------------------------------------------------------
+    | UPDATE SHIPPING SETTINGS
+    |--------------------------------------------------------------------------
+    */
+
+    public function updateShipping(Request $request)
+    {
+        $validated = $request->validate([
+
+            'shipping_enabled' => [
+                'required',
+                'boolean',
+            ],
+
+            'shipping_method' => [
+                'required',
+                'in:free,flat_rate',
+            ],
+
+            'shipping_amount' => [
+                'required',
+                'numeric',
+                'min:0',
+            ],
+
+            'free_shipping_enabled' => [
+                'required',
+                'boolean',
+            ],
+
+            'free_shipping_minimum' => [
+                'required',
+                'numeric',
+                'min:0',
+            ],
+
+            'shipping_note' => [
+                'nullable',
+                'string',
+                'max:1000',
+            ],
+
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SAVE SETTINGS
+        |--------------------------------------------------------------------------
+        */
+
+        foreach ($validated as $key => $value) {
+
+            Setting::updateOrCreate(
+                [
+                    'key' => $key,
+                ],
+                [
+                    'value' => is_bool($value)
+                        ? ($value ? '1' : '0')
+                        : $value,
+                ]
+            );
+
+        }
+
+
+        return redirect()
+            ->back()
+            ->with(
+                'success',
+                'Shipping settings updated successfully.'
+            );
+    }
+
+
 
 
 

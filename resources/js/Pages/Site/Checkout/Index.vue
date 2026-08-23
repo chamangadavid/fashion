@@ -2,8 +2,7 @@
 
 <script setup>
 
-import { reactive, ref } from "vue";
-
+import { reactive, ref, computed, watch } from "vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 
 import MyFashionLayout from "@/Layouts/MyFashionLayout.vue";
@@ -72,6 +71,27 @@ const props = defineProps({
 
     },
 
+    /*
+    |--------------------------------------------------------------------------
+    | SHIPPING SETTINGS
+    |--------------------------------------------------------------------------
+    */
+
+    shippingSettings: {
+        type: Object,
+        default: () => ({
+            enabled: true,
+            method: 'flat_rate',
+            flat_rate: 0,
+            free_shipping_enabled: false,
+            free_shipping_threshold: 0,
+            local_shipping_enabled: true,
+            local_shipping_rate: 0,
+            international_shipping_enabled: false,
+            international_shipping_rate: 0,
+        }),
+    },
+
 });
 
 
@@ -113,7 +133,15 @@ const paymentMethod = ref(
 
 const processing = ref(false);
 
+/*
+|--------------------------------------------------------------------------
+| SHIPPING
+|--------------------------------------------------------------------------
+*/
 
+const shippingAmount = ref(0);
+
+const shippingLabel = ref("Free Shipping");
 
 /*
 |--------------------------------------------------------------------------
@@ -185,6 +213,28 @@ const form = reactive({
 
 
 
+watch(
+    () => form.country,
+    () => {
+        calculateShipping();
+    }
+);
+
+watch(
+    () => form.city,
+    () => {
+        calculateShipping();
+    }
+);
+
+const grandTotal = computed(() => {
+
+    return (
+        Number(props.subtotal || 0) +
+        Number(shippingAmount.value || 0)
+    );
+
+});
 /*
 |--------------------------------------------------------------------------
 | SUBMIT ORDER
@@ -1270,8 +1320,32 @@ const formatPrice = (amount) => {
 
 
                 <!-- SHIPPING -->
+                 <div class="summary-row">
 
-                <div class="summary-row">
+    <span>
+        {{ shippingLabel }}
+    </span>
+
+    <strong>
+
+        <span v-if="calculatingShipping">
+            Calculating...
+        </span>
+
+        <span v-else-if="shippingAmount <= 0">
+            FREE
+        </span>
+
+        <span v-else>
+            {{ formatPrice(shippingAmount) }}
+        </span>
+
+    </strong>
+
+</div>
+
+
+                <!-- <div class="summary-row">
 
                     <span>
 
@@ -1285,7 +1359,7 @@ const formatPrice = (amount) => {
 
                     </strong>
 
-                </div>
+                </div> -->
 
 
 
