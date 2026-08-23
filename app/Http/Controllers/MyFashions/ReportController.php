@@ -3,42 +3,515 @@
 namespace App\Http\Controllers\MyFashions;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Carbon\Carbon;
 
 class ReportController extends Controller
 {
     
-/**
-     * Sales Reports
-     */
-    public function sales()
+     /*
+    |--------------------------------------------------------------------------
+    | SALES REPORT
+    |--------------------------------------------------------------------------
+    */
+
+    public function sales(Request $request)
     {
-        return Inertia::render('MyFashions/Reports/Sales');
+        [$startDate, $endDate] = $this->getDateRange($request);
+
+        /*
+        |--------------------------------------------------------------------------
+        | TOTAL ORDERS
+        |--------------------------------------------------------------------------
+        */
+
+        $totalOrders = Order::whereBetween('created_at', [
+            $startDate,
+            $endDate,
+        ])->count();
+
+        /*
+        |--------------------------------------------------------------------------
+        | TOTAL SALES
+        |--------------------------------------------------------------------------
+        */
+
+        $totalSales = Order::whereBetween('created_at', [
+            $startDate,
+            $endDate,
+        ])
+            ->whereNotIn('status', ['cancelled', 'refunded'])
+            ->sum('total_amount');
+
+        /*
+        |--------------------------------------------------------------------------
+        | ITEMS SOLD
+        |--------------------------------------------------------------------------
+        */
+
+        $itemsSold = OrderItem::whereHas('order', function ($query) use ($startDate, $endDate) {
+            $query->whereBetween('created_at', [
+                $startDate,
+                $endDate,
+            ])
+            ->whereNotIn('status', ['cancelled', 'refunded']);
+        })->sum('quantity');
+
+        /*
+        |--------------------------------------------------------------------------
+        | AVERAGE ORDER VALUE
+        |--------------------------------------------------------------------------
+        */
+
+        $averageOrderValue = $totalOrders > 0
+            ? $totalSales / $totalOrders
+            : 0;
+
+        /*
+        |--------------------------------------------------------------------------
+        | SALES BY MONTH
+        |--------------------------------------------------------------------------
+        */
+
+        $salesByMonth = Order::select(
+                DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month"),
+                DB::raw("SUM(total_amount) as total")
+            )
+            ->whereBetween('created_at', [
+                $startDate,
+                $endDate,
+            ])
+            ->whereNotIn('status', ['cancelled', 'refunded'])
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | ORDERS BY STATUS
+        |--------------------------------------------------------------------------
+        */
+
+        $ordersByStatus = Order::select(
+                'status',
+                DB::raw('COUNT(*) as total')
+            )
+            ->whereBetween('created_at', [
+                $startDate,
+                $endDate,
+            ])
+            ->groupBy('status')
+            ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | TOP SELLING PRODUCTS
+        |--------------------------------------------------------------------------
+        */
+
+        $topProducts = OrderItem::select(
+                'product_id',
+                'product_name',
+                DB::raw('SUM(quantity) as quantity_sold'),
+                DB::raw('SUM(total_price) as revenue')
+            )
+            ->whereHas('order', function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('created_at', [
+                    $startDate,
+                    $endDate,
+                ])
+                ->whereNotIn('status', ['cancelled', 'refunded']);
+            })
+            ->groupBy(
+                'product_id',
+                'product_name'
+            )
+            ->orderByDesc('quantity_sold')
+            ->limit(10)
+            ->get();
+
+
+        return Inertia::render('MyFashions/Reports/Sales', [
+            'reports' => [
+                'date_range' => [
+                    'start' => $startDate->format('Y-m-d'),
+                    'end' => $endDate->format('Y-m-d'),
+                ],
+
+                'summary' => [
+                    'total_orders' => $totalOrders,
+                    'total_sales' => $totalSales,
+                    'items_sold' => $itemsSold,
+                    'average_order_value' => $averageOrderValue,
+                ],
+
+                'salesByMonth' => $salesByMonth,
+
+                'ordersByStatus' => $ordersByStatus,
+
+                'topProducts' => $topProducts,
+            ],
+        ]);
     }
 
-    /**
-     * Product Reports
-     */
-    public function products()
+
+    /*
+    |--------------------------------------------------------------------------
+    | REVENUE REPORT
+    |--------------------------------------------------------------------------
+    */
+
+    public function revenue(Request $request)
     {
-        return Inertia::render('MyFashions/Reports/Products');
+        [$startDate, $endDate] = $this->getDateRange($request);
+
+        /*
+        |--------------------------------------------------------------------------
+        | TOTAL REVENUE
+        |--------------------------------------------------------------------------
+        */
+
+        $totalRevenue = Order::whereBetween('created_at', [
+            $startDate,
+            $endDate,
+        ])
+            ->whereNotIn('status', ['cancelled', 'refunded'])
+            ->sum('total_amount');
+
+        /*
+        |--------------------------------------------------------------------------
+        | REVENUE BY MONTH
+        |--------------------------------------------------------------------------
+        */
+
+        $revenueByMonth = Order::select(
+                DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month"),
+                DB::raw("SUM(total_amount) as revenue")
+            )
+            ->whereBetween('created_at', [
+                $startDate,
+                $endDate,
+            ])
+            ->whereNotIn('status', ['cancelled', 'refunded'])
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | REVENUE BY PAYMENT METHOD
+        |--------------------------------------------------------------------------
+        */
+
+        $revenueByPaymentMethod = Order::select(
+                'payment_method',
+                DB::raw('SUM(total_amount) as revenue'),
+                DB::raw('COUNT(*) as orders')
+            )
+            ->whereBetween('created_at', [
+                $startDate,
+                $endDate,
+            ])
+            ->whereNotIn('status', ['cancelled', 'refunded'])
+            ->groupBy('payment_method')
+            ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | PAYMENT STATUS
+        |--------------------------------------------------------------------------
+        */
+
+        $paymentStatus = Order::select(
+                'payment_status',
+                DB::raw('COUNT(*) as total')
+            )
+            ->whereBetween('created_at', [
+                $startDate,
+                $endDate,
+            ])
+            ->groupBy('payment_status')
+            ->get();
+
+        return Inertia::render('MyFashions/Reports/Revenue', [
+            'reports' => [
+                'date_range' => [
+                    'start' => $startDate->format('Y-m-d'),
+                    'end' => $endDate->format('Y-m-d'),
+                ],
+
+                'summary' => [
+                    'total_revenue' => $totalRevenue,
+                ],
+
+                'revenue_by_month' => $revenueByMonth,
+
+                'revenue_by_payment_method' => $revenueByPaymentMethod,
+
+                'payment_status' => $paymentStatus,
+            ],
+        ]);
     }
 
-    /**
-     * Customer Reports
-     */
-    public function customers()
+
+    /*
+    |--------------------------------------------------------------------------
+    | CUSTOMER REPORT
+    |--------------------------------------------------------------------------
+    */
+
+    public function customers(Request $request)
     {
-        return Inertia::render('MyFashions/Reports/Customers');
+        [$startDate, $endDate] = $this->getDateRange($request);
+
+        /*
+        |--------------------------------------------------------------------------
+        | TOTAL CUSTOMERS
+        |--------------------------------------------------------------------------
+        */
+
+        $totalCustomers = User::whereBetween('created_at', [
+            $startDate,
+            $endDate,
+        ])->count();
+
+        /*
+        |--------------------------------------------------------------------------
+        | CUSTOMERS WITH ORDERS
+        |--------------------------------------------------------------------------
+        */
+
+        $activeCustomers = User::whereHas('orders', function ($query) use ($startDate, $endDate) {
+            $query->whereBetween('created_at', [
+                $startDate,
+                $endDate,
+            ]);
+        })->count();
+
+        /*
+        |--------------------------------------------------------------------------
+        | TOP CUSTOMERS
+        |--------------------------------------------------------------------------
+        */
+
+        $topCustomers = User::select(
+                'users.id',
+                'users.name',
+                'users.email',
+                DB::raw('COUNT(orders.id) as orders_count'),
+                DB::raw('SUM(orders.total_amount) as total_spent')
+            )
+            ->join('orders', 'orders.user_id', '=', 'users.id')
+            ->whereBetween('orders.created_at', [
+                $startDate,
+                $endDate,
+            ])
+            ->whereNotIn('orders.status', ['cancelled', 'refunded'])
+            ->groupBy(
+                'users.id',
+                'users.name',
+                'users.email'
+            )
+            ->orderByDesc('total_spent')
+            ->limit(10)
+            ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | CUSTOMER GROWTH
+        |--------------------------------------------------------------------------
+        */
+
+        $customerGrowth = User::select(
+                DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month"),
+                DB::raw('COUNT(*) as total')
+            )
+            ->whereBetween('created_at', [
+                $startDate,
+                $endDate,
+            ])
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+
+        return Inertia::render('MyFashions/Reports/Customers', [
+            'reports' => [
+                'date_range' => [
+                    'start' => $startDate->format('Y-m-d'),
+                    'end' => $endDate->format('Y-m-d'),
+                ],
+
+                'summary' => [
+                    'total_customers' => $totalCustomers,
+                    'active_customers' => $activeCustomers,
+                ],
+
+                'top_customers' => $topCustomers,
+
+                'customer_growth' => $customerGrowth,
+            ],
+        ]);
     }
 
-    /**
-     * Revenue Reports
-     */
-    public function revenue()
+
+    /*
+    |--------------------------------------------------------------------------
+    | PRODUCT REPORT
+    |--------------------------------------------------------------------------
+    */
+
+    public function products(Request $request)
     {
-        return Inertia::render('MyFashions/Reports/Revenue');
+        [$startDate, $endDate] = $this->getDateRange($request);
+
+        /*
+        |--------------------------------------------------------------------------
+        | TOTAL PRODUCTS SOLD
+        |--------------------------------------------------------------------------
+        */
+
+        $itemsSold = OrderItem::whereHas('order', function ($query) use ($startDate, $endDate) {
+            $query->whereBetween('created_at', [
+                $startDate,
+                $endDate,
+            ])
+            ->whereNotIn('status', ['cancelled', 'refunded']);
+        })->sum('quantity');
+
+        /*
+        |--------------------------------------------------------------------------
+        | PRODUCT PERFORMANCE
+        |--------------------------------------------------------------------------
+        */
+
+        $products = OrderItem::select(
+                'product_id',
+                'product_name',
+                DB::raw('SUM(quantity) as quantity_sold'),
+                DB::raw('SUM(total_price) as revenue'),
+                DB::raw('COUNT(DISTINCT order_id) as orders_count')
+            )
+            ->whereHas('order', function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('created_at', [
+                    $startDate,
+                    $endDate,
+                ])
+                ->whereNotIn('status', ['cancelled', 'refunded']);
+            })
+            ->groupBy(
+                'product_id',
+                'product_name'
+            )
+            ->orderByDesc('revenue')
+            ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | TOP PRODUCTS
+        |--------------------------------------------------------------------------
+        */
+
+        $topProducts = $products->take(10)->values();
+
+        return Inertia::render('MyFashions/Reports/Products', [
+            'reports' => [
+                'date_range' => [
+                    'start' => $startDate->format('Y-m-d'),
+                    'end' => $endDate->format('Y-m-d'),
+                ],
+
+                'summary' => [
+                    'items_sold' => $itemsSold,
+                    'products_count' => $products->count(),
+                ],
+
+                'products' => $products,
+
+                'top_products' => $topProducts,
+            ],
+        ]);
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | DATE RANGE
+    |--------------------------------------------------------------------------
+    */
+
+    private function getDateRange(Request $request)
+    {
+        $range = $request->get('range', 'month');
+
+        switch ($range) {
+
+            case 'today':
+
+                $startDate = Carbon::today();
+
+                $endDate = Carbon::now();
+
+                break;
+
+
+            case 'week':
+
+                $startDate = Carbon::now()->startOfWeek();
+
+                $endDate = Carbon::now()->endOfWeek();
+
+                break;
+
+
+            case 'month':
+
+                $startDate = Carbon::now()->startOfMonth();
+
+                $endDate = Carbon::now()->endOfMonth();
+
+                break;
+
+
+            case 'year':
+
+                $startDate = Carbon::now()->startOfYear();
+
+                $endDate = Carbon::now()->endOfYear();
+
+                break;
+
+
+            case 'custom':
+
+                $startDate = $request->filled('start_date')
+                    ? Carbon::parse($request->start_date)->startOfDay()
+                    : Carbon::now()->startOfMonth();
+
+                $endDate = $request->filled('end_date')
+                    ? Carbon::parse($request->end_date)->endOfDay()
+                    : Carbon::now()->endOfDay();
+
+                break;
+
+
+            default:
+
+                $startDate = Carbon::now()->startOfMonth();
+
+                $endDate = Carbon::now()->endOfMonth();
+
+                break;
+        }
+
+        return [
+            $startDate,
+            $endDate,
+        ];
     }
 
 

@@ -343,9 +343,10 @@ Route::middleware('auth')->group(function () {
         */
 
         Route::get('/reports/sales', [ReportController::class, 'sales'])->name('fashion.reports.sales');
-        Route::get('/reports/products', [ReportController::class, 'products'])->name('fashion.reports.products');
-        Route::get('/reports/customers', [ReportController::class, 'customers'])->name('fashion.reports.customers');
         Route::get('/reports/revenue', [ReportController::class, 'revenue'])->name('fashion.reports.revenue');
+        Route::get('/reports/customers', [ReportController::class, 'customers'])->name('fashion.reports.customers');
+        Route::get('/reports/products', [ReportController::class, 'products'])->name('fashion.reports.products');
+     
 
 
         /*
