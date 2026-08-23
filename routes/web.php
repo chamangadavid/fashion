@@ -368,12 +368,20 @@ Route::middleware('auth')->group(function () {
         */
 
         Route::get('/settings', [FashionSettingsController::class, 'index'])->name('fashion.settings.index');
-        Route::get('/settings/store', [FashionSettingsController::class, 'store'])->name('fashion.settings.store');
+        //Route::get('/settings/store', [FashionSettingsController::class, 'store'])->name('fashion.settings.store');
         //Route::get('/settings/payments', [FashionSettingsController::class, 'payments'])->name('fashion.settings.payments');
         Route::get('/settings/shipping', [FashionSettingsController::class, 'shipping'])->name('fashion.settings.shipping');
 
         Route::post('/settings', [FashionSettingsController::class, 'update']);
         // Route::post('/settings/payments', [FashionSettingsController::class, 'updatePayments'])->name('fashion.settings.payments');
+
+
+
+
+
+        Route::get('/settings/store', [SettingsController::class, 'store'])->name('fashions.settings.store');
+
+Route::put('/settings/store', [SettingsController::class, 'updateStore'])->name('fashions.settings.store.update');
 
 
         /*

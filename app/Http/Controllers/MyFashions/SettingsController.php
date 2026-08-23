@@ -209,4 +209,192 @@ class SettingsController extends Controller
         return $setting->value;
     }
 
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | STORE SETTINGS PAGE
+    |--------------------------------------------------------------------------
+    */
+
+    public function store()
+    {
+        $settings = [
+            'store_name' => $this->getSetting(
+                'store_name',
+                'My Fashion Store'
+            ),
+
+            'store_tagline' => $this->getSetting(
+                'store_tagline',
+                ''
+            ),
+
+            'store_email' => $this->getSetting(
+                'store_email',
+                ''
+            ),
+
+            'store_phone' => $this->getSetting(
+                'store_phone',
+                ''
+            ),
+
+            'store_address' => $this->getSetting(
+                'store_address',
+                ''
+            ),
+
+            'store_city' => $this->getSetting(
+                'store_city',
+                ''
+            ),
+
+            'store_country' => $this->getSetting(
+                'store_country',
+                'Zambia'
+            ),
+
+            'store_currency' => $this->getSetting(
+                'store_currency',
+                'ZMW'
+            ),
+
+            'store_description' => $this->getSetting(
+                'store_description',
+                ''
+            ),
+
+            'store_status' => $this->getSetting(
+                'store_status',
+                'open'
+            ),
+
+            'store_logo' => $this->getSetting(
+                'store_logo',
+                ''
+            ),
+        ];
+
+        return Inertia::render(
+            'MyFashions/Settings/Store',
+            [
+                'settings' => $settings,
+            ]
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | UPDATE STORE SETTINGS
+    |--------------------------------------------------------------------------
+    */
+
+    public function updateStore(Request $request)
+    {
+        $validated = $request->validate([
+
+            'store_name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'store_tagline' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+            'store_email' => [
+                'nullable',
+                'email',
+                'max:255',
+            ],
+
+            'store_phone' => [
+                'nullable',
+                'string',
+                'max:50',
+            ],
+
+            'store_address' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+            'store_city' => [
+                'nullable',
+                'string',
+                'max:100',
+            ],
+
+            'store_country' => [
+                'required',
+                'string',
+                'max:100',
+            ],
+
+            'store_currency' => [
+                'required',
+                'string',
+                'max:10',
+            ],
+
+            'store_description' => [
+                'nullable',
+                'string',
+            ],
+
+            'store_status' => [
+                'required',
+                'in:open,closed',
+            ],
+
+            'store_logo' => [
+                'nullable',
+                'string',
+                'max:500',
+            ],
+
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SAVE SETTINGS
+        |--------------------------------------------------------------------------
+        */
+
+        foreach ($validated as $key => $value) {
+
+            Setting::updateOrCreate(
+
+                [
+                    'key' => $key,
+                ],
+
+                [
+                    'value' => $value,
+                ]
+
+            );
+        }
+
+
+        return redirect()
+            ->back()
+            ->with(
+                'success',
+                'Store settings updated successfully.'
+            );
+    }
+
+
+
+
+
 }
