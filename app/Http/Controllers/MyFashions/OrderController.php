@@ -7,9 +7,11 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\OrderStatusHistory;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
@@ -103,6 +105,7 @@ class OrderController extends Controller
 
         'filters' => [
             'search' => $request->search ?? '',
+             'payment_method' => $request->payment_method ?? '',
         ],
 
     ]);
@@ -138,6 +141,7 @@ public function processing(Request $request)
 
         'filters' => [
             'search' => $request->search ?? '',
+             'payment_method' => $request->payment_method ?? '',
         ],
 
     ]);
@@ -173,6 +177,42 @@ public function completed(Request $request)
 
         'filters' => [
             'search' => $request->search ?? '',
+        ],
+
+    ]);
+}
+
+public function cancelled(Request $request)
+{
+    $query = Order::with('items')
+        ->where('status', 'cancelled')
+        ->latest();
+
+    if ($request->filled('search')) {
+
+        $search = $request->search;
+
+        $query->where(function ($q) use ($search) {
+
+            $q->where('order_number', 'like', "%{$search}%")
+                ->orWhere('customer_email', 'like', "%{$search}%")
+                ->orWhere('shipping_first_name', 'like', "%{$search}%")
+                ->orWhere('shipping_last_name', 'like', "%{$search}%");
+
+        });
+    }
+
+    $orders = $query
+        ->paginate(10)
+        ->withQueryString();
+
+    return Inertia::render('MyFashions/Orders/Cancelled', [
+
+        'orders' => $orders,
+
+        'filters' => [
+            'search' => $request->search ?? '',
+             'payment_method' => $request->payment_method ?? '',
         ],
 
     ]);
@@ -226,10 +266,22 @@ public function completed(Request $request)
 /**
  * Display a single order
  */
+// public function show(Order $order)
+// {
+//     $order->load([
+//         'items.product',
+//     ]);
+
+//     return Inertia::render('MyFashions/Orders/ViewOrder', [
+//         'order' => $order,
+//     ]);
+// }
+
 public function show(Order $order)
 {
     $order->load([
         'items.product',
+        'statusHistory.user',
     ]);
 
     return Inertia::render('MyFashions/Orders/ViewOrder', [
@@ -527,6 +579,24 @@ public function show(Order $order)
 
             ]);
 
+              /*
+            |--------------------------------------------------------------------------
+            | CREATE ORDER HISTORY
+            |--------------------------------------------------------------------------
+            */
+
+            OrderStatusHistory::create([
+                'order_id' => $order->id,
+
+                'old_status' => null,
+
+                'new_status' => 'pending',
+
+                'changed_by' => Auth::id(),
+
+                'note' => 'Order placed.',
+            ]);
+
             
             /*
             |--------------------------------------------------------------------------
@@ -598,17 +668,30 @@ public function show(Order $order)
     }
 
 
-    public function updateStatus(Request $request, Order $order)
-{
+    public function updateStatus(
+    Request $request,
+    Order $order
+) {
     $validated = $request->validate([
+
         'status' => [
             'required',
             'in:pending,processing,completed,cancelled',
         ],
+
+        'note' => [
+            'nullable',
+            'string',
+            'max:1000',
+        ],
+
     ]);
 
+
     $newStatus = $validated['status'];
+
     $oldStatus = $order->status;
+
 
     /*
     |--------------------------------------------------------------------------
@@ -624,9 +707,10 @@ public function show(Order $order)
         );
     }
 
+
     /*
     |--------------------------------------------------------------------------
-    | ALLOWED STATUS FLOW
+    | ALLOWED TRANSITIONS
     |--------------------------------------------------------------------------
     */
 
@@ -648,6 +732,7 @@ public function show(Order $order)
 
     ];
 
+
     if (
         !in_array(
             $newStatus,
@@ -657,20 +742,34 @@ public function show(Order $order)
     ) {
 
         return back()->withErrors([
+
             'status' =>
                 "Cannot change order from {$oldStatus} to {$newStatus}.",
+
         ]);
     }
 
+
     /*
     |--------------------------------------------------------------------------
-    | CANCELLATION
+    | TRANSACTION
     |--------------------------------------------------------------------------
     */
 
-    if ($newStatus === 'cancelled') {
+    DB::transaction(function () use (
+        $order,
+        $oldStatus,
+        $newStatus,
+        $validated
+    ) {
 
-        DB::transaction(function () use ($order) {
+        /*
+        |--------------------------------------------------------------------------
+        | CANCEL + RESTORE STOCK
+        |--------------------------------------------------------------------------
+        */
+
+        if ($newStatus === 'cancelled') {
 
             $order->load('items');
 
@@ -679,12 +778,16 @@ public function show(Order $order)
                 $product = Product::lockForUpdate()
                     ->find($item->product_id);
 
+
                 if (!$product) {
 
                     throw new \Exception(
+
                         "Product {$item->product_name} no longer exists."
+
                     );
                 }
+
 
                 /*
                 |--------------------------------------------------------------------------
@@ -697,39 +800,66 @@ public function show(Order $order)
                     $item->quantity
                 );
             }
+        }
 
-            /*
-            |--------------------------------------------------------------------------
-            | UPDATE ORDER
-            |--------------------------------------------------------------------------
-            */
 
-            $order->update([
-                'status' => 'cancelled',
-            ]);
-        });
+        /*
+        |--------------------------------------------------------------------------
+        | UPDATE ORDER
+        |--------------------------------------------------------------------------
+        */
 
-        return back()->with(
-            'success',
-            'Order cancelled and stock restored successfully.'
-        );
-    }
+        $order->update([
+
+            'status' => $newStatus,
+
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CREATE STATUS HISTORY
+        |--------------------------------------------------------------------------
+        */
+
+        OrderStatusHistory::create([
+
+            'order_id' => $order->id,
+
+            'old_status' => $oldStatus,
+
+            'new_status' => $newStatus,
+
+            'changed_by' => Auth::id(),
+
+            'note' =>
+                $validated['note']
+                ?? null,
+
+        ]);
+
+    });
+
 
     /*
     |--------------------------------------------------------------------------
-    | NORMAL STATUS UPDATE
+    | RESPONSE
     |--------------------------------------------------------------------------
     */
 
-    $order->update([
-        'status' => $newStatus,
-    ]);
-
     return back()->with(
+
         'success',
-        'Order status updated successfully.'
+
+        $newStatus === 'cancelled'
+
+            ? 'Order cancelled and stock restored successfully.'
+
+            : 'Order status updated successfully.'
+
     );
 }
+
 
 
 

@@ -263,9 +263,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/orders/pending', [OrderController::class, 'pending'])->name('fashion.orders.pending');
         Route::get('/orders/processing', [OrderController::class, 'processing'])->name('fashion.orders.processing');
         Route::get('/orders/completed', [OrderController::class, 'completed'])->name('fashion.orders.completed');
+          Route::get('/orders/cancelled', [OrderController::class, 'cancelled'])->name('fashion.orders.rejected');
 Route::get('/orders/{order}', [OrderController::class, 'show'])->name('fashion.orders.show');
 
-Route::patch('/fashion/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('fashion.orders.status');
+Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('fashion.orders.status');
 
 
    

@@ -81,4 +81,19 @@ protected $fillable = [
     {
         return $this->hasMany(OrderItem::class);
     }
+
+//     public function statusHistories(): HasMany
+// {
+//     return $this->hasMany(
+//         OrderStatusHistory::class
+//     )->latest();
+// }
+
+public function statusHistory(): HasMany
+{
+    return $this->hasMany(OrderStatusHistory::class, 'order_id')
+        ->orderBy('created_at', 'desc');
+}
+
+
 }

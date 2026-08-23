@@ -166,6 +166,11 @@ const navigation = [
                 href: "/fashion/orders/completed",
             },
 
+             {
+                label: "Cancelled Orders",
+                href: "/fashion/orders/cancelled",
+            },
+
         ],
     },
 
