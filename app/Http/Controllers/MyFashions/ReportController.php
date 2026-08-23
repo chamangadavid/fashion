@@ -161,364 +161,467 @@ class ReportController extends Controller
 
 
     /*
-|--------------------------------------------------------------------------
-| REVENUE REPORT
-|--------------------------------------------------------------------------
-*/
-
-public function revenue(Request $request)
-{
-    [$startDate, $endDate] = $this->getDateRange($request);
-
-    /*
     |--------------------------------------------------------------------------
-    | BASE QUERY
+    | REVENUE REPORT
     |--------------------------------------------------------------------------
     */
 
-    $baseQuery = Order::whereBetween('created_at', [
-        $startDate,
-        $endDate,
-    ]);
-
-    /*
-    |--------------------------------------------------------------------------
-    | TOTAL ORDERS
-    |--------------------------------------------------------------------------
-    */
-
-    // $totalOrders = (clone $baseQuery)->count();
-
-$totalOrders = (clone $baseQuery)
-    ->whereNotIn('status', ['cancelled', 'refunded'])
-    ->count();
-    /*
-    |--------------------------------------------------------------------------
-    | GROSS REVENUE
-    |--------------------------------------------------------------------------
-    |
-    | All orders except cancelled/refunded.
-    |
-    */
-
-    $grossRevenue = (clone $baseQuery)
-        ->whereNotIn('status', ['cancelled', 'refunded'])
-        ->sum('total_amount');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | PAID REVENUE
-    |--------------------------------------------------------------------------
-    */
-
-    $paidRevenue = (clone $baseQuery)
-        ->where('payment_status', 'paid')
-        ->whereNotIn('status', ['cancelled', 'refunded'])
-        ->sum('total_amount');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | PENDING REVENUE
-    |--------------------------------------------------------------------------
-    */
-
-    $pendingRevenue = (clone $baseQuery)
-        ->where('payment_status', 'pending')
-        ->whereNotIn('status', ['cancelled', 'refunded'])
-        ->sum('total_amount');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | FAILED REVENUE
-    |--------------------------------------------------------------------------
-    */
-
-    $failedRevenue = (clone $baseQuery)
-        ->where('payment_status', 'failed')
-        ->sum('total_amount');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CANCELLED REVENUE
-    |--------------------------------------------------------------------------
-    */
-
-    $cancelledRevenue = (clone $baseQuery)
-        ->where(function ($query) {
-            $query
-                ->where('status', 'cancelled')
-                ->orWhere('payment_status', 'cancelled');
-        })
-        ->sum('total_amount');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | REFUNDED REVENUE
-    |--------------------------------------------------------------------------
-    */
-
-    $refundedRevenue = (clone $baseQuery)
-        ->where(function ($query) {
-            $query
-                ->where('status', 'refunded')
-                ->orWhere('payment_status', 'refunded');
-        })
-        ->sum('total_amount');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | REVENUE BY DATE
-    |--------------------------------------------------------------------------
-    |
-    | This matches:
-    | revenueByDate in Revenue.vue
-    |
-    */
-
-    $revenueByDate = (clone $baseQuery)
-        ->select(
-            DB::raw("DATE(created_at) as date"),
-            DB::raw("SUM(total_amount) as revenue")
-        )
-        ->whereNotIn('status', ['cancelled', 'refunded'])
-        ->groupBy(DB::raw("DATE(created_at)"))
-        ->orderBy('date')
-        ->get();
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | REVENUE BY PAYMENT METHOD
-    |--------------------------------------------------------------------------
-    */
-
-    $revenueByPaymentMethod = (clone $baseQuery)
-        ->select(
-            'payment_method',
-            DB::raw('COUNT(*) as orders'),
-            DB::raw('SUM(total_amount) as revenue')
-        )
-        ->whereNotIn('status', ['cancelled', 'refunded'])
-        ->groupBy('payment_method')
-        ->orderByDesc('revenue')
-        ->get();
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | REVENUE BY PAYMENT STATUS
-    |--------------------------------------------------------------------------
-    */
-
-    $revenueByPaymentStatus = (clone $baseQuery)
-        ->select(
-            'payment_status',
-            DB::raw('COUNT(*) as orders'),
-            DB::raw('SUM(total_amount) as revenue')
-        )
-        ->groupBy('payment_status')
-        ->orderByDesc('revenue')
-        ->get();
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | RETURN REPORT
-    |--------------------------------------------------------------------------
-    */
-
-    return Inertia::render('MyFashions/Reports/Revenue', [
-
-        'reports' => [
-
-            /*
-            |--------------------------------------------------------------------------
-            | DATE RANGE
-            |--------------------------------------------------------------------------
-            */
-
-            'date_range' => [
-                'start' => $startDate->format('Y-m-d'),
-                'end'   => $endDate->format('Y-m-d'),
-            ],
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | SUMMARY
-            |--------------------------------------------------------------------------
-            */
-
-            'summary' => [
-
-                'gross_revenue' => (float) $grossRevenue,
-
-                'paid_revenue' => (float) $paidRevenue,
-
-                'pending_revenue' => (float) $pendingRevenue,
-
-                'failed_revenue' => (float) $failedRevenue,
-
-                'refunded_revenue' => (float) $refundedRevenue,
-
-                'cancelled_revenue' => (float) $cancelledRevenue,
-
-                'total_orders' => (int) $totalOrders,
-            ],
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | REVENUE TREND
-            |--------------------------------------------------------------------------
-            */
-
-            'revenueByDate' => $revenueByDate,
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | PAYMENT METHOD
-            |--------------------------------------------------------------------------
-            */
-
-            'revenueByPaymentMethod' => $revenueByPaymentMethod,
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | PAYMENT STATUS
-            |--------------------------------------------------------------------------
-            */
-
-            'revenueByPaymentStatus' => $revenueByPaymentStatus,
-        ],
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | FILTERS
-        |--------------------------------------------------------------------------
-        */
-
-        'filters' => [
-
-            'period' => $request->get('period', 'month'),
-
-            'start_date' => $request->get('start_date', ''),
-
-            'end_date' => $request->get('end_date', ''),
-        ],
-    ]);
-}
-
-
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CUSTOMER REPORT
-    |--------------------------------------------------------------------------
-    */
-
-    public function customers(Request $request)
+    public function revenue(Request $request)
     {
         [$startDate, $endDate] = $this->getDateRange($request);
 
         /*
         |--------------------------------------------------------------------------
-        | TOTAL CUSTOMERS
+        | BASE QUERY
         |--------------------------------------------------------------------------
         */
 
-        $totalCustomers = User::whereBetween('created_at', [
+        $baseQuery = Order::whereBetween('created_at', [
             $startDate,
             $endDate,
-        ])->count();
+        ]);
 
         /*
         |--------------------------------------------------------------------------
-        | CUSTOMERS WITH ORDERS
+        | TOTAL ORDERS
         |--------------------------------------------------------------------------
         */
 
-        $activeCustomers = User::whereHas('orders', function ($query) use ($startDate, $endDate) {
-            $query->whereBetween('created_at', [
-                $startDate,
-                $endDate,
-            ]);
-        })->count();
+        // $totalOrders = (clone $baseQuery)->count();
+
+        $totalOrders = (clone $baseQuery)
+            ->whereNotIn('status', ['cancelled', 'refunded'])
+            ->count();
+        /*
+        |--------------------------------------------------------------------------
+        | GROSS REVENUE
+        |--------------------------------------------------------------------------
+        |
+        | All orders except cancelled/refunded.
+        |
+        */
+
+        $grossRevenue = (clone $baseQuery)
+            ->whereNotIn('status', ['cancelled', 'refunded'])
+            ->sum('total_amount');
+
 
         /*
         |--------------------------------------------------------------------------
-        | TOP CUSTOMERS
+        | PAID REVENUE
         |--------------------------------------------------------------------------
         */
 
-        $topCustomers = User::select(
-                'users.id',
-                'users.name',
-                'users.email',
-                DB::raw('COUNT(orders.id) as orders_count'),
-                DB::raw('SUM(orders.total_amount) as total_spent')
+        $paidRevenue = (clone $baseQuery)
+            ->where('payment_status', 'paid')
+            ->whereNotIn('status', ['cancelled', 'refunded'])
+            ->sum('total_amount');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | PENDING REVENUE
+        |--------------------------------------------------------------------------
+        */
+
+        $pendingRevenue = (clone $baseQuery)
+            ->where('payment_status', 'pending')
+            ->whereNotIn('status', ['cancelled', 'refunded'])
+            ->sum('total_amount');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | FAILED REVENUE
+        |--------------------------------------------------------------------------
+        */
+
+        $failedRevenue = (clone $baseQuery)
+            ->where('payment_status', 'failed')
+            ->sum('total_amount');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CANCELLED REVENUE
+        |--------------------------------------------------------------------------
+        */
+
+        $cancelledRevenue = (clone $baseQuery)
+            ->where(function ($query) {
+                $query
+                    ->where('status', 'cancelled')
+                    ->orWhere('payment_status', 'cancelled');
+            })
+            ->sum('total_amount');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | REFUNDED REVENUE
+        |--------------------------------------------------------------------------
+        */
+
+        $refundedRevenue = (clone $baseQuery)
+            ->where(function ($query) {
+                $query
+                    ->where('status', 'refunded')
+                    ->orWhere('payment_status', 'refunded');
+            })
+            ->sum('total_amount');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | REVENUE BY DATE
+        |--------------------------------------------------------------------------
+        |
+        | This matches:
+        | revenueByDate in Revenue.vue
+        |
+        */
+
+        $revenueByDate = (clone $baseQuery)
+            ->select(
+                DB::raw("DATE(created_at) as date"),
+                DB::raw("SUM(total_amount) as revenue")
             )
-            ->join('orders', 'orders.user_id', '=', 'users.id')
-            ->whereBetween('orders.created_at', [
-                $startDate,
-                $endDate,
-            ])
-            ->whereNotIn('orders.status', ['cancelled', 'refunded'])
-            ->groupBy(
-                'users.id',
-                'users.name',
-                'users.email'
-            )
-            ->orderByDesc('total_spent')
-            ->limit(10)
+            ->whereNotIn('status', ['cancelled', 'refunded'])
+            ->groupBy(DB::raw("DATE(created_at)"))
+            ->orderBy('date')
             ->get();
 
+
         /*
         |--------------------------------------------------------------------------
-        | CUSTOMER GROWTH
+        | REVENUE BY PAYMENT METHOD
         |--------------------------------------------------------------------------
         */
 
-        $customerGrowth = User::select(
-                DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month"),
-                DB::raw('COUNT(*) as total')
+        $revenueByPaymentMethod = (clone $baseQuery)
+            ->select(
+                'payment_method',
+                DB::raw('COUNT(*) as orders'),
+                DB::raw('SUM(total_amount) as revenue')
             )
-            ->whereBetween('created_at', [
-                $startDate,
-                $endDate,
-            ])
-            ->groupBy('month')
-            ->orderBy('month')
+            ->whereNotIn('status', ['cancelled', 'refunded'])
+            ->groupBy('payment_method')
+            ->orderByDesc('revenue')
             ->get();
 
-        return Inertia::render('MyFashions/Reports/Customers', [
+
+        /*
+        |--------------------------------------------------------------------------
+        | REVENUE BY PAYMENT STATUS
+        |--------------------------------------------------------------------------
+        */
+
+        $revenueByPaymentStatus = (clone $baseQuery)
+            ->select(
+                'payment_status',
+                DB::raw('COUNT(*) as orders'),
+                DB::raw('SUM(total_amount) as revenue')
+            )
+            ->groupBy('payment_status')
+            ->orderByDesc('revenue')
+            ->get();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RETURN REPORT
+        |--------------------------------------------------------------------------
+        */
+
+        return Inertia::render('MyFashions/Reports/Revenue', [
+
             'reports' => [
+
+                /*
+                |--------------------------------------------------------------------------
+                | DATE RANGE
+                |--------------------------------------------------------------------------
+                */
+
                 'date_range' => [
                     'start' => $startDate->format('Y-m-d'),
-                    'end' => $endDate->format('Y-m-d'),
+                    'end'   => $endDate->format('Y-m-d'),
                 ],
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | SUMMARY
+                |--------------------------------------------------------------------------
+                */
 
                 'summary' => [
-                    'total_customers' => $totalCustomers,
-                    'active_customers' => $activeCustomers,
+
+                    'gross_revenue' => (float) $grossRevenue,
+
+                    'paid_revenue' => (float) $paidRevenue,
+
+                    'pending_revenue' => (float) $pendingRevenue,
+
+                    'failed_revenue' => (float) $failedRevenue,
+
+                    'refunded_revenue' => (float) $refundedRevenue,
+
+                    'cancelled_revenue' => (float) $cancelledRevenue,
+
+                    'total_orders' => (int) $totalOrders,
                 ],
 
-                'top_customers' => $topCustomers,
 
-                'customer_growth' => $customerGrowth,
+                /*
+                |--------------------------------------------------------------------------
+                | REVENUE TREND
+                |--------------------------------------------------------------------------
+                */
+
+                'revenueByDate' => $revenueByDate,
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | PAYMENT METHOD
+                |--------------------------------------------------------------------------
+                */
+
+                'revenueByPaymentMethod' => $revenueByPaymentMethod,
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | PAYMENT STATUS
+                |--------------------------------------------------------------------------
+                */
+
+                'revenueByPaymentStatus' => $revenueByPaymentStatus,
+            ],
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | FILTERS
+            |--------------------------------------------------------------------------
+            */
+
+            'filters' => [
+
+                'period' => $request->get('period', 'month'),
+
+                'start_date' => $request->get('start_date', ''),
+
+                'end_date' => $request->get('end_date', ''),
             ],
         ]);
     }
+
+
+public function customers(Request $request)
+{
+    [$startDate, $endDate] = $this->getDateRange($request);
+
+    /*
+    |--------------------------------------------------------------------------
+    | TOTAL CUSTOMERS
+    |--------------------------------------------------------------------------
+    */
+
+    $totalCustomers = User::whereBetween('created_at', [
+        $startDate,
+        $endDate,
+    ])->count();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ACTIVE / RETURNING CUSTOMERS
+    |--------------------------------------------------------------------------
+    */
+
+    $activeCustomers = User::whereHas('orders', function ($query) use ($startDate, $endDate) {
+
+        $query->whereBetween('created_at', [
+            $startDate,
+            $endDate,
+        ]);
+
+    })->count();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ORDERS
+    |--------------------------------------------------------------------------
+    */
+
+    $totalOrders = Order::whereBetween('created_at', [
+        $startDate,
+        $endDate,
+    ])
+        ->whereNotIn('status', ['cancelled', 'refunded'])
+        ->count();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | TOTAL REVENUE
+    |--------------------------------------------------------------------------
+    */
+
+    $totalRevenue = Order::whereBetween('created_at', [
+        $startDate,
+        $endDate,
+    ])
+        ->whereNotIn('status', ['cancelled', 'refunded'])
+        ->sum('total_amount');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | TOP CUSTOMERS
+    |--------------------------------------------------------------------------
+    */
+
+    $topCustomers = User::query()
+        ->select([
+            'users.id',
+            'users.name',
+            'users.email',
+        ])
+        ->selectRaw('COUNT(orders.id) as orders')
+        ->selectRaw('COALESCE(SUM(orders.total_amount), 0) as revenue')
+        ->selectRaw(
+            'CASE 
+                WHEN COUNT(orders.id) > 0 
+                THEN COALESCE(SUM(orders.total_amount), 0) / COUNT(orders.id)
+                ELSE 0
+             END as average_order'
+        )
+        ->join('orders', function ($join) use ($startDate, $endDate) {
+
+            $join->on(
+                'orders.user_id',
+                '=',
+                'users.id'
+            );
+
+            $join->whereBetween('orders.created_at', [
+                $startDate,
+                $endDate,
+            ]);
+
+            $join->whereNotIn('orders.status', [
+                'cancelled',
+                'refunded',
+            ]);
+
+        })
+        ->groupBy(
+            'users.id',
+            'users.name',
+            'users.email'
+        )
+        ->orderByDesc('revenue')
+        ->limit(10)
+        ->get()
+        ->map(function ($customer) {
+
+            return [
+                'id' => $customer->id,
+                'name' => $customer->name,
+                'email' => $customer->email,
+                'orders' => (int) $customer->orders,
+                'revenue' => (float) $customer->revenue,
+                'average_order' => (float) $customer->average_order,
+            ];
+
+        })
+        ->values();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CUSTOMER GROWTH
+    |--------------------------------------------------------------------------
+    */
+
+    $customerGrowth = User::select(
+            DB::raw("DATE_FORMAT(created_at, '%Y-%m') as label"),
+            DB::raw('COUNT(*) as customers')
+        )
+        ->whereBetween('created_at', [
+            $startDate,
+            $endDate,
+        ])
+        ->groupBy('label')
+        ->orderBy('label')
+        ->get();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | AVERAGE CUSTOMER VALUE
+    |--------------------------------------------------------------------------
+    */
+
+    $averageCustomerValue = $activeCustomers > 0
+        ? $totalRevenue / $activeCustomers
+        : 0;
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | RETURN
+    |--------------------------------------------------------------------------
+    */
+
+    return Inertia::render('MyFashions/Reports/Customers', [
+
+        'filters' => [
+            'range' => $request->get('range', 'month'),
+            'start_date' => $request->get('start_date', ''),
+            'end_date' => $request->get('end_date', ''),
+        ],
+
+        'reports' => [
+
+            'date_range' => [
+                'start' => $startDate->format('Y-m-d'),
+                'end' => $endDate->format('Y-m-d'),
+            ],
+
+            'summary' => [
+
+                'totalCustomers' => $totalCustomers,
+
+                'newCustomers' => $totalCustomers,
+
+                'returningCustomers' => max(
+                    0,
+                    $activeCustomers - $totalCustomers
+                ),
+
+                'totalOrders' => $totalOrders,
+
+                'totalRevenue' => $totalRevenue,
+
+                'averageCustomerValue' => $averageCustomerValue,
+
+            ],
+
+            'topCustomers' => $topCustomers,
+
+            'customerGrowth' => $customerGrowth,
+
+        ],
+
+    ]);
+}
+
+
 
 
     /*
