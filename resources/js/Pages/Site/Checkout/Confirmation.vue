@@ -1,3 +1,4 @@
+<!-- resources\js\Pages\Site\Checkout\Confirmation.vue -->
 <script setup>
 
 import { Head, Link } from "@inertiajs/vue3";

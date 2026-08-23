@@ -217,22 +217,6 @@ Route::middleware('auth')->group(function () {
 
 
 
-
-    //Order Routes
-    // Route::prefix('fashion')->group(function () {
-
-    //     // Fashion Dashboard
-    //     //Route::get('/', [DashboardController::class, 'fashionDashboard'])->name('fashion.index');
-
-    //     Route::get('/orders', [OrderController::class, 'index'])->name('fashion.orders.index');
-    //     Route::get('/orders/pending', [OrderController::class, 'pending'])->name('fashion.orders.pending');
-    //     Route::get('/orders/processing', [OrderController::class, 'processing'])->name('fashion.orders.processing');
-    //     Route::get('/orders/completed', [OrderController::class, 'completed'])->name('fashion.orders.completed');
-
-    // });
-
-
-
       /*
         |--------------------------------------------------------------------------
         | CHECKOUT-allowing checkout only for authenticated customers:
@@ -263,37 +247,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/orders/pending', [OrderController::class, 'pending'])->name('fashion.orders.pending');
         Route::get('/orders/processing', [OrderController::class, 'processing'])->name('fashion.orders.processing');
         Route::get('/orders/completed', [OrderController::class, 'completed'])->name('fashion.orders.completed');
-          Route::get('/orders/cancelled', [OrderController::class, 'cancelled'])->name('fashion.orders.rejected');
-Route::get('/orders/{order}', [OrderController::class, 'show'])->name('fashion.orders.show');
-
-Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('fashion.orders.status');
-
-
-   
-
-;
-
-
-// Route::get('/orders', [
-//     OrderController::class,
-//     'index'
-// ])->name('fashion.orders.index');
-
-// Route::get('/orders/pending', [
-//     OrderController::class,
-//     'pending'
-// ])->name('fashion.orders.pending');
-
-// Route::get('/orders/processing', [
-//     OrderController::class,
-//     'processing'
-// ])->name('fashion.orders.processing');
-
-// Route::get('/orders/completed', [
-//     OrderController::class,
-//     'completed'
-// ])->name('fashion.orders.completed');
-
+        Route::get('/orders/cancelled', [OrderController::class, 'cancelled'])->name('fashion.orders.rejected');
+        Route::get('/orders/{order}', [OrderController::class, 'show'])->name('fashion.orders.show');
+        Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('fashion.orders.status');
 
         /*
         |--------------------------------------------------------------------------
@@ -313,6 +269,9 @@ Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])
         Route::post('/products/{product}/stock-adjustment', [StockAdjustmentController::class, 'store'])->name('fashion.products.stock-adjustment');
         Route::get('/products/inventory/audit', [InventoryAuditController::class, 'index'])->name('fashion.products.inventory.audit');
         Route::get('/products/inventory/audit/product/{product}', [InventoryAuditController::class, 'productAuditDetails'])->name('fashion.products.inventory.audit.product');
+
+
+
 
 
         /*
@@ -368,9 +327,14 @@ Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])
         |--------------------------------------------------------------------------
         */
 
-        Route::get('/customers', [CustomerController::class, 'index'])->name('fashion.customers.index');
+        //Route::get('/fashion/customers', [OrderController::class, 'customers'])->name('fashion.customers');
+
+        Route::get('/customers', [CustomerController::class, 'customers'])->name('fashion.customers.index');
         Route::get('/customers/groups', [CustomerController::class, 'groups'])->name('fashion.customers.groups');
         Route::get('/customers/vip', [CustomerController::class, 'vip'])->name('fashion.customers.vip');
+        Route::get('/customers/{customer}', [CustomerController::class, 'show'])->name('fashion.customers.show');
+
+
 
         /*
         |--------------------------------------------------------------------------
