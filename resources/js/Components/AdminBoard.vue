@@ -8,6 +8,7 @@ import {
     ShoppingOutlined,
     ShoppingCartOutlined,
     UserOutlined,
+    LogoutOutlined,
     TeamOutlined,
     AppstoreOutlined,
     TagsOutlined,
@@ -322,10 +323,10 @@ const navigation = [
                 href: "/fashion/users",
             },
 
-            {
-                label: "Add User",
-                href: "/fashion/users/create",
-            },
+            // {
+            //     label: "Add User",
+            //     href: "/fashion/users/create",
+            // },
 
             {
                 label: "Roles & Permissions",
@@ -662,16 +663,14 @@ const closeSidebar = () => {
                     class="admin-logo"
                 >
 
-                    <span class="logo-mark">
-                        FS
-                    </span>
+                   <img src="/assets/aaib.png" alt="Fashion Style" class="logo-image" />
 
                     <span class="logo-text">
 
-                        FASHION
+                        IN STYLE
 
                         <small>
-                            STYLES
+                           ASARA
                         </small>
 
                     </span>
@@ -946,6 +945,54 @@ const closeSidebar = () => {
 
 
                     <!-- USER -->
+
+                    <!-- USER ACCOUNT DROPDOWN -->
+<a-dropdown
+    placement="bottomRight"
+    trigger="click"
+>
+    <a-tooltip
+        title="Account"
+        placement="bottom"
+    >
+        <button
+            type="button"
+            class="profile-button"
+        >
+            <UserOutlined />
+        </button>
+    </a-tooltip>
+
+    <template #overlay>
+        <a-menu class="account-menu">
+
+            <!-- PROFILE -->
+            <a-menu-item key="profile">
+                <Link
+                    :href="route('profile.edit')"
+                    class="account-menu-link"
+                >
+                    <UserOutlined />
+                    <span>Profile</span>
+                </Link>
+            </a-menu-item>
+
+            <!-- LOGOUT -->
+            <a-menu-item key="logout">
+                <Link
+                    :href="route('logout')"
+                    method="post"
+                    as="button"
+                    class="account-menu-link logout-link"
+                >
+                    <LogoutOutlined />
+                    <span>Log Out</span>
+                </Link>
+            </a-menu-item>
+
+        </a-menu>
+    </template>
+</a-dropdown>
 
                     <!-- <a-tooltip
                         title="Account"
@@ -1510,6 +1557,63 @@ const closeSidebar = () => {
         sans-serif;
 }
 
+/* =========================================================
+   USER ACCOUNT
+========================================================= */
+
+
+.account-menu {
+    min-width: 180px;
+    padding: 6px;
+    border-radius: 10px;
+}
+
+.account-menu-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 12px;
+    color: #374151;
+    text-decoration: none;
+    border-radius: 7px;
+    transition: all 0.2s ease;
+}
+
+.account-menu-link:hover {
+    background: #f0fdfa;
+    color: #0f766e;
+}
+
+.logout-link {
+    color: #dc2626;
+}
+
+.logout-link:hover {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+.profile-button {
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background: #f0fdfa;
+    color: #0f766e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.profile-button:hover {
+    background: #ccfbf1;
+    color: #115e59;
+    transform: translateY(-1px);
+}
+
 
 /* =========================================================
    SIDEBAR
@@ -1559,24 +1663,11 @@ const closeSidebar = () => {
     color: #064f4c;
 }
 
-
-.logo-mark {
-    width: 36px;
-    height: 36px;
-
-    border-radius: 10px;
-
-    background: #064f4c;
-    color: white;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: 11px;
-    font-weight: 800;
-
-    letter-spacing: 1px;
+.logo-image {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+    display: block;
 }
 
 

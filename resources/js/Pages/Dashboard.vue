@@ -1,7 +1,6 @@
 <!-- resources\js\Pages\Dashboard.vue -->
 <script setup>
-
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import MyFashionLayout from '@/Layouts/MyFashionLayout.vue'
 import { Head } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
@@ -223,14 +222,14 @@ const dashboardTitle = computed(() => {
     <Head :title="dashboardTitle" />
 
 
-    <AuthenticatedLayout>
+  
 
 
         <!-- =====================================================
              HEADER
         ====================================================== -->
 
-        <template #header>
+        <!-- <template #header>
 
             <div class="flex items-center justify-between">
 
@@ -254,7 +253,7 @@ const dashboardTitle = computed(() => {
 
             </div>
 
-        </template>
+        </template> -->
 
 
         <!-- =====================================================
@@ -387,6 +386,5 @@ const dashboardTitle = computed(() => {
         </div>
 
 
-    </AuthenticatedLayout>
 
 </template>

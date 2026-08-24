@@ -459,15 +459,7 @@ const formatPrice = (amount) => {
 
                         </label>
 
-                        <input
-
-                            v-model="form.customer_email"
-
-                            type="email"
-
-                            placeholder="you@example.com"
-
-                        />
+                        <input v-model="form.customer_email" type="email" placeholder="you@example.com" />
 
                     </div>
 
@@ -501,15 +493,7 @@ const formatPrice = (amount) => {
 
                             </label>
 
-                            <input
-
-                                v-model="form.first_name"
-
-                                type="text"
-
-                                placeholder="First name"
-
-                            />
+                            <input v-model="form.first_name" type="text" placeholder="First name" />
 
                         </div>
 
@@ -525,15 +509,7 @@ const formatPrice = (amount) => {
 
                             </label>
 
-                            <input
-
-                                v-model="form.last_name"
-
-                                type="text"
-
-                                placeholder="Last name"
-
-                            />
+                            <input v-model="form.last_name" type="text" placeholder="Last name" />
 
                         </div>
 
@@ -552,15 +528,7 @@ const formatPrice = (amount) => {
 
                         </label>
 
-                        <input
-
-                            v-model="form.address"
-
-                            type="text"
-
-                            placeholder="Street address"
-
-                        />
+                        <input v-model="form.address" type="text" placeholder="Street address" />
 
                     </div>
 
@@ -579,15 +547,7 @@ const formatPrice = (amount) => {
 
                             </label>
 
-                            <input
-
-                                v-model="form.city"
-
-                                type="text"
-
-                                placeholder="City"
-
-                            />
+                            <input v-model="form.city" type="text" placeholder="City" />
 
                         </div>
 
@@ -601,15 +561,7 @@ const formatPrice = (amount) => {
 
                             </label>
 
-                            <input
-
-                                v-model="form.country"
-
-                                type="text"
-
-                                placeholder="Country"
-
-                            />
+                            <input v-model="form.country" type="text" placeholder="Country" />
 
                         </div>
 
@@ -628,15 +580,7 @@ const formatPrice = (amount) => {
 
                         </label>
 
-                        <input
-
-                            v-model="form.customer_phone"
-
-                            type="tel"
-
-                            placeholder="+260"
-
-                        />
+                        <input v-model="form.customer_phone" type="tel" placeholder="+260" />
 
                     </div>
 
@@ -661,38 +605,16 @@ const formatPrice = (amount) => {
                     <div class="checkout-items">
 
 
-                        <div
-
-                            v-for="item in cart"
-
-                            :key="item.id"
-
-                            class="checkout-item"
-
-                        >
+                        <div v-for="item in cart" :key="item.id" class="checkout-item">
 
 
                             <!-- IMAGE -->
 
                             <div class="checkout-item-image">
 
-                                <img
+                                <img v-if="item.image" :src="item.image" :alt="item.name" />
 
-                                    v-if="item.image"
-
-                                    :src="item.image"
-
-                                    :alt="item.name"
-
-                                />
-
-                                <div
-
-                                    v-else
-
-                                    class="no-item-image"
-
-                                >
+                                <div v-else class="no-item-image">
 
                                     NO IMAGE
 
@@ -771,33 +693,17 @@ const formatPrice = (amount) => {
                              CASH ON DELIVERY
                         ============================== -->
 
-                        <label
+                        <label v-if="paymentSettings.cash_on_delivery" class="payment-option" :class="{
 
-                            v-if="paymentSettings.cash_on_delivery"
+                            selected:
 
-                            class="payment-option"
+                                paymentMethod ===
 
-                            :class="{
+                                'cash_on_delivery'
 
-                                selected:
+                        }">
 
-                                    paymentMethod ===
-
-                                    'cash_on_delivery'
-
-                            }"
-
-                        >
-
-                            <input
-
-                                type="radio"
-
-                                value="cash_on_delivery"
-
-                                v-model="paymentMethod"
-
-                            />
+                            <input type="radio" value="cash_on_delivery" v-model="paymentMethod" />
 
 
                             <div class="payment-icon">
@@ -832,33 +738,17 @@ const formatPrice = (amount) => {
                              MOBILE MONEY
                         ============================== -->
 
-                        <label
+                        <label v-if="paymentSettings.mobile_money" class="payment-option" :class="{
 
-                            v-if="paymentSettings.mobile_money"
+                            selected:
 
-                            class="payment-option"
+                                paymentMethod ===
 
-                            :class="{
+                                'mobile_money'
 
-                                selected:
+                        }">
 
-                                    paymentMethod ===
-
-                                    'mobile_money'
-
-                            }"
-
-                        >
-
-                            <input
-
-                                type="radio"
-
-                                value="mobile_money"
-
-                                v-model="paymentMethod"
-
-                            />
+                            <input type="radio" value="mobile_money" v-model="paymentMethod" />
 
 
                             <div class="payment-icon">
@@ -895,31 +785,15 @@ const formatPrice = (amount) => {
                              CARD
                         ============================== -->
 
-                        <label
+                        <label v-if="paymentSettings.card" class="payment-option" :class="{
 
-                            v-if="paymentSettings.card"
+                            selected:
 
-                            class="payment-option"
+                                paymentMethod === 'card'
 
-                            :class="{
+                        }">
 
-                                selected:
-
-                                    paymentMethod === 'card'
-
-                            }"
-
-                        >
-
-                            <input
-
-                                type="radio"
-
-                                value="card"
-
-                                v-model="paymentMethod"
-
-                            />
+                            <input type="radio" value="card" v-model="paymentMethod" />
 
 
                             <div class="payment-icon">
@@ -959,21 +833,15 @@ const formatPrice = (amount) => {
                          NO PAYMENT METHODS
                     ================================== -->
 
-                    <div
+                    <div v-if="
 
-                        v-if="
+                        !paymentSettings.cash_on_delivery &&
 
-                            !paymentSettings.cash_on_delivery &&
+                        !paymentSettings.mobile_money &&
 
-                            !paymentSettings.mobile_money &&
+                        !paymentSettings.card
 
-                            !paymentSettings.card
-
-                        "
-
-                        class="no-payment-methods"
-
-                    >
+                    " class="no-payment-methods">
 
                         <strong>
 
@@ -995,19 +863,13 @@ const formatPrice = (amount) => {
                          MOBILE MONEY DETAILS
                     ================================== -->
 
-                    <div
+                    <div v-if="
 
-                        v-if="
+                        paymentMethod === 'mobile_money' &&
 
-                            paymentMethod === 'mobile_money' &&
+                        paymentSettings.mobile_money
 
-                            paymentSettings.mobile_money
-
-                        "
-
-                        class="payment-details"
-
-                    >
+                    " class="payment-details">
 
 
                         <div class="form-group">
@@ -1018,15 +880,7 @@ const formatPrice = (amount) => {
 
                             </label>
 
-                            <input
-
-                                v-model="form.mobile_money_number"
-
-                                type="tel"
-
-                                placeholder="+260 97 123 4567"
-
-                            />
+                            <input v-model="form.mobile_money_number" type="tel" placeholder="+260 97 123 4567" />
 
                         </div>
 
@@ -1034,13 +888,7 @@ const formatPrice = (amount) => {
 
                         <!-- PROVIDER -->
 
-                        <p
-
-                            v-if="paymentSettings.mobile_money_provider"
-
-                            class="payment-note"
-
-                        >
+                        <p v-if="paymentSettings.mobile_money_provider" class="payment-note">
 
                             Provider:
 
@@ -1056,13 +904,7 @@ const formatPrice = (amount) => {
 
                         <!-- STORE NUMBER -->
 
-                        <p
-
-                            v-if="paymentSettings.mobile_money_number"
-
-                            class="payment-note"
-
-                        >
+                        <p v-if="paymentSettings.mobile_money_number" class="payment-note">
 
                             Payment Number:
 
@@ -1078,13 +920,7 @@ const formatPrice = (amount) => {
 
                         <!-- INSTRUCTIONS -->
 
-                        <p
-
-                            v-if="paymentSettings.payment_instructions"
-
-                            class="payment-note payment-instructions"
-
-                        >
+                        <p v-if="paymentSettings.payment_instructions" class="payment-note payment-instructions">
 
                             {{ paymentSettings.payment_instructions }}
 
@@ -1099,20 +935,13 @@ const formatPrice = (amount) => {
                          CARD DETAILS
                     ================================== -->
 
-                    <div
+                    <div v-if="
 
-                        v-if="
+                        paymentMethod === 'card' &&
 
-                            paymentMethod === 'card' &&
+                        paymentSettings.card
 
-                            paymentSettings.card
-
-                        "
-
-                        class="payment-details"
-
-
-                    >
+                    " class="payment-details">
 
 
                         <!-- CARDHOLDER -->
@@ -1125,15 +954,7 @@ const formatPrice = (amount) => {
 
                             </label>
 
-                            <input
-
-                                v-model="form.cardholder_name"
-
-                                type="text"
-
-                                placeholder="Name on card"
-
-                            />
+                            <input v-model="form.cardholder_name" type="text" placeholder="Name on card" />
 
                         </div>
 
@@ -1149,19 +970,8 @@ const formatPrice = (amount) => {
 
                             </label>
 
-                            <input
-
-                                v-model="form.card_number"
-
-                                type="text"
-
-                                inputmode="numeric"
-
-                                maxlength="19"
-
-                                placeholder="•••• •••• •••• ••••"
-
-                            />
+                            <input v-model="form.card_number" type="text" inputmode="numeric" maxlength="19"
+                                placeholder="•••• •••• •••• ••••" />
 
                         </div>
 
@@ -1180,17 +990,7 @@ const formatPrice = (amount) => {
 
                                 </label>
 
-                                <input
-
-                                    v-model="form.card_expiry"
-
-                                    type="text"
-
-                                    maxlength="5"
-
-                                    placeholder="MM/YY"
-
-                                />
+                                <input v-model="form.card_expiry" type="text" maxlength="5" placeholder="MM/YY" />
 
                             </div>
 
@@ -1204,17 +1004,7 @@ const formatPrice = (amount) => {
 
                                 </label>
 
-                                <input
-
-                                    v-model="form.card_cvv"
-
-                                    type="password"
-
-                                    maxlength="4"
-
-                                    placeholder="•••"
-
-                                />
+                                <input v-model="form.card_cvv" type="password" maxlength="4" placeholder="•••" />
 
                             </div>
 
@@ -1225,13 +1015,7 @@ const formatPrice = (amount) => {
 
                         <!-- CARD PROVIDER -->
 
-                        <p
-
-                            v-if="paymentSettings.card_provider"
-
-                            class="payment-note"
-
-                        >
+                        <p v-if="paymentSettings.card_provider" class="payment-note">
 
                             Payment Provider:
 
@@ -1320,29 +1104,29 @@ const formatPrice = (amount) => {
 
 
                 <!-- SHIPPING -->
-                 <div class="summary-row">
+                <div class="summary-row">
 
-    <span>
-        {{ shippingLabel }}
-    </span>
+                    <span>
+                        {{ shippingLabel }}
+                    </span>
 
-    <strong>
+                    <strong>
 
-        <span v-if="calculatingShipping">
-            Calculating...
-        </span>
+                        <span v-if="calculatingShipping">
+                            Calculating...
+                        </span>
 
-        <span v-else-if="shippingAmount <= 0">
-            FREE
-        </span>
+                        <span v-else-if="shippingAmount <= 0">
+                            FREE
+                        </span>
 
-        <span v-else>
-            {{ formatPrice(shippingAmount) }}
-        </span>
+                        <span v-else>
+                            {{ formatPrice(shippingAmount) }}
+                        </span>
 
-    </strong>
+                    </strong>
 
-</div>
+                </div>
 
 
                 <!-- <div class="summary-row">
@@ -1391,25 +1175,13 @@ const formatPrice = (amount) => {
                      PLACE ORDER
                 ================================== -->
 
-                <button
+                <button type="button" class="place-order-button" :disabled="processing ||
 
-                    type="button"
+                    cart.length === 0 ||
 
-                    class="place-order-button"
+                    !paymentMethod
 
-                    :disabled="
-
-                        processing ||
-
-                        cart.length === 0 ||
-
-                        !paymentMethod
-
-                    "
-
-                    @click="submitOrder"
-
-                >
+                    " @click="submitOrder">
 
                     {{
 
@@ -1427,13 +1199,7 @@ const formatPrice = (amount) => {
 
                 <!-- BACK TO BAG -->
 
-                <Link
-
-                    href="/cart"
-
-                    class="back-to-bag"
-
-                >
+                <Link href="/cart" class="back-to-bag">
 
                     ← BACK TO BAG
 
@@ -1463,8 +1229,6 @@ const formatPrice = (amount) => {
 
 
 <style scoped>
-
-
 /* =========================================
    PAGE
 ========================================= */
@@ -2149,15 +1913,11 @@ const formatPrice = (amount) => {
 
     background:
 
-        linear-gradient(
+        linear-gradient(to bottom,
 
-            to bottom,
+            rgba(0, 0, 0, .10),
 
-            rgba(0,0,0,.10),
-
-            rgba(0,0,0,.42)
-
-        );
+            rgba(0, 0, 0, .42));
 
 }
 
@@ -2209,15 +1969,11 @@ const formatPrice = (amount) => {
 
         serif;
 
-    font-size: clamp(
+    font-size: clamp(48px,
 
-        48px,
+            7vw,
 
-        7vw,
-
-        85px
-
-    );
+            85px);
 
     font-weight: 400;
 
@@ -2312,5 +2068,4 @@ const formatPrice = (amount) => {
     }
 
 }
-
 </style>

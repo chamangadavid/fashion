@@ -218,7 +218,7 @@ defineProps({
 
 
             <!-- CONTACT -->
-            <Link href="/contact" class="nav-link"> CONTACT </Link>
+            <Link href="/contact-us" class="nav-link"> CONTACT </Link>
 
             <!-- OUR COLLECTIONS -->
             <Link href="/collections" class="nav-link"> OUR COLLECTIONS </Link>

@@ -14,6 +14,7 @@ import {
     ShoppingOutlined,
     ShoppingCartOutlined,
     UserOutlined,
+    LogoutOutlined,
     TeamOutlined,
     AppstoreOutlined,
     TagsOutlined,
@@ -346,11 +347,11 @@ const navigation = [
                 href: "/fashion/users",
             },
 
-            {
-                label: "Add User",
+            // {
+            //     label: "Add User",
 
-                href: "/fashion/users/create",
-            },
+            //     href: "/fashion/users/create",
+            // },
 
             {
                 label: "Roles & Permissions",
@@ -608,22 +609,15 @@ const createNewOrder = () => {
                     class="admin-logo"
                     @click="closeSidebar"
                 >
-
-                    <span class="logo-mark">
-
-                        FS
-
-                    </span>
-
+                   <img src="/assets/aaib.png" alt="Fashion Style" class="logo-image" />
 
                     <span class="logo-text">
 
-                        FASHION
+                        IN STYLE
 
                         <small>
 
-                            STYLES
-
+                            ASARA
                         </small>
 
                     </span>
@@ -973,26 +967,39 @@ const createNewOrder = () => {
 
 
 
-                    <!-- =================================================
+                <!-- =================================================
                          PROFILE
                     ================================================== -->
+                    <a-dropdown placement="bottomRight" trigger="click">
+                        <a-tooltip title="Account" placement="bottom">
+                            <button type="button" class="profile-button">
+                                <UserOutlined />
+                            </button>
+                        </a-tooltip>
 
-                    <a-tooltip
-                        title="Account"
-                        placement="bottom"
-                    >
+                        <template #overlay>
+                            <a-menu class="account-menu">
 
-                        <Link
-                            href="/profile"
-                            class="profile-button"
-                        >
+                                <!-- PROFILE -->
+                                <a-menu-item key="profile">
+                                    <Link :href="route('profile.edit')" class="account-menu-link">
+                                        <UserOutlined />
+                                        <span>Profile</span>
+                                    </Link>
+                                </a-menu-item>
 
-                            <UserOutlined />
+                                <!-- LOGOUT -->
+                                <a-menu-item key="logout">
+                                    <Link :href="route('logout')" method="post" as="button"
+                                        class="account-menu-link logout-link">
+                                        <LogoutOutlined />
+                                        <span>Log Out</span>
+                                    </Link>
+                                </a-menu-item>
 
-                        </Link>
-
-                    </a-tooltip>
-
+                            </a-menu>
+                        </template>
+                    </a-dropdown>
 
                 </div>
 
@@ -1114,30 +1121,11 @@ const createNewOrder = () => {
 }
 
 
-.logo-mark {
-
+.logo-image {
     width: 42px;
-
     height: 42px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    border-radius: 12px;
-
-    background: #111827;
-
-    color: #ffffff;
-
-    font-size: 14px;
-
-    font-weight: 800;
-
-    letter-spacing: 1px;
-
+    object-fit: contain;
+    display: block;
 }
 
 
@@ -1802,6 +1790,63 @@ const createNewOrder = () => {
 
 }
 
+/* =========================================================
+   USER ACCOUNT
+========================================================= */
+
+
+.account-menu {
+    min-width: 180px;
+    padding: 6px;
+    border-radius: 10px;
+}
+
+.account-menu-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 12px;
+    color: #374151;
+    text-decoration: none;
+    border-radius: 7px;
+    transition: all 0.2s ease;
+}
+
+.account-menu-link:hover {
+    background: #f0fdfa;
+    color: #0f766e;
+}
+
+.logout-link {
+    color: #dc2626;
+}
+
+.logout-link:hover {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+.profile-button {
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background: #f0fdfa;
+    color: #0f766e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.profile-button:hover {
+    background: #ccfbf1;
+    color: #115e59;
+    transform: translateY(-1px);
+}
+
 
 /*
 |--------------------------------------------------------------------------
@@ -1809,7 +1854,7 @@ const createNewOrder = () => {
 |--------------------------------------------------------------------------
 */
 
-.profile-button {
+/* .profile-button {
 
     width: 40px;
 
@@ -1840,7 +1885,7 @@ const createNewOrder = () => {
 
     background: #f9fafb;
 
-}
+} */
 
 
 /*

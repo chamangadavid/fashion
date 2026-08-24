@@ -38,29 +38,14 @@ const props = defineProps({
 
 const form = reactive({
 
-    store_name:
-        props.settings?.store_name || '',
-
-    store_email:
-        props.settings?.store_email || '',
-
-    store_phone:
-        props.settings?.store_phone || '',
-
-    store_address:
-        props.settings?.store_address || '',
-
-    store_city:
-        props.settings?.store_city || '',
-
-    store_country:
-        props.settings?.store_country || 'Zambia',
-
-    currency:
-        props.settings?.currency || 'ZMW',
-
-    timezone:
-        props.settings?.timezone || 'Africa/Lusaka',
+    store_name: props.settings?.store_name || '',
+    store_email: props.settings?.store_email || '',
+    store_phone: props.settings?.store_phone || '',
+    store_address: props.settings?.store_address || '',
+    store_city: props.settings?.store_city || '',
+    store_country: props.settings?.store_country || 'Zambia',
+    currency: props.settings?.currency || 'ZMW',
+    timezone: props.settings?.timezone || 'Africa/Lusaka',
 
 })
 
@@ -82,9 +67,7 @@ const saveSettings = () => {
 
     processing.value = true
 
-    router.post(
-        '/fashion/settings',
-        form,
+    router.post('/fashion/settings', form,
         {
             preserveScroll: true,
 

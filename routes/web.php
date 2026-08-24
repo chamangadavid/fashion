@@ -49,56 +49,36 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 
-/*
-|--------------------------------------------------------------------------
-| Authenticated Routes
-|--------------------------------------------------------------------------
-*/
-
-// Route::get('/test-imagick', function() {
-//     phpinfo();
-// });
+    /*
+    |--------------------------------------------------------------------------
+    | Authenticated Routes
+    |--------------------------------------------------------------------------
+    */
 
 
-/*
-|--------------------------------------------------------------------------
-| Site Pages
-|--------------------------------------------------------------------------
-*/
+    /*
+    |--------------------------------------------------------------------------
+    | Site Pages Public pages
+    |--------------------------------------------------------------------------
+    */
 
-//Collection Api
-// Route::get('/collections', function () {
-//     return Inertia::render('Site/Collections/Index');
-// })->name('collections.index');
-
-
-Route::get('/collections', [CollectionController::class, 'publicIndex'])->name('collections.index');
-Route::get('/collections/{collection:slug}', [CollectionController::class, 'publicShow'])->name('collections.show');
-Route::get('/products/{product:slug}', [ProductController::class, 'publicShow'])->name('products.show');
-
-Route::get('/shop/{slug}', [ShopController::class, 'category'])->name('shop.category');
+    Route::get('/collections', [CollectionController::class, 'publicIndex'])->name('collections.index');
+    Route::get('/collections/{collection:slug}', [CollectionController::class, 'publicShow'])->name('collections.show');
+    Route::get('/products/{product:slug}', [ProductController::class, 'publicShow'])->name('products.show');
+    Route::get('/shop/{slug}', [ShopController::class, 'category'])->name('shop.category');
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | SHOPPING CART
+    |--------------------------------------------------------------------------
+    */
 
-
-
-
-
-
-
-
-//public 
-/*
-|--------------------------------------------------------------------------
-| SHOPPING CART
-|--------------------------------------------------------------------------
-*/
-
-Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
-Route::put('/cart/{product}', [CartController::class, 'update'])->name('cart.update');
-Route::delete('/cart/{product}', [CartController::class, 'remove'])->name('cart.remove');
-Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
+    Route::put('/cart/{product}', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/{product}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
 
 
 
@@ -119,6 +99,8 @@ Route::get('/faq', function () {
 Route::get('/contact-us', function () {
     return Inertia::render('Site/Contact');
 })->name('contactDetails');
+
+
 
 Route::get('/management-team', function () {
     return Inertia::render('Site/ManagementTeam');
@@ -225,7 +207,6 @@ Route::middleware('auth')->group(function () {
         */
 
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
-
     Route::post('/checkout', [OrderController::class, 'store'])->name('checkout.store');
     Route::get('/checkout/confirmation/{order}', [OrderController::class, 'confirmation'])->name('checkout.confirmation');
 
