@@ -429,7 +429,7 @@ class ClientDashboardController extends Controller
 
     public function completedOrders(Request $request)
     {
-        return $this->ordersByStatus(
+        return $this->ordersCompletedByStatus(
             $request,
             [
                 'completed',
@@ -438,6 +438,38 @@ class ClientDashboardController extends Controller
             'Completed Orders'
         );
     }
+
+    private function ordersCompletedByStatus(Request $request, array $statuses,  string $title) 
+    {
+        $user = $request->user();
+
+        $query = Order::with(['items'])
+            ->where('customer_email', $user->email)
+            ->whereIn('status', $statuses)
+            ->latest();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('order_number', 'like', "%{$search}%")
+                    ->orWhere('customer_email', 'like', "%{$search}%");
+            });
+        }
+
+        $orders = $query
+            ->paginate(10)
+            ->withQueryString();
+
+        return Inertia::render('MyFashions/Clients/Orders/Completed', [
+            'orders' => $orders,
+            'title' => $title,
+            'filters' => [
+                'search' => $request->search ?? '',
+            ],
+        ]);
+    }
+
 
 
     /*
@@ -448,9 +480,7 @@ class ClientDashboardController extends Controller
 
     public function cancelledOrders(Request $request)
     {
-        return $this->ordersByStatus(
-            $request,
-            [
+        return $this->ordersCancelledByStatus($request, [
                 'cancelled',
             ],
             'Cancelled Orders'
@@ -464,32 +494,39 @@ class ClientDashboardController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    // private function ordersProcessingByStatus(
-    //     Request $request,
-    //     array $statuses,
-    //     string $title
-    // ) {
-    //     $user = $request->user();
+    private function ordersCancelledByStatus(Request $request, array $statuses,  string $title) 
+    {
+        $user = $request->user();
 
-    //     $orders = Order::with('items')
-    //         ->where('user_id', $user->id)
-    //         ->whereIn('status', $statuses)
-    //         ->latest()
-    //         ->paginate(10)
-    //         ->withQueryString();
+        $query = Order::with(['items'])
+            ->where('customer_email', $user->email)
+            ->whereIn('status', $statuses)
+            ->latest();
 
-    //     return Inertia::render(
-    //         'MyFashions/Clients/Orders/Processing',
-    //         [
-    //             'orders' => $orders,
+        if ($request->filled('search')) {
+            $search = $request->search;
 
-    //             'title' => $title,
+            $query->where(function ($q) use ($search) {
+                $q->where('order_number', 'like', "%{$search}%")
+                    ->orWhere('customer_email', 'like', "%{$search}%");
+            });
+        }
 
-    //             'statuses' => $statuses,
-    //         ]
-    //     );
-    // }
+        $orders = $query
+            ->paginate(10)
+            ->withQueryString();
 
+        return Inertia::render('MyFashions/Clients/Orders/Cancelled', [
+            'orders' => $orders,
+            'title' => $title,
+            'filters' => [
+                'search' => $request->search ?? '',
+            ],
+        ]);
+    }
+
+
+    
 
     /*
     |--------------------------------------------------------------------------
