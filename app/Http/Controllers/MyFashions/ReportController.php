@@ -8,6 +8,7 @@ use App\Models\OrderItem;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Inertia\Inertia;
 use Carbon\Carbon;
 
@@ -778,6 +779,377 @@ public function customers(Request $request)
             $endDate,
         ];
     }
+
+    /*
+|--------------------------------------------------------------------------
+| DOWNLOAD SALES REPORT
+|--------------------------------------------------------------------------
+*/
+
+public function downloadSales(Request $request)
+{
+    [$startDate, $endDate] = $this->getDateRange($request);
+
+    $totalOrders = Order::whereBetween('created_at', [
+        $startDate,
+        $endDate,
+    ])->count();
+
+    $totalSales = Order::whereBetween('created_at', [
+        $startDate,
+        $endDate,
+    ])
+        ->whereNotIn('status', ['cancelled', 'refunded'])
+        ->sum('total_amount');
+
+    $itemsSold = OrderItem::whereHas('order', function ($query) use (
+        $startDate,
+        $endDate
+    ) {
+        $query
+            ->whereBetween('created_at', [
+                $startDate,
+                $endDate,
+            ])
+            ->whereNotIn('status', [
+                'cancelled',
+                'refunded',
+            ]);
+    })->sum('quantity');
+
+    $averageOrderValue = $totalOrders > 0
+        ? $totalSales / $totalOrders
+        : 0;
+
+    $orders = Order::whereBetween('created_at', [
+        $startDate,
+        $endDate,
+    ])
+        ->whereNotIn('status', [
+            'cancelled',
+            'refunded',
+        ])
+        ->latest()
+        ->get();
+
+    $pdf = Pdf::loadView(
+        'reports.sales',
+        [
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'totalOrders' => $totalOrders,
+            'totalSales' => $totalSales,
+            'itemsSold' => $itemsSold,
+            'averageOrderValue' => $averageOrderValue,
+            'orders' => $orders,
+        ]
+    );
+
+    return $pdf->download(
+        'sales-report-' .
+        $startDate->format('Y-m-d') .
+        '-to-' .
+        $endDate->format('Y-m-d') .
+        '.pdf'
+    );
+}
+
+/*
+|--------------------------------------------------------------------------
+| DOWNLOAD REVENUE REPORT
+|--------------------------------------------------------------------------
+*/
+
+public function downloadRevenue(Request $request)
+{
+    [$startDate, $endDate] = $this->getDateRange($request);
+
+    $baseQuery = Order::whereBetween('created_at', [
+        $startDate,
+        $endDate,
+    ]);
+
+    $grossRevenue = (clone $baseQuery)
+        ->whereNotIn('status', [
+            'cancelled',
+            'refunded',
+        ])
+        ->sum('total_amount');
+
+    $paidRevenue = (clone $baseQuery)
+        ->where('payment_status', 'paid')
+        ->whereNotIn('status', [
+            'cancelled',
+            'refunded',
+        ])
+        ->sum('total_amount');
+
+    $pendingRevenue = (clone $baseQuery)
+        ->where('payment_status', 'pending')
+        ->whereNotIn('status', [
+            'cancelled',
+            'refunded',
+        ])
+        ->sum('total_amount');
+
+    $cancelledRevenue = (clone $baseQuery)
+        ->where(function ($query) {
+
+            $query
+                ->where('status', 'cancelled')
+                ->orWhere('payment_status', 'cancelled');
+
+        })
+        ->sum('total_amount');
+
+    $refundedRevenue = (clone $baseQuery)
+        ->where(function ($query) {
+
+            $query
+                ->where('status', 'refunded')
+                ->orWhere('payment_status', 'refunded');
+
+        })
+        ->sum('total_amount');
+
+    $orders = (clone $baseQuery)
+        ->whereNotIn('status', [
+            'cancelled',
+            'refunded',
+        ])
+        ->latest()
+        ->get();
+
+    $pdf = Pdf::loadView(
+        'reports.revenue',
+        [
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'grossRevenue' => $grossRevenue,
+            'paidRevenue' => $paidRevenue,
+            'pendingRevenue' => $pendingRevenue,
+            'cancelledRevenue' => $cancelledRevenue,
+            'refundedRevenue' => $refundedRevenue,
+            'orders' => $orders,
+        ]
+    );
+
+    return $pdf->download(
+        'revenue-report-' .
+        $startDate->format('Y-m-d') .
+        '-to-' .
+        $endDate->format('Y-m-d') .
+        '.pdf'
+    );
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| DOWNLOAD CUSTOMER REPORT
+|--------------------------------------------------------------------------
+*/
+
+public function downloadCustomers(Request $request)
+{
+    [$startDate, $endDate] = $this->getDateRange($request);
+
+    $totalCustomers = User::whereBetween('created_at', [
+        $startDate,
+        $endDate,
+    ])->count();
+
+    $activeCustomers = User::whereHas(
+        'orders',
+        function ($query) use ($startDate, $endDate) {
+
+            $query->whereBetween('created_at', [
+                $startDate,
+                $endDate,
+            ]);
+
+        }
+    )->count();
+
+    $totalOrders = Order::whereBetween('created_at', [
+        $startDate,
+        $endDate,
+    ])
+        ->whereNotIn('status', [
+            'cancelled',
+            'refunded',
+        ])
+        ->count();
+
+    $totalRevenue = Order::whereBetween('created_at', [
+        $startDate,
+        $endDate,
+    ])
+        ->whereNotIn('status', [
+            'cancelled',
+            'refunded',
+        ])
+        ->sum('total_amount');
+
+    $customers = User::query()
+        ->select([
+            'users.id',
+            'users.name',
+            'users.email',
+        ])
+        ->selectRaw(
+            'COUNT(orders.id) as orders'
+        )
+        ->selectRaw(
+            'COALESCE(SUM(orders.total_amount), 0) as revenue'
+        )
+        ->join(
+            'orders',
+            function ($join) use (
+                $startDate,
+                $endDate
+            ) {
+
+                $join->on(
+                    'orders.user_id',
+                    '=',
+                    'users.id'
+                );
+
+                $join->whereBetween(
+                    'orders.created_at',
+                    [
+                        $startDate,
+                        $endDate,
+                    ]
+                );
+
+                $join->whereNotIn(
+                    'orders.status',
+                    [
+                        'cancelled',
+                        'refunded',
+                    ]
+                );
+            }
+        )
+        ->groupBy(
+            'users.id',
+            'users.name',
+            'users.email'
+        )
+        ->orderByDesc('revenue')
+        ->get();
+
+    $pdf = Pdf::loadView(
+        'reports.customers',
+        [
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'totalCustomers' => $totalCustomers,
+            'activeCustomers' => $activeCustomers,
+            'totalOrders' => $totalOrders,
+            'totalRevenue' => $totalRevenue,
+            'customers' => $customers,
+        ]
+    );
+
+    return $pdf->download(
+        'customer-report-' .
+        $startDate->format('Y-m-d') .
+        '-to-' .
+        $endDate->format('Y-m-d') .
+        '.pdf'
+    );
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| DOWNLOAD PRODUCT REPORT
+|--------------------------------------------------------------------------
+*/
+
+public function downloadProducts(Request $request)
+{
+    [$startDate, $endDate] = $this->getDateRange($request);
+
+    $itemsSold = OrderItem::whereHas(
+        'order',
+        function ($query) use (
+            $startDate,
+            $endDate
+        ) {
+
+            $query
+                ->whereBetween('created_at', [
+                    $startDate,
+                    $endDate,
+                ])
+                ->whereNotIn('status', [
+                    'cancelled',
+                    'refunded',
+                ]);
+        }
+    )->sum('quantity');
+
+    $products = OrderItem::select(
+        'product_id',
+        'product_name',
+        DB::raw(
+            'SUM(quantity) as quantity_sold'
+        ),
+        DB::raw(
+            'SUM(total_price) as revenue'
+        ),
+        DB::raw(
+            'COUNT(DISTINCT order_id) as orders_count'
+        )
+    )
+        ->whereHas(
+            'order',
+            function ($query) use (
+                $startDate,
+                $endDate
+            ) {
+
+                $query
+                    ->whereBetween('created_at', [
+                        $startDate,
+                        $endDate,
+                    ])
+                    ->whereNotIn('status', [
+                        'cancelled',
+                        'refunded',
+                    ]);
+            }
+        )
+        ->groupBy(
+            'product_id',
+            'product_name'
+        )
+        ->orderByDesc('revenue')
+        ->get();
+
+    $pdf = Pdf::loadView(
+        'reports.products',
+        [
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'itemsSold' => $itemsSold,
+            'products' => $products,
+        ]
+    );
+
+    return $pdf->download(
+        'product-report-' .
+        $startDate->format('Y-m-d') .
+        '-to-' .
+        $endDate->format('Y-m-d') .
+        '.pdf'
+    );
+}
+
 
 
 }

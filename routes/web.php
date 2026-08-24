@@ -44,10 +44,14 @@ Route::get('/', function () {
 
 
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Route::get('/dashboard', function () {
+//     return Inertia::render('Dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
 
+
+Route::get('/dashboard', [DashboardController::class, 'dashboard'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
     /*
     |--------------------------------------------------------------------------
@@ -328,6 +332,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/reports/revenue', [ReportController::class, 'revenue'])->name('fashion.reports.revenue');
         Route::get('/reports/customers', [ReportController::class, 'customers'])->name('fashion.reports.customers');
         Route::get('/reports/products', [ReportController::class, 'products'])->name('fashion.reports.products');
+
+         // Download reports
+    Route::get('/reports/sales/download', [ReportController::class, 'downloadSales'])->name('reports.sales.download');
+
+    Route::get('/reports/revenue/download', [ReportController::class, 'downloadRevenue'])->name('reports.revenue.download');
+
+    Route::get('/reports/customers/download',  [ReportController::class, 'downloadCustomers'])->name('reports.customers.download');
+
+    Route::get('/reports/products/download', [ReportController::class, 'downloadProducts'])->name('reports.products.download');
      
 
 

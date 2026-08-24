@@ -35,6 +35,7 @@ import {
 | PROPS
 |--------------------------------------------------------------------------
 */
+
 const props = defineProps({
     auth: {
         type: Object,
@@ -46,21 +47,19 @@ const props = defineProps({
         default: () => ({
             total_orders: 0,
             pending_orders: 0,
-            processing_orders: 0,
             completed_orders: 0,
-            cancelled_orders: 0,
             total_revenue: 0,
             total_customers: 0,
             products: 0,
         })
     },
 
-    orders: {
-        type: Array,
-        default: () => []
+    charts: {
+        type: Object,
+        default: () => ({})
     },
 
-    products: {
+    orders: {
         type: Array,
         default: () => []
     },
@@ -69,12 +68,8 @@ const props = defineProps({
         type: Array,
         default: () => []
     },
-
-    charts: {
-        type: Object,
-        default: () => ({})
-    },
 });
+
 
 /*
 |--------------------------------------------------------------------------
@@ -182,7 +177,7 @@ const navigation = [
                 label: "Completed Orders",
                 href: "/fashion/orders/completed",
             },
-            {
+             {
                 label: "Cancelled Orders",
                 href: "/fashion/orders/cancelled",
             },
@@ -380,8 +375,51 @@ const navigation = [
 | RECENT ORDERS
 |--------------------------------------------------------------------------
 */
+
+const demoOrders = [
+    {
+        id: "#ORD-1048",
+        customer_name: "Grace Mwila",
+        product: "Elegant Evening Dress",
+        amount: 850,
+        status: "Pending",
+        date: "10 minutes ago",
+    },
+
+    {
+        id: "#ORD-1047",
+        customer_name: "Mary Banda",
+        product: "Silk Button-Up Blouse",
+        amount: 450,
+        status: "Processing",
+        date: "1 hour ago",
+    },
+
+    {
+        id: "#ORD-1046",
+        customer_name: "Linda Phiri",
+        product: "Premium Denim Jacket",
+        amount: 620,
+        status: "Completed",
+        date: "2 hours ago",
+    },
+
+    {
+        id: "#ORD-1045",
+        customer_name: "Esther Chanda",
+        product: "Custom Made Gown",
+        amount: 1250,
+        status: "Completed",
+        date: "3 hours ago",
+    },
+];
+
+
 const displayedOrders = computed(() => {
-    const source = props.orders || [];
+    const source =
+        props.orders?.length
+            ? props.orders
+            : demoOrders;
 
     if (!search.value.trim()) {
         return source;
@@ -395,142 +433,61 @@ const displayedOrders = computed(() => {
                 .toLowerCase()
                 .includes(term) ||
 
-            String(order.order_number ?? "")
-                .toLowerCase()
-                .includes(term) ||
-
             String(order.customer_name ?? "")
                 .toLowerCase()
                 .includes(term) ||
 
             String(order.product ?? "")
                 .toLowerCase()
-                .includes(term) ||
-
-            String(order.status ?? "")
-                .toLowerCase()
                 .includes(term)
         );
     });
 });
-
-// const demoOrders = [
-//     {
-//         id: "#ORD-1048",
-//         customer_name: "Grace Mwila",
-//         product: "Elegant Evening Dress",
-//         amount: 850,
-//         status: "Pending",
-//         date: "10 minutes ago",
-//     },
-
-//     {
-//         id: "#ORD-1047",
-//         customer_name: "Mary Banda",
-//         product: "Silk Button-Up Blouse",
-//         amount: 450,
-//         status: "Processing",
-//         date: "1 hour ago",
-//     },
-
-//     {
-//         id: "#ORD-1046",
-//         customer_name: "Linda Phiri",
-//         product: "Premium Denim Jacket",
-//         amount: 620,
-//         status: "Completed",
-//         date: "2 hours ago",
-//     },
-
-//     {
-//         id: "#ORD-1045",
-//         customer_name: "Esther Chanda",
-//         product: "Custom Made Gown",
-//         amount: 1250,
-//         status: "Completed",
-//         date: "3 hours ago",
-//     },
-// ];
-
-
-// const displayedOrders = computed(() => {
-//     const source =
-//         props.orders?.length
-//             ? props.orders
-//             : demoOrders;
-
-//     if (!search.value.trim()) {
-//         return source;
-//     }
-
-//     const term = search.value.toLowerCase();
-
-//     return source.filter((order) => {
-//         return (
-//             String(order.id ?? "")
-//                 .toLowerCase()
-//                 .includes(term) ||
-
-//             String(order.customer_name ?? "")
-//                 .toLowerCase()
-//                 .includes(term) ||
-
-//             String(order.product ?? "")
-//                 .toLowerCase()
-//                 .includes(term)
-//         );
-//     });
-// });
-
 
 
 /*
 |--------------------------------------------------------------------------
-| PRODUCT FEED
+| THREAD FEED
 |--------------------------------------------------------------------------
 */
-const displayedProducts = computed(() => {
-    const source = Array.isArray(props.products)
-        ? props.products
-        : [];
 
-    if (!search.value.trim()) {
-        return source;
-    }
+const threadFeed = [
+    {
+        icon: ShoppingCartOutlined,
+        title: "New order received",
+        description: "Order #ORD-1048 was placed",
+        time: "10 minutes ago",
+    },
 
-    const term = search.value.toLowerCase().trim();
+    {
+        icon: UserOutlined,
+        title: "New customer registered",
+        description: "Grace Mwila created an account",
+        time: "1 hour ago",
+    },
 
-    return source.filter((product) => {
-        return (
-            String(product.name ?? "")
-                .toLowerCase()
-                .includes(term) ||
+    {
+        icon: AppstoreOutlined,
+        title: "New product added",
+        description: "Elegant Evening Dress added",
+        time: "1 hour ago",
+    },
 
-            String(product.sku ?? "")
-                .toLowerCase()
-                .includes(term) ||
+    {
+        icon: ShoppingOutlined,
+        title: "Order completed",
+        description: "Order #ORD-1046 completed",
+        time: "2 hours ago",
+    },
 
-            String(product.category ?? "")
-                .toLowerCase()
-                .includes(term)
-        );
-    });
-});
+    {
+        icon: DollarOutlined,
+        title: "Payment received",
+        description: "Payment for #ORD-1045 confirmed",
+        time: "3 hours ago",
+    },
+];
 
-console.log("ADMIN PRODUCTS:", props.products);
-console.log("DISPLAYED PRODUCTS:", displayedProducts.value);
-
-const feedIcon = (icon) => {
-    const icons = {
-        order: ShoppingCartOutlined,
-        customer: UserOutlined,
-        product: AppstoreOutlined,
-        completed: CheckCircleOutlined,
-        payment: DollarOutlined,
-    };
-
-    return icons[icon] || FileTextOutlined;
-};
 
 /*
 |--------------------------------------------------------------------------
@@ -538,53 +495,50 @@ const feedIcon = (icon) => {
 |--------------------------------------------------------------------------
 */
 
-// const demoReports = [
-//     {
-//         type: "PDF",
-//         title: "Monthly Sales Report",
-//         date: "Generated on Aug 20, 2026",
-//     },
+const demoReports = [
+    {
+        type: "PDF",
+        title: "Monthly Sales Report",
+        date: "Generated on Aug 20, 2026",
+    },
 
-//     {
-//         type: "CSV",
-//         title: "Customer Report",
-//         date: "Generated on Aug 20, 2026",
-//     },
+    {
+        type: "CSV",
+        title: "Customer Report",
+        date: "Generated on Aug 20, 2026",
+    },
 
-//     {
-//         type: "PDF",
-//         title: "Product Performance Report",
-//         date: "Generated on Aug 19, 2026",
-//     },
+    {
+        type: "PDF",
+        title: "Product Performance Report",
+        date: "Generated on Aug 19, 2026",
+    },
 
-//     {
-//         type: "XLS",
-//         title: "Inventory Summary",
-//         date: "Generated on Aug 19, 2026",
-//     },
+    {
+        type: "XLS",
+        title: "Inventory Summary",
+        date: "Generated on Aug 19, 2026",
+    },
 
-//     {
-//         type: "PDF",
-//         title: "Revenue Analysis Report",
-//         date: "Generated on Aug 18, 2026",
-//     },
+    {
+        type: "PDF",
+        title: "Revenue Analysis Report",
+        date: "Generated on Aug 18, 2026",
+    },
 
-//     {
-//         type: "CSV",
-//         title: "Order Analysis Report",
-//         date: "Generated on Aug 18, 2026",
-//     },
-// ];
+    {
+        type: "CSV",
+        title: "Order Analysis Report",
+        date: "Generated on Aug 18, 2026",
+    },
+];
+
 
 const displayedReports = computed(() => {
-    return props.reports || [];
+    return props.reports?.length
+        ? props.reports
+        : demoReports;
 });
-
-// const displayedReports = computed(() => {
-//     return props.reports?.length
-//         ? props.reports
-//         : demoReports;
-// });
 
 
 /*
@@ -594,71 +548,46 @@ const displayedReports = computed(() => {
 */
 
 const totalOrders = computed(() => {
-    return Number(props.stats?.total_orders ?? 0);
+    return Number(
+        props.stats?.total_orders ??
+        demoOrders.length
+    );
 });
+
 
 const pendingOrders = computed(() => {
-    return Number(props.stats?.pending_orders ?? 0);
+    return Number(
+        props.stats?.pending_orders ?? 12
+    );
 });
+
 
 const completedOrders = computed(() => {
-    return Number(props.stats?.completed_orders ?? 0);
+    return Number(
+        props.stats?.completed_orders ?? 86
+    );
 });
+
 
 const revenue = computed(() => {
-    return Number(props.stats?.total_revenue ?? 0);
+    return Number(
+        props.stats?.total_revenue ?? 24580
+    );
 });
+
 
 const customers = computed(() => {
-    return Number(props.stats?.total_customers ?? 0);
+    return Number(
+        props.stats?.total_customers ?? 348
+    );
 });
+
 
 const products = computed(() => {
-    return Number(props.stats?.products ?? 0);
+    return Number(
+        props.stats?.products ?? 126
+    );
 });
-
-
-// const totalOrders = computed(() => {
-//     return Number(
-//         props.stats?.total_orders ??
-//         demoOrders.length
-//     );
-// });
-
-
-// const pendingOrders = computed(() => {
-//     return Number(
-//         props.stats?.pending_orders ?? 12
-//     );
-// });
-
-
-// const completedOrders = computed(() => {
-//     return Number(
-//         props.stats?.completed_orders ?? 86
-//     );
-// });
-
-
-// const revenue = computed(() => {
-//     return Number(
-//         props.stats?.total_revenue ?? 24580
-//     );
-// });
-
-
-// const customers = computed(() => {
-//     return Number(
-//         props.stats?.total_customers ?? 348
-//     );
-// });
-
-
-// const products = computed(() => {
-//     return Number(
-//         props.stats?.products ?? 126
-//     );
-// });
 
 
 /*
@@ -675,19 +604,6 @@ const formatMoney = (amount) => {
     }).format(amount);
 };
 
-
-const productPrice = (product) => {
-
-    if (
-        product.sale_price !== null &&
-        product.sale_price !== undefined &&
-        Number(product.sale_price) < Number(product.price)
-    ) {
-        return product.sale_price;
-    }
-
-    return product.price;
-};
 
 /*
 |--------------------------------------------------------------------------
@@ -714,7 +630,11 @@ const closeSidebar = () => {
 
         <transition name="fade">
 
-            <div v-if="sidebarOpen" class="sidebar-overlay" @click="closeSidebar"></div>
+            <div
+                v-if="sidebarOpen"
+                class="sidebar-overlay"
+                @click="closeSidebar"
+            ></div>
 
         </transition>
 
@@ -724,9 +644,12 @@ const closeSidebar = () => {
              SIDEBAR
         ========================================================== -->
 
-        <aside class="admin-sidebar" :class="{
-            'sidebar-mobile-open': sidebarOpen
-        }">
+        <aside
+            class="admin-sidebar"
+            :class="{
+                'sidebar-mobile-open': sidebarOpen
+            }"
+        >
 
 
             <!-- =====================================================
@@ -735,16 +658,19 @@ const closeSidebar = () => {
 
             <div class="sidebar-brand">
 
-                <Link href="/" class="admin-logo">
+                <Link
+                    href="/"
+                    class="admin-logo"
+                >
 
-                    <img src="/assets/aaib.png" alt="Fashion Style" class="logo-image" />
+                   <img src="/assets/aaib.png" alt="Fashion Style" class="logo-image" />
 
                     <span class="logo-text">
 
                         IN STYLE
 
                         <small>
-                            ASARA
+                           ASARA
                         </small>
 
                     </span>
@@ -754,7 +680,10 @@ const closeSidebar = () => {
 
                 <!-- MOBILE CLOSE -->
 
-                <button class="mobile-close" @click="closeSidebar">
+                <button
+                    class="mobile-close"
+                    @click="closeSidebar"
+                >
 
                     <CloseOutlined />
 
@@ -777,18 +706,31 @@ const closeSidebar = () => {
 
                 <!-- NAVIGATION ITEMS -->
 
-                <div v-for="item in navigation" :key="item.label" class="nav-item">
+                <div
+                    v-for="item in navigation"
+                    :key="item.label"
+                    class="nav-item"
+                >
 
 
                     <!-- =================================================
                          NORMAL LINK
                     ================================================== -->
 
-                    <Link v-if="!item.children" :href="item.href" class="sidebar-link" :class="{
-                        active: item.label === 'Dashboard'
-                    }" @click="closeSidebar">
+                    <Link
+                        v-if="!item.children"
+                        :href="item.href"
+                        class="sidebar-link"
+                        :class="{
+                            active: item.label === 'Dashboard'
+                        }"
+                        @click="closeSidebar"
+                    >
 
-                        <component :is="item.icon" class="sidebar-icon" />
+                        <component
+                            :is="item.icon"
+                            class="sidebar-icon"
+                        />
 
                         <span>
                             {{ item.label }}
@@ -802,22 +744,34 @@ const closeSidebar = () => {
                          DROPDOWN BUTTON
                     ================================================== -->
 
-                    <button v-else type="button" class="sidebar-link sidebar-dropdown-trigger" :class="{
-                        'dropdown-open':
-                            openDropdown === item.label
-                    }" @click="toggleDropdown(item.label)">
+                    <button
+                        v-else
+                        type="button"
+                        class="sidebar-link sidebar-dropdown-trigger"
+                        :class="{
+                            'dropdown-open':
+                                openDropdown === item.label
+                        }"
+                        @click="toggleDropdown(item.label)"
+                    >
 
-                        <component :is="item.icon" class="sidebar-icon" />
+                        <component
+                            :is="item.icon"
+                            class="sidebar-icon"
+                        />
 
                         <span class="sidebar-link-text">
                             {{ item.label }}
                         </span>
 
 
-                        <ArrowDownOutlined class="dropdown-arrow" :class="{
-                            rotated:
-                                openDropdown === item.label
-                        }" />
+                        <ArrowDownOutlined
+                            class="dropdown-arrow"
+                            :class="{
+                                rotated:
+                                    openDropdown === item.label
+                            }"
+                        />
 
                     </button>
 
@@ -829,13 +783,21 @@ const closeSidebar = () => {
 
                     <transition name="sidebar-dropdown">
 
-                        <div v-if="
-                            item.children &&
-                            openDropdown === item.label
-                        " class="sidebar-submenu">
+                        <div
+                            v-if="
+                                item.children &&
+                                openDropdown === item.label
+                            "
+                            class="sidebar-submenu"
+                        >
 
-                            <Link v-for="child in item.children" :key="child.label" :href="child.href"
-                                class="sidebar-submenu-link" @click="closeSidebar">
+                            <Link
+                                v-for="child in item.children"
+                                :key="child.label"
+                                :href="child.href"
+                                class="sidebar-submenu-link"
+                                @click="closeSidebar"
+                            >
 
                                 {{ child.label }}
 
@@ -902,7 +864,10 @@ const closeSidebar = () => {
 
                 <!-- MOBILE MENU -->
 
-                <button class="mobile-menu-button" @click="sidebarOpen = true">
+                <button
+                    class="mobile-menu-button"
+                    @click="sidebarOpen = true"
+                >
 
                     <MenuOutlined />
 
@@ -937,7 +902,11 @@ const closeSidebar = () => {
 
                         <SearchOutlined />
 
-                        <input v-model="search" type="text" placeholder="Search anything" />
+                        <input
+                            v-model="search"
+                            type="text"
+                            placeholder="Search anything"
+                        />
 
                         <span class="search-shortcut">
                             ⌘
@@ -953,9 +922,15 @@ const closeSidebar = () => {
 
                     <!-- NEW ORDER -->
 
-                    <a-tooltip title="Create New Order" placement="bottom">
+                    <a-tooltip
+                        title="Create New Order"
+                        placement="bottom"
+                    >
 
-                        <Link href="/orders/create" class="new-action-button">
+                        <Link
+                            href="/orders/create"
+                            class="new-action-button"
+                        >
 
                             <PlusOutlined />
 
@@ -972,38 +947,54 @@ const closeSidebar = () => {
                     <!-- USER -->
 
                     <!-- USER ACCOUNT DROPDOWN -->
-                    <a-dropdown placement="bottomRight" trigger="click">
-                        <a-tooltip title="Account" placement="bottom">
-                            <button type="button" class="profile-button">
-                                <UserOutlined />
-                            </button>
-                        </a-tooltip>
+<a-dropdown
+    placement="bottomRight"
+    trigger="click"
+>
+    <a-tooltip
+        title="Account"
+        placement="bottom"
+    >
+        <button
+            type="button"
+            class="profile-button"
+        >
+            <UserOutlined />
+        </button>
+    </a-tooltip>
 
-                        <template #overlay>
-                            <a-menu class="account-menu">
+    <template #overlay>
+        <a-menu class="account-menu">
 
-                                <!-- PROFILE -->
-                                <a-menu-item key="profile">
-                                    <Link :href="route('profile.edit')" class="account-menu-link">
-                                        <UserOutlined />
-                                        <span>Profile</span>
-                                    </Link>
-                                </a-menu-item>
+            <!-- PROFILE -->
+            <a-menu-item key="profile">
+                <Link
+                    :href="route('profile.edit')"
+                    class="account-menu-link"
+                >
+                    <UserOutlined />
+                    <span>Profile</span>
+                </Link>
+            </a-menu-item>
 
-                                <!-- LOGOUT -->
-                                <a-menu-item key="logout">
-                                    <Link :href="route('logout')" method="post" as="button"
-                                        class="account-menu-link logout-link">
-                                        <LogoutOutlined />
-                                        <span>Log Out</span>
-                                    </Link>
-                                </a-menu-item>
+            <!-- LOGOUT -->
+            <a-menu-item key="logout">
+                <Link
+                    :href="route('logout')"
+                    method="post"
+                    as="button"
+                    class="account-menu-link logout-link"
+                >
+                    <LogoutOutlined />
+                    <span>Log Out</span>
+                </Link>
+            </a-menu-item>
 
-                            </a-menu>
-                        </template>
-                    </a-dropdown>
+        </a-menu>
+    </template>
+</a-dropdown>
 
-
+            
 
                 </div>
 
@@ -1184,7 +1175,10 @@ const closeSidebar = () => {
 
                             </div>
 
-                            <a-tooltip title="More options" placement="bottom">
+                            <a-tooltip
+                                title="More options"
+                                placement="bottom"
+                            >
 
                                 <button class="panel-menu">
 
@@ -1199,18 +1193,13 @@ const closeSidebar = () => {
 
                         <!-- ORDERS -->
 
-
                         <div class="orders-grid">
 
-                            <div v-if="displayedOrders.length === 0" class="dashboard-empty">
-                                <ShoppingCartOutlined />
-
-                                <span>
-                                    No recent orders found.
-                                </span>
-                            </div>
-
-                            <div v-for="order in displayedOrders.slice(0, 4)" v-else :key="order.id" class="order-item">
+                            <div
+                                v-for="order in displayedOrders.slice(0, 4)"
+                                :key="order.id"
+                                class="order-item"
+                            >
 
                                 <div class="order-product-icon">
 
@@ -1222,15 +1211,15 @@ const closeSidebar = () => {
                                 <div class="order-information">
 
                                     <strong>
-                                        {{ order.order_number || `#${order.id}` }}
+                                        {{ order.id }}
                                     </strong>
 
                                     <span>
-                                        {{ order.customer_name || 'Unknown Customer' }}
+                                        {{ order.customer_name }}
                                     </span>
 
                                     <small>
-                                        {{ order.product || order.product_name || 'Product' }}
+                                        {{ order.product }}
                                     </small>
 
                                 </div>
@@ -1238,15 +1227,19 @@ const closeSidebar = () => {
 
                                 <div class="order-status">
 
-                                    <span class="status-badge" :class="String(order.status)
-                                            .toLowerCase()
-                                            .replace(' ', '-')
-                                        ">
+                                    <span
+                                        class="status-badge"
+                                        :class="
+                                            String(order.status)
+                                                .toLowerCase()
+                                                .replace(' ', '-')
+                                        "
+                                    >
                                         {{ order.status }}
                                     </span>
 
                                     <strong>
-                                        {{ formatMoney(order.amount || order.total || 0) }}
+                                        {{ formatMoney(order.amount) }}
                                     </strong>
 
                                 </div>
@@ -1260,7 +1253,7 @@ const closeSidebar = () => {
 
                         <div class="panel-footer">
 
-                            <Link href="/fashion/orders">
+                            <Link href="/orders">
                                 View all orders
                             </Link>
 
@@ -1268,239 +1261,71 @@ const closeSidebar = () => {
 
                     </div>
 
-<!-- =========================================================
-     PRODUCTS
-========================================================= -->
-<div class="dashboard-panel products-panel">
-
-    <!-- PANEL HEADER -->
-    <div class="panel-header">
-        <div>
-            <h3>Products</h3>
-            <p>Recently added products</p>
-        </div>
-
-        <div class="product-panel-actions">
-            <span class="product-count">
-                {{ displayedProducts.length }}
-            </span>
-
-            <a-tooltip
-                title="Add Product"
-                placement="bottom"
-            >
-                <Link
-                    href="/fashion/products/create"
-                    class="product-add-button"
-                >
-                    <PlusOutlined />
-                </Link>
-            </a-tooltip>
-        </div>
-    </div>
 
 
-    <!-- =====================================================
-         PRODUCT LIST
-    ====================================================== -->
-    <div class="products-list">
+                    <!-- THREAD FEED -->
 
-        <!-- EMPTY STATE -->
-        <div
-            v-if="displayedProducts.length === 0"
-            class="product-empty"
-        >
-            <AppstoreOutlined />
+                    <div class="dashboard-panel feed-panel">
 
-            <span>
-                No products found.
-            </span>
+                        <div class="panel-header">
 
-            <Link
-                href="/fashion/products/create"
-                class="empty-product-link"
-            >
-                Add your first product
-            </Link>
-        </div>
+                            <div>
 
+                                <h3>
+                                    Thread Feed
+                                </h3>
 
-        <!-- =================================================
-             PRODUCT ITEMS
-        ================================================== -->
-        <Link
-            v-for="product in displayedProducts.slice(0, 4)"
-            :key="product.id"
-            :href="`/fashion/products/${product.id}/edit`"
-            class="product-item product-item-link"
-        >
+                                <p>
+                                    Latest store activity
+                                </p>
 
-            <!-- =============================================
-                 PRODUCT IMAGE
-            ============================================== -->
-            <div class="product-image-wrapper">
+                            </div>
 
-                <img
-                    v-if="product.image"
-                    :src="
-                        String(product.image).startsWith('http')
-                            ? product.image
-                            : `/storage/${String(product.image).replace(/^\/?storage\//, '')}`
-                    "
-                    :alt="product.name || 'Product'"
-                    class="product-image"
-                    @error="$event.target.style.display = 'none'"
-                />
+                            <span class="feed-count">
+                                {{ threadFeed.length }}
+                            </span>
 
-                <div
-                    v-if="!product.image"
-                    class="product-image-placeholder"
-                >
-                    <AppstoreOutlined />
-                </div>
-
-            </div>
+                        </div>
 
 
-            <!-- =============================================
-                 PRODUCT INFORMATION
-            ============================================== -->
-            <div class="product-information">
+                        <div class="feed-list">
 
-                <strong>
-                    {{ product.name || 'Unnamed Product' }}
-                </strong>
+                            <div
+                                v-for="(feed, index) in threadFeed"
+                                :key="index"
+                                class="feed-item"
+                            >
 
-                <span>
-                    {{ product.category || 'Uncategorized' }}
-                </span>
+                                <div class="feed-icon">
 
-                <small v-if="product.sku">
-                    SKU: {{ product.sku }}
-                </small>
+                                    <component
+                                        :is="feed.icon"
+                                    />
 
-            </div>
+                                </div>
 
 
-            <!-- =============================================
-                 PRODUCT DETAILS
-            ============================================== -->
-            <div class="product-details">
+                                <div class="feed-content">
 
-                <!-- PRICE -->
-                <div class="product-price">
+                                    <strong>
+                                        {{ feed.title }}
+                                    </strong>
 
-                    <strong>
-                        {{ formatMoney(productPrice(product)) }}
-                    </strong>
+                                    <span>
+                                        {{ feed.description }}
+                                    </span>
 
-                    <small
-                        v-if="
-                            product.sale_price !== null &&
-                            product.sale_price !== undefined &&
-                            Number(product.sale_price) < Number(product.price)
-                        "
-                    >
-                        {{ formatMoney(product.price) }}
-                    </small>
+                                    <small>
+                                        {{ feed.time }}
+                                    </small>
 
-                </div>
+                                </div>
 
+                            </div>
 
-                <!-- STOCK -->
-                <span
-                    class="product-stock"
-                    :class="{
-                        'stock-out':
-                            Number(product.stock_quantity ?? 0) <= 0,
+                        </div>
 
-                        'stock-low':
-                            Number(product.stock_quantity ?? 0) > 0 &&
-                            Number(product.stock_quantity ?? 0) <=
-                                Number(product.low_stock_threshold ?? 5),
-
-                        'stock-good':
-                            Number(product.stock_quantity ?? 0) >
-                            Number(product.low_stock_threshold ?? 5)
-                    }"
-                >
-
-                    <span
-                        v-if="Number(product.stock_quantity ?? 0) <= 0"
-                    >
-                        Out of stock
-                    </span>
-
-                    <span
-                        v-else-if="
-                            Number(product.stock_quantity ?? 0) <=
-                            Number(product.low_stock_threshold ?? 5)
-                        "
-                    >
-                        {{ product.stock_quantity }} left
-                    </span>
-
-                    <span v-else>
-                        {{ product.stock_quantity }} in stock
-                    </span>
-
-                </span>
-
-            </div>
-
-
-            <!-- =============================================
-                 PRODUCT STATUS
-            ============================================== -->
-            <div class="product-status">
-
-                <span
-                    v-if="product.is_featured"
-                    class="featured-badge"
-                >
-                    Featured
-                </span>
-
-                <span
-                    v-if="product.is_active"
-                    class="active-dot"
-                    title="Active"
-                ></span>
-
-                <span
-                    v-else
-                    class="inactive-dot"
-                    title="Inactive"
-                ></span>
-
-            </div>
-
-
-            <!-- =============================================
-                 ARROW
-            ============================================== -->
-            <div class="product-arrow">
-                <EyeOutlined />
-            </div>
-
-        </Link>
-
-    </div>
-
-
-    <!-- =====================================================
-         VIEW ALL PRODUCTS
-    ====================================================== -->
-    <div class="panel-footer">
-        <Link href="/fashion/products">
-            View all products
-        </Link>
-    </div>
-
-</div>
-           
-
-
+                    </div>
 
                 </section>
 
@@ -1527,7 +1352,10 @@ const closeSidebar = () => {
                         </div>
 
 
-                        <a-tooltip title="More options" placement="bottom">
+                        <a-tooltip
+                            title="More options"
+                            placement="bottom"
+                        >
 
                             <button class="panel-menu">
 
@@ -1541,13 +1369,19 @@ const closeSidebar = () => {
 
 
                     <!-- REPORT GRID -->
+
                     <div class="reports-grid">
 
-                        <div v-for="(report, index) in displayedReports" :key="index" class="report-item">
+                        <div
+                            v-for="(report, index) in displayedReports"
+                            :key="index"
+                            class="report-item"
+                        >
 
-                            <!-- FILE -->
-
-                            <div class="report-file" :class="report.type.toLowerCase()">
+                            <div
+                                class="report-file"
+                                :class="report.type.toLowerCase()"
+                            >
 
                                 <FileTextOutlined />
 
@@ -1557,8 +1391,6 @@ const closeSidebar = () => {
 
                             </div>
 
-
-                            <!-- INFORMATION -->
 
                             <div class="report-information">
 
@@ -1573,33 +1405,32 @@ const closeSidebar = () => {
                             </div>
 
 
-                            <!-- ACTIONS -->
-
                             <div class="report-actions">
 
-                                <!-- VIEW -->
+                                <a-tooltip
+                                    title="View Report"
+                                    placement="top"
+                                >
 
-                                <a-tooltip title="View Report" placement="top">
-
-                                    <a :href="report.url" target="_blank" rel="noopener noreferrer"
-                                        class="report-action-button">
+                                    <button>
 
                                         <EyeOutlined />
 
-                                    </a>
+                                    </button>
 
                                 </a-tooltip>
 
 
-                                <!-- DOWNLOAD -->
+                                <a-tooltip
+                                    title="Download Report"
+                                    placement="top"
+                                >
 
-                                <a-tooltip title="Download Report" placement="top">
-
-                                    <a :href="report.download_url" class="report-action-button">
+                                    <button>
 
                                         <DownloadOutlined />
 
-                                    </a>
+                                    </button>
 
                                 </a-tooltip>
 
@@ -1646,7 +1477,10 @@ const closeSidebar = () => {
 
                         <div class="progress-bar">
 
-                            <div class="progress-value" style="width: 86%"></div>
+                            <div
+                                class="progress-value"
+                                style="width: 86%"
+                            ></div>
 
                         </div>
 
@@ -1690,6 +1524,7 @@ const closeSidebar = () => {
 
 
 <style scoped>
+
 /* =========================================================
    ROOT
 ========================================================= */
@@ -1934,7 +1769,6 @@ const closeSidebar = () => {
     font-size: 17px;
     flex: 0 0 17px;
 }
-
 
 
 /* =========================================================
@@ -2308,451 +2142,6 @@ const closeSidebar = () => {
     margin: auto;
 }
 
-/* =========================================================
-   PRODUCTS PANEL
-========================================================= */
-
-.products-panel {
-    overflow: hidden;
-}
-
-.product-panel-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.product-count {
-    min-width: 28px;
-    height: 28px;
-    padding: 0 8px;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 999px;
-
-    background: #f3f4f6;
-    color: #374151;
-
-    font-size: 12px;
-    font-weight: 700;
-}
-
-.product-add-button {
-    width: 34px;
-    height: 34px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 8px;
-
-    background: #111827;
-    color: white;
-
-    text-decoration: none;
-
-    transition: all 0.2s ease;
-}
-
-.product-add-button:hover {
-    background: #000;
-    color: white;
-    transform: translateY(-1px);
-}
-
-
-/* =========================================================
-   PRODUCT LIST
-========================================================= */
-
-.products-list {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-}
-
-
-/* =========================================================
-   PRODUCT ITEM
-========================================================= */
-
-.product-item {
-    position: relative;
-
-    display: grid;
-
-    grid-template-columns:
-        58px
-        minmax(140px, 1fr)
-        auto
-        auto
-        30px;
-
-    align-items: center;
-
-    gap: 14px;
-
-    width: 100%;
-
-    padding: 14px 16px;
-
-    border-bottom: 1px solid #f0f0f0;
-
-    background: #fff;
-
-    text-decoration: none;
-
-    color: inherit;
-
-    transition:
-        background 0.2s ease,
-        transform 0.2s ease;
-}
-
-.product-item:hover {
-    background: #fafafa;
-    color: inherit;
-}
-
-.product-item:last-child {
-    border-bottom: none;
-}
-
-
-/* =========================================================
-   PRODUCT IMAGE
-========================================================= */
-
-.product-image-wrapper {
-    width: 58px;
-    height: 58px;
-
-    flex-shrink: 0;
-
-    overflow: hidden;
-
-    border-radius: 10px;
-
-    background: #f5f5f5;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.product-image {
-    width: 100%;
-    height: 100%;
-
-    display: block;
-
-    object-fit: cover;
-}
-
-.product-image-placeholder {
-    width: 100%;
-    height: 100%;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: #f3f4f6;
-
-    color: #9ca3af;
-
-    font-size: 22px;
-}
-
-
-/* =========================================================
-   PRODUCT INFORMATION
-========================================================= */
-
-.product-information {
-    min-width: 0;
-
-    display: flex;
-    flex-direction: column;
-
-    gap: 3px;
-}
-
-.product-information strong {
-    display: block;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-
-    white-space: nowrap;
-
-    color: #111827;
-
-    font-size: 14px;
-    font-weight: 700;
-}
-
-.product-information span {
-    display: block;
-
-    color: #6b7280;
-
-    font-size: 12px;
-}
-
-.product-information small {
-    display: block;
-
-    color: #9ca3af;
-
-    font-size: 11px;
-}
-
-
-/* =========================================================
-   PRODUCT DETAILS
-========================================================= */
-
-.product-details {
-    display: flex;
-    flex-direction: column;
-
-    align-items: flex-end;
-
-    gap: 5px;
-
-    white-space: nowrap;
-}
-
-.product-price {
-    display: flex;
-    align-items: center;
-
-    gap: 6px;
-}
-
-.product-price strong {
-    color: #111827;
-
-    font-size: 13px;
-    font-weight: 700;
-}
-
-.product-price small {
-    color: #9ca3af;
-
-    font-size: 10px;
-
-    text-decoration: line-through;
-}
-
-
-/* =========================================================
-   STOCK
-========================================================= */
-
-.product-stock {
-    font-size: 10px;
-    font-weight: 600;
-}
-
-.stock-out {
-    color: #dc2626;
-}
-
-.stock-low {
-    color: #d97706;
-}
-
-.stock-good {
-    color: #16a34a;
-}
-
-
-/* =========================================================
-   STATUS
-========================================================= */
-
-.product-status {
-    min-width: 55px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: flex-end;
-
-    gap: 6px;
-}
-
-.featured-badge {
-    padding: 3px 7px;
-
-    border-radius: 999px;
-
-    background: #fff7ed;
-
-    color: #ea580c;
-
-    font-size: 9px;
-    font-weight: 700;
-}
-
-.active-dot,
-.inactive-dot {
-    width: 8px;
-    height: 8px;
-
-    border-radius: 50%;
-
-    display: inline-block;
-}
-
-.active-dot {
-    background: #22c55e;
-}
-
-.inactive-dot {
-    background: #d1d5db;
-}
-
-
-/* =========================================================
-   ARROW
-========================================================= */
-
-.product-arrow {
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    color: #9ca3af;
-
-    font-size: 15px;
-
-    transition: all 0.2s ease;
-}
-
-.product-item:hover .product-arrow {
-    color: #111827;
-    transform: translateX(3px);
-}
-
-
-/* =========================================================
-   EMPTY STATE
-========================================================= */
-
-.product-empty {
-    min-height: 180px;
-
-    display: flex;
-    flex-direction: column;
-
-    align-items: center;
-    justify-content: center;
-
-    gap: 8px;
-
-    color: #9ca3af;
-
-    text-align: center;
-}
-
-.product-empty > .anticon {
-    font-size: 32px;
-}
-
-.empty-product-link {
-    color: #111827;
-
-    font-size: 13px;
-    font-weight: 600;
-
-    text-decoration: none;
-}
-
-.empty-product-link:hover {
-    text-decoration: underline;
-}
-
-
-/* =========================================================
-   PANEL FOOTER
-========================================================= */
-
-.products-panel .panel-footer {
-    padding: 12px 16px;
-
-    border-top: 1px solid #f0f0f0;
-}
-
-.products-panel .panel-footer a {
-    color: #111827;
-
-    font-size: 13px;
-    font-weight: 600;
-
-    text-decoration: none;
-}
-
-.products-panel .panel-footer a:hover {
-    text-decoration: underline;
-}
-
-
-/* =========================================================
-   RESPONSIVE
-========================================================= */
-
-@media (max-width: 900px) {
-
-    .product-item {
-        grid-template-columns:
-            50px
-            minmax(120px, 1fr)
-            auto
-            25px;
-    }
-
-    .product-status {
-        display: none;
-    }
-
-    .product-image-wrapper {
-        width: 50px;
-        height: 50px;
-    }
-}
-
-
-@media (max-width: 600px) {
-
-    .product-item {
-        grid-template-columns:
-            48px
-            minmax(0, 1fr)
-            25px;
-
-        gap: 10px;
-
-        padding: 12px;
-    }
-
-    .product-details {
-        display: none;
-    }
-
-    .product-image-wrapper {
-        width: 48px;
-        height: 48px;
-    }
-}
 
 /* =========================================================
    STATISTICS
@@ -2861,27 +2250,12 @@ const closeSidebar = () => {
     display: grid;
 
     grid-template-columns:
-        minmax(0, 1.55fr) minmax(280px, .9fr);
+        minmax(0, 1.55fr)
+        minmax(280px, .9fr);
 
     gap: 15px;
 
     margin-bottom: 15px;
-}
-
-.feed-empty {
-    min-height: 180px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    color: #aaa;
-    font-size: 10px;
-}
-
-.feed-empty .anticon {
-    font-size: 25px;
-    color: #ccc;
 }
 
 
@@ -3104,151 +2478,6 @@ const closeSidebar = () => {
     font-size: 9px;
 }
 
-/* =========================================================
-   PRODUCTS
-========================================================= */
-
-.products-list {
-    padding: 0;
-}
-
-.product-item {
-    min-height: 72px;
-    padding: 10px 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    border-bottom: 1px solid #eee;
-}
-
-.product-image-wrapper {
-    width: 44px;
-    height: 44px;
-    flex: 0 0 44px;
-    border-radius: 7px;
-    overflow: hidden;
-    background: #f3f5f4;
-}
-
-.product-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.product-image-placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #064f4c;
-    font-size: 16px;
-}
-
-.product-information {
-    min-width: 0;
-    flex: 1;
-}
-
-.product-information strong {
-    display: block;
-    font-size: 9px;
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.product-information span {
-    display: block;
-    font-size: 8px;
-    color: #777;
-    margin-top: 3px;
-}
-
-.product-information small {
-    display: block;
-    font-size: 7px;
-    color: #aaa;
-    margin-top: 3px;
-}
-
-.product-details {
-    text-align: right;
-    min-width: 75px;
-}
-
-.product-details strong {
-    display: block;
-    font-size: 9px;
-    color: #064f4c;
-}
-
-.product-details small {
-    display: block;
-    font-size: 7px;
-    color: #777;
-    margin-top: 3px;
-}
-
-.original-price {
-    display: block;
-    font-size: 7px;
-    color: #aaa;
-    text-decoration: line-through;
-    margin-top: 2px;
-}
-
-.product-details small.low-stock {
-    color: #d17b28;
-}
-
-.product-details small.out-of-stock {
-    color: #dc2626;
-    font-weight: 600;
-}
-
-.product-status {
-    min-width: 48px;
-    text-align: right;
-}
-
-.product-status-badge {
-    display: inline-block;
-    padding: 3px 6px;
-    border-radius: 4px;
-    font-size: 7px;
-    font-weight: 600;
-}
-
-.product-status-badge.active {
-    background: #e5f6ed;
-    color: #26805a;
-}
-
-.product-status-badge.inactive {
-    background: #f3f3f3;
-    color: #888;
-}
-
-.products-empty {
-    min-height: 180px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    color: #aaa;
-    font-size: 10px;
-}
-
-.products-empty .anticon {
-    font-size: 25px;
-    color: #ccc;
-}
-
 
 /* =========================================================
    FEED
@@ -3460,7 +2689,8 @@ const closeSidebar = () => {
     display: grid;
 
     grid-template-columns:
-        minmax(0, 1fr) auto;
+        minmax(0, 1fr)
+        auto;
 
     gap: 15px;
 }
@@ -3576,24 +2806,6 @@ const closeSidebar = () => {
 }
 
 
-.dashboard-empty {
-    grid-column: 1 / -1;
-    min-height: 150px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    color: #aaa;
-    font-size: 11px;
-}
-
-.dashboard-empty .anticon {
-    font-size: 28px;
-    color: #ccc;
-}
-
-
 /* =========================================================
    OVERLAY
 ========================================================= */
@@ -3679,7 +2891,7 @@ const closeSidebar = () => {
             transform .3s ease;
 
         box-shadow:
-            10px 0 30px rgba(0, 0, 0, .12);
+            10px 0 30px rgba(0,0,0,.12);
     }
 
 
@@ -3700,7 +2912,7 @@ const closeSidebar = () => {
 
         inset: 0;
 
-        background: rgba(0, 0, 0, .38);
+        background: rgba(0,0,0,.38);
 
         z-index: 999;
     }
@@ -3902,4 +3114,5 @@ const closeSidebar = () => {
     }
 
 }
+
 </style>
