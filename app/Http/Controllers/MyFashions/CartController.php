@@ -10,51 +10,31 @@ use Inertia\Inertia;
 class CartController extends Controller
 {
     
- /**
+ 
+    /**
      * Display shopping cart.
      */
-    // public function index(Request $request)
-    // {
-    //     $cart = $request->session()->get('cart', []);
+    public function index(Request $request)
+    {
+        $cart = $request->session()->get('cart', []);
 
-    //     $subtotal = collect($cart)->sum(function ($item) {
-    //         return $item['price'] * $item['quantity'];
-    //     });
+        $subtotal = collect($cart)->sum(function ($item) {
 
-    //     $totalItems = collect($cart)->sum('quantity');
+            // Use sale price when available,
+            // otherwise use the regular price.
+            $price = $item['sale_price'] ?? $item['price'];
 
-    //     return Inertia::render('Site/Cart/Index', [
-    //         'cart' => array_values($cart),
-    //         'subtotal' => $subtotal,
-    //         'totalItems' => $totalItems,
-    //     ]);
-    // }
+            return $price * $item['quantity'];
+        });
 
+        $totalItems = collect($cart)->sum('quantity');
 
-    /**
- * Display shopping cart.
- */
-public function index(Request $request)
-{
-    $cart = $request->session()->get('cart', []);
-
-    $subtotal = collect($cart)->sum(function ($item) {
-
-        // Use sale price when available,
-        // otherwise use the regular price.
-        $price = $item['sale_price'] ?? $item['price'];
-
-        return $price * $item['quantity'];
-    });
-
-    $totalItems = collect($cart)->sum('quantity');
-
-    return Inertia::render('Site/Cart/Index', [
-        'cart' => array_values($cart),
-        'subtotal' => $subtotal,
-        'totalItems' => $totalItems,
-    ]);
-}
+        return Inertia::render('Site/Cart/Index', [
+            'cart' => array_values($cart),
+            'subtotal' => $subtotal,
+            'totalItems' => $totalItems,
+        ]);
+    }
 
 
     /**

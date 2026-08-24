@@ -12,579 +12,395 @@ class CheckoutController extends Controller
 {
    
 
-// public function index(Request $request)
-// {
-//     $cart = session()->get('cart', []);
+    public function index(Request $request)
+    {
+        $cart = session()->get('cart', []);
 
-//     if (empty($cart)) {
-//         return redirect()
-//             ->route('cart.index')
-//             ->with('error', 'Your shopping bag is empty.');
-//     }
+        if (empty($cart)) {
+            return redirect()
+                ->route('cart.index')
+                ->with('error', 'Your shopping bag is empty.');
+        }
 
-//     $subtotal = collect($cart)->sum(function ($item) {
-//         return (float) $item['price'] * (int) $item['quantity'];
-//     });
+        /*
+        |--------------------------------------------------------------------------
+        | SUBTOTAL
+        |--------------------------------------------------------------------------
+        */
 
-//     $totalItems = collect($cart)->sum('quantity');
+        $subtotal = collect($cart)->sum(function ($item) {
+            return (float) $item['price'] * (int) $item['quantity'];
+        });
 
-//     /*
-//     |--------------------------------------------------------------------------
-//     | PAYMENT SETTINGS
-//     |--------------------------------------------------------------------------
-//     */
+        $totalItems = collect($cart)->sum('quantity');
 
-//     $paymentSettings = [
 
-//         'cash_on_delivery' => $this->getSetting(
-//             'cash_on_delivery',
-//             true
-//         ),
+        /*
+        |--------------------------------------------------------------------------
+        | PAYMENT SETTINGS
+        |--------------------------------------------------------------------------
+        */
 
-//         'mobile_money' => $this->getSetting(
-//             'mobile_money',
-//             true
-//         ),
+        $paymentSettings = [
 
-//         'card' => $this->getSetting(
-//             'card',
-//             false
-//         ),
+            'cash_on_delivery' => $this->getSetting(
+                'cash_on_delivery',
+                true
+            ),
 
-//         'mobile_money_provider' => $this->getSetting(
-//             'mobile_money_provider',
-//             ''
-//         ),
+            'mobile_money' => $this->getSetting(
+                'mobile_money',
+                true
+            ),
 
-//         'mobile_money_number' => $this->getSetting(
-//             'mobile_money_number',
-//             ''
-//         ),
+            'card' => $this->getSetting(
+                'card',
+                false
+            ),
 
-//         'card_provider' => $this->getSetting(
-//             'card_provider',
-//             ''
-//         ),
+            'mobile_money_provider' => $this->getSetting(
+                'mobile_money_provider',
+                ''
+            ),
 
-//         'currency' => $this->getSetting(
-//             'currency',
-//             'ZMW'
-//         ),
+            'mobile_money_number' => $this->getSetting(
+                'mobile_money_number',
+                ''
+            ),
 
-//         'payment_instructions' => $this->getSetting(
-//             'payment_instructions',
-//             ''
-//         ),
-//     ];
+            'card_provider' => $this->getSetting(
+                'card_provider',
+                ''
+            ),
 
-//     return Inertia::render('Site/Checkout/Index', [
+            'currency' => $this->getSetting(
+                'currency',
+                'ZMW'
+            ),
 
-//         'cart' => array_values($cart),
+            'payment_instructions' => $this->getSetting(
+                'payment_instructions',
+                ''
+            ),
 
-//         'subtotal' => $subtotal,
+        ];
 
-//         'totalItems' => $totalItems,
 
-//         /*
-//         |--------------------------------------------------------------------------
-//         | SEND PAYMENT SETTINGS TO CHECKOUT
-//         |--------------------------------------------------------------------------
-//         */
+        /*
+        |--------------------------------------------------------------------------
+        | SHIPPING SETTINGS
+        |--------------------------------------------------------------------------
+        */
 
-//         'paymentSettings' => $paymentSettings,
-//     ]);
-// }
+        $shippingSettings = [
 
-public function index(Request $request)
-{
-    $cart = session()->get('cart', []);
+            'enabled' => $this->getSetting(
+                'shipping_enabled',
+                true
+            ),
 
-    if (empty($cart)) {
-        return redirect()
-            ->route('cart.index')
-            ->with('error', 'Your shopping bag is empty.');
+            'method' => $this->getSetting(
+                'shipping_method',
+                'flat_rate'
+            ),
+
+            'flat_rate' => (float) $this->getSetting(
+                'shipping_flat_rate',
+                0
+            ),
+
+            'free_shipping_enabled' => $this->getSetting(
+                'free_shipping_enabled',
+                false
+            ),
+
+            'free_shipping_threshold' => (float) $this->getSetting(
+                'free_shipping_threshold',
+                0
+            ),
+
+            'local_shipping_enabled' => $this->getSetting(
+                'local_shipping_enabled',
+                true
+            ),
+
+            'local_shipping_rate' => (float) $this->getSetting(
+                'local_shipping_rate',
+                0
+            ),
+
+            'international_shipping_enabled' => $this->getSetting(
+                'international_shipping_enabled',
+                false
+            ),
+
+            'international_shipping_rate' => (float) $this->getSetting(
+                'international_shipping_rate',
+                0
+            ),
+
+        ];
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RESPONSE
+        |--------------------------------------------------------------------------
+        */
+
+        return Inertia::render('Site/Checkout/Index', [
+
+            'cart' => array_values($cart),
+
+            'subtotal' => $subtotal,
+
+            'totalItems' => $totalItems,
+
+            'paymentSettings' => $paymentSettings,
+
+            'shippingSettings' => $shippingSettings,
+
+        ]);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | SUBTOTAL
-    |--------------------------------------------------------------------------
-    */
 
-    $subtotal = collect($cart)->sum(function ($item) {
-        return (float) $item['price'] * (int) $item['quantity'];
-    });
-
-    $totalItems = collect($cart)->sum('quantity');
+    public function calculateShipping(Request $request)
+    {
+        $validated = $request->validate([
+            'city' => ['nullable', 'string', 'max:100'],
+            'country' => ['required', 'string', 'max:100'],
+        ]);
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | PAYMENT SETTINGS
-    |--------------------------------------------------------------------------
-    */
+        /*
+        |--------------------------------------------------------------------------
+        | CART
+        |--------------------------------------------------------------------------
+        */
 
-    $paymentSettings = [
+        $cart = session()->get('cart', []);
 
-        'cash_on_delivery' => $this->getSetting(
-            'cash_on_delivery',
-            true
-        ),
-
-        'mobile_money' => $this->getSetting(
-            'mobile_money',
-            true
-        ),
-
-        'card' => $this->getSetting(
-            'card',
-            false
-        ),
-
-        'mobile_money_provider' => $this->getSetting(
-            'mobile_money_provider',
-            ''
-        ),
-
-        'mobile_money_number' => $this->getSetting(
-            'mobile_money_number',
-            ''
-        ),
-
-        'card_provider' => $this->getSetting(
-            'card_provider',
-            ''
-        ),
-
-        'currency' => $this->getSetting(
-            'currency',
-            'ZMW'
-        ),
-
-        'payment_instructions' => $this->getSetting(
-            'payment_instructions',
-            ''
-        ),
-
-    ];
+        if (empty($cart)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Your shopping bag is empty.',
+            ], 422);
+        }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | SHIPPING SETTINGS
-    |--------------------------------------------------------------------------
-    */
+        /*
+        |--------------------------------------------------------------------------
+        | SUBTOTAL
+        |--------------------------------------------------------------------------
+        */
 
-    $shippingSettings = [
+        $subtotal = collect($cart)->sum(function ($item) {
 
-        'enabled' => $this->getSetting(
+            return (float) $item['price']
+                * (int) $item['quantity'];
+
+        });
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SHIPPING SETTINGS
+        |--------------------------------------------------------------------------
+        */
+
+        $enabled = $this->getSetting(
             'shipping_enabled',
             true
-        ),
-
-        'method' => $this->getSetting(
-            'shipping_method',
-            'flat_rate'
-        ),
-
-        'flat_rate' => (float) $this->getSetting(
-            'shipping_flat_rate',
-            0
-        ),
-
-        'free_shipping_enabled' => $this->getSetting(
-            'free_shipping_enabled',
-            false
-        ),
-
-        'free_shipping_threshold' => (float) $this->getSetting(
-            'free_shipping_threshold',
-            0
-        ),
-
-        'local_shipping_enabled' => $this->getSetting(
-            'local_shipping_enabled',
-            true
-        ),
-
-        'local_shipping_rate' => (float) $this->getSetting(
-            'local_shipping_rate',
-            0
-        ),
-
-        'international_shipping_enabled' => $this->getSetting(
-            'international_shipping_enabled',
-            false
-        ),
-
-        'international_shipping_rate' => (float) $this->getSetting(
-            'international_shipping_rate',
-            0
-        ),
-
-    ];
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | RESPONSE
-    |--------------------------------------------------------------------------
-    */
-
-    return Inertia::render('Site/Checkout/Index', [
-
-        'cart' => array_values($cart),
-
-        'subtotal' => $subtotal,
-
-        'totalItems' => $totalItems,
-
-        'paymentSettings' => $paymentSettings,
-
-        'shippingSettings' => $shippingSettings,
-
-    ]);
-}
-
-
-public function calculateShipping(Request $request)
-{
-    $validated = $request->validate([
-        'city' => ['nullable', 'string', 'max:100'],
-        'country' => ['required', 'string', 'max:100'],
-    ]);
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CART
-    |--------------------------------------------------------------------------
-    */
-
-    $cart = session()->get('cart', []);
-
-    if (empty($cart)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Your shopping bag is empty.',
-        ], 422);
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | SUBTOTAL
-    |--------------------------------------------------------------------------
-    */
-
-    $subtotal = collect($cart)->sum(function ($item) {
-
-        return (float) $item['price']
-            * (int) $item['quantity'];
-
-    });
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | SHIPPING SETTINGS
-    |--------------------------------------------------------------------------
-    */
-
-    $enabled = $this->getSetting(
-        'shipping_enabled',
-        true
-    );
-
-    $method = $this->getSetting(
-        'shipping_method',
-        'flat_rate'
-    );
-
-    $flatRate = (float) $this->getSetting(
-        'shipping_flat_rate',
-        0
-    );
-
-    $freeShippingEnabled = $this->getSetting(
-        'free_shipping_enabled',
-        false
-    );
-
-    $freeShippingThreshold = (float) $this->getSetting(
-        'free_shipping_threshold',
-        0
-    );
-
-    $localShippingEnabled = $this->getSetting(
-        'local_shipping_enabled',
-        true
-    );
-
-    $localShippingRate = (float) $this->getSetting(
-        'local_shipping_rate',
-        0
-    );
-
-    $internationalShippingEnabled = $this->getSetting(
-        'international_shipping_enabled',
-        false
-    );
-
-    $internationalShippingRate = (float) $this->getSetting(
-        'international_shipping_rate',
-        0
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | DEFAULT SHIPPING
-    |--------------------------------------------------------------------------
-    */
-
-    $shippingAmount = 0;
-
-    $shippingLabel = 'Free Shipping';
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | SHIPPING DISABLED
-    |--------------------------------------------------------------------------
-    */
-
-    if (!$enabled) {
-
-        return response()->json([
-            'success' => true,
-            'shipping' => 0,
-            'shipping_label' => 'Shipping Disabled',
-            'total' => $subtotal,
-        ]);
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | FREE SHIPPING THRESHOLD
-    |--------------------------------------------------------------------------
-    */
-
-    if (
-        $freeShippingEnabled &&
-        $freeShippingThreshold > 0 &&
-        $subtotal >= $freeShippingThreshold
-    ) {
-
-        return response()->json([
-            'success' => true,
-            'shipping' => 0,
-            'shipping_label' => 'Free Shipping',
-            'total' => $subtotal,
-        ]);
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | FLAT RATE
-    |--------------------------------------------------------------------------
-    */
-
-    if ($method === 'flat_rate') {
-
-        $shippingAmount = $flatRate;
-
-        $shippingLabel = $shippingAmount > 0
-            ? 'Standard Shipping'
-            : 'Free Shipping';
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | LOCAL / INTERNATIONAL
-    |--------------------------------------------------------------------------
-    */
-
-    if ($method === 'location') {
-
-        $country = strtolower(
-            trim($validated['country'])
         );
 
-        if ($country === 'zambia') {
+        $method = $this->getSetting(
+            'shipping_method',
+            'flat_rate'
+        );
 
-            if ($localShippingEnabled) {
+        $flatRate = (float) $this->getSetting(
+            'shipping_flat_rate',
+            0
+        );
 
-                $shippingAmount = $localShippingRate;
+        $freeShippingEnabled = $this->getSetting(
+            'free_shipping_enabled',
+            false
+        );
 
-                $shippingLabel = $shippingAmount > 0
-                    ? 'Local Shipping'
-                    : 'Free Shipping';
+        $freeShippingThreshold = (float) $this->getSetting(
+            'free_shipping_threshold',
+            0
+        );
 
-            }
+        $localShippingEnabled = $this->getSetting(
+            'local_shipping_enabled',
+            true
+        );
 
-        } else {
+        $localShippingRate = (float) $this->getSetting(
+            'local_shipping_rate',
+            0
+        );
 
-            if ($internationalShippingEnabled) {
+        $internationalShippingEnabled = $this->getSetting(
+            'international_shipping_enabled',
+            false
+        );
 
-                $shippingAmount = $internationalShippingRate;
+        $internationalShippingRate = (float) $this->getSetting(
+            'international_shipping_rate',
+            0
+        );
 
-                $shippingLabel = $shippingAmount > 0
-                    ? 'International Shipping'
-                    : 'International Shipping Unavailable';
+
+        /*
+        |--------------------------------------------------------------------------
+        | DEFAULT SHIPPING
+        |--------------------------------------------------------------------------
+        */
+
+        $shippingAmount = 0;
+
+        $shippingLabel = 'Free Shipping';
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SHIPPING DISABLED
+        |--------------------------------------------------------------------------
+        */
+
+        if (!$enabled) {
+
+            return response()->json([
+                'success' => true,
+                'shipping' => 0,
+                'shipping_label' => 'Shipping Disabled',
+                'total' => $subtotal,
+            ]);
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | FREE SHIPPING THRESHOLD
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            $freeShippingEnabled &&
+            $freeShippingThreshold > 0 &&
+            $subtotal >= $freeShippingThreshold
+        ) {
+
+            return response()->json([
+                'success' => true,
+                'shipping' => 0,
+                'shipping_label' => 'Free Shipping',
+                'total' => $subtotal,
+            ]);
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | FLAT RATE
+        |--------------------------------------------------------------------------
+        */
+
+        if ($method === 'flat_rate') {
+
+            $shippingAmount = $flatRate;
+
+            $shippingLabel = $shippingAmount > 0
+                ? 'Standard Shipping'
+                : 'Free Shipping';
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | LOCAL / INTERNATIONAL
+        |--------------------------------------------------------------------------
+        */
+
+        if ($method === 'location') {
+
+            $country = strtolower(
+                trim($validated['country'])
+            );
+
+            if ($country === 'zambia') {
+
+                if ($localShippingEnabled) {
+
+                    $shippingAmount = $localShippingRate;
+
+                    $shippingLabel = $shippingAmount > 0
+                        ? 'Local Shipping'
+                        : 'Free Shipping';
+
+                }
+
+            } else {
+
+                if ($internationalShippingEnabled) {
+
+                    $shippingAmount = $internationalShippingRate;
+
+                    $shippingLabel = $shippingAmount > 0
+                        ? 'International Shipping'
+                        : 'International Shipping Unavailable';
+
+                }
 
             }
 
         }
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | TOTAL
+        |--------------------------------------------------------------------------
+        */
+
+        $total = $subtotal + $shippingAmount;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RESPONSE
+        |--------------------------------------------------------------------------
+        */
+
+        return response()->json([
+
+            'success' => true,
+
+            'shipping' => round(
+                $shippingAmount,
+                2
+            ),
+
+            'shipping_label' => $shippingLabel,
+
+            'subtotal' => round(
+                $subtotal,
+                2
+            ),
+
+            'total' => round(
+                $total,
+                2
+            ),
+
+        ]);
     }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | TOTAL
-    |--------------------------------------------------------------------------
-    */
-
-    $total = $subtotal + $shippingAmount;
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | RESPONSE
-    |--------------------------------------------------------------------------
-    */
-
-    return response()->json([
-
-        'success' => true,
-
-        'shipping' => round(
-            $shippingAmount,
-            2
-        ),
-
-        'shipping_label' => $shippingLabel,
-
-        'subtotal' => round(
-            $subtotal,
-            2
-        ),
-
-        'total' => round(
-            $total,
-            2
-        ),
-
-    ]);
-}
-
-
- /*
-    |--------------------------------------------------------------------------
-    | CHECKOUT PAGE
-    |--------------------------------------------------------------------------
-    */
-
-    // public function index(Request $request)
-    // {
-    //     $cart = session()->get('cart', []);
-
-    //     if (empty($cart)) {
-    //         return redirect()
-    //             ->route('cart.index')
-    //             ->with('error', 'Your shopping bag is empty.');
-    //     }
-
-    //     /*
-    //     |--------------------------------------------------------------------------
-    //     | CALCULATE CART TOTALS
-    //     |--------------------------------------------------------------------------
-    //     */
-
-    //     $subtotal = collect($cart)->sum(function ($item) {
-    //         return (float) $item['price'] * (int) $item['quantity'];
-    //     });
-
-    //     $totalItems = collect($cart)->sum('quantity');
-
-
-    //     /*
-    //     |--------------------------------------------------------------------------
-    //     | GET PAYMENT SETTINGS
-    //     |--------------------------------------------------------------------------
-    //     */
-
-    //     $paymentSettings = [
-
-    //         'cash_on_delivery' => $this->getSetting(
-    //             'cash_on_delivery',
-    //             true
-    //         ),
-
-    //         'mobile_money' => $this->getSetting(
-    //             'mobile_money',
-    //             true
-    //         ),
-
-    //         'card' => $this->getSetting(
-    //             'card',
-    //             false
-    //         ),
-
-    //         'mobile_money_provider' => $this->getSetting(
-    //             'mobile_money_provider',
-    //             ''
-    //         ),
-
-    //         'mobile_money_number' => $this->getSetting(
-    //             'mobile_money_number',
-    //             ''
-    //         ),
-
-    //         'card_provider' => $this->getSetting(
-    //             'card_provider',
-    //             ''
-    //         ),
-
-    //         'currency' => $this->getSetting(
-    //             'currency',
-    //             'ZMW'
-    //         ),
-
-    //         'payment_instructions' => $this->getSetting(
-    //             'payment_instructions',
-    //             ''
-    //         ),
-
-    //     ];
-
-
-    //     /*
-    //     |--------------------------------------------------------------------------
-    //     | RETURN CHECKOUT PAGE
-    //     |--------------------------------------------------------------------------
-    //     */
-
-    //     return Inertia::render(
-    //         'Site/Checkout/Index',
-    //         [
-    //             'cart' => array_values($cart),
-
-    //             'subtotal' => $subtotal,
-
-    //             'totalItems' => $totalItems,
-
-    //             'paymentSettings' => $paymentSettings,
-    //         ]
-    //     );
-    // }
 
 
      /*
@@ -775,10 +591,8 @@ public function calculateShipping(Request $request)
     |--------------------------------------------------------------------------
     */
 
-    private function getSetting(
-        string $key,
-        $default = null
-    ) {
+    private function getSetting(string $key, $default = null)
+    {
         $setting = Setting::where(
             'key',
             $key
@@ -822,108 +636,6 @@ public function calculateShipping(Request $request)
         return $setting->value;
     }
 
-
-    // public function index(Request $request)
-    // {
-    //     $cart = session()->get('cart', []);
-
-    //     if (empty($cart)) {
-    //         return redirect()
-    //             ->route('cart.index')
-    //             ->with('error', 'Your shopping bag is empty.');
-    //     }
-
-    //     $subtotal = collect($cart)->sum(function ($item) {
-    //         return (float) $item['price'] * (int) $item['quantity'];
-    //     });
-
-    //     $totalItems = collect($cart)->sum('quantity');
-
-    //     return Inertia::render('Site/Checkout/Index', [
-    //         'cart' => array_values($cart),
-    //         'subtotal' => $subtotal,
-    //         'totalItems' => $totalItems,
-    //     ]);
-    // }
-
-
-    // public function store(Request $request)
-    // {
-
-    // // dd($request->all());
-    //     $validated = $request->validate([
-
-    //         'email' => [
-    //             'required',
-    //             'email',
-    //             'max:255',
-    //         ],
-
-    //         'first_name' => [
-    //             'required',
-    //             'string',
-    //             'max:100',
-    //         ],
-
-    //         'last_name' => [
-    //             'required',
-    //             'string',
-    //             'max:100',
-    //         ],
-
-    //         'address' => [
-    //             'required',
-    //             'string',
-    //             'max:255',
-    //         ],
-
-    //         'city' => [
-    //             'required',
-    //             'string',
-    //             'max:100',
-    //         ],
-
-    //         'country' => [
-    //             'required',
-    //             'string',
-    //             'max:100',
-    //         ],
-
-    //         'phone' => [
-    //             'required',
-    //             'string',
-    //             'max:30',
-    //         ],
-
-    //         'payment_method' => [
-    //             'required',
-    //             'in:cash_on_delivery,mobile_money,card',
-    //         ],
-
-    //         'mobile_money_number' => [
-    //             'nullable',
-    //             'required_if:payment_method,mobile_money',
-    //             'string',
-    //             'max:30',
-    //         ],
-
-    //         'cardholder_name' => [
-    //             'nullable',
-    //             'required_if:payment_method,card',
-    //             'string',
-    //             'max:255',
-    //         ],
-
-    //     ]);
-
-
-    //     // Order creation comes next.
-
-    //     return back()->with(
-    //         'success',
-    //         'Checkout information validated successfully.'
-    //     );
-    // }
 
     
 

@@ -18,9 +18,13 @@ use App\Http\Controllers\MyFashions\FashionSettingsController;
 use App\Http\Controllers\MyFashions\ProductCategoryController;
 use App\Http\Controllers\MyFashions\StockAdjustmentController;
 use App\Http\Controllers\MyFashions\InventoryAuditController;
+use App\Http\Controllers\MyFashions\ClientDashboardController;
+use App\Http\Controllers\MyFashions\UserDashboardController;
 use App\Http\Controllers\MyFashions\CheckoutController;
 use App\Http\Controllers\MyFashions\CartController;
 use App\Http\Controllers\MyFashions\SettingsController;
+use App\Http\Controllers\UserFashionController;
+
 use App\Http\Controllers\ShopController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -53,6 +57,8 @@ Route::get('/dashboard', [DashboardController::class, 'dashboard'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
+
+   
     /*
     |--------------------------------------------------------------------------
     | Authenticated Routes
@@ -368,15 +374,25 @@ Route::middleware('auth')->group(function () {
         Route::put('/settings/store', [SettingsController::class, 'updateStore'])->name('fashions.settings.store.update');
         Route::get('/settings/payments', [SettingsController::class, 'payments'])->name('fashion.settings.payments');
         Route::post('/settings/payments', [SettingsController::class, 'updatePayments'])->name('fashion.settings.payments.update');
+        Route::post('/settings/shipping', [SettingsController::class, 'updateShipping'])->name('fashion.settings.shipping.update');
 
 
 
 
 
 
-       // Route::get('/settings/shipping', [SettingsController::class, 'shipping'])->name('fashion.settings.shipping');
+        //UserDasboard route for user
 
-Route::post('/settings/shipping', [SettingsController::class, 'updateShipping'])->name('fashion.settings.shipping.update');
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -384,6 +400,87 @@ Route::post('/settings/shipping', [SettingsController::class, 'updateShipping'])
 
 
     });
+
+
+
+    Route::prefix('client')->group(function () {
+
+    /*
+    |--------------------------------------------------------------------------
+    | CLIENT DASHBOARD
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/dashboard', [ClientDashboardController::class, 'dashboard'])->name('client.dashboard');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CLIENT SHOP
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/shop', [ClientDashboardController::class, 'shop' ])->name('client.shop');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CLIENT CART
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/cart', [ClientDashboardController::class, 'cart'])->name('client.cart');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CLIENT ORDERS
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/orders', [ClientDashboardController::class, 'orders'])->name('client.orders.index');
+    Route::get('/orders/pending', [ClientDashboardController::class, 'pendingOrders'])->name('client.orders.pending');
+
+
+    Route::get('/orders/processing', [ClientDashboardController::class, 'processingOrders'])->name('client.orders.processing');
+
+
+    Route::get('/orders/completed', [ClientDashboardController::class, 'completedOrders'])->name('client.orders.completed');
+
+
+    Route::get('/orders/cancelled', [ClientDashboardController::class, 'cancelledOrders'])->name('client.orders.cancelled');
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ORDER DETAILS
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/orders/{order}', [
+        ClientDashboardController::class,
+        'show'
+    ])->name('client.orders.show');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | PAYMENT HISTORY
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/payments', [ClientDashboardController::class, 'paymentHistory'])->name('client.payments');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | PROFILE
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/profile', [ClientDashboardController::class, 'profile'])->name('client.profile');
+});
 
 
 

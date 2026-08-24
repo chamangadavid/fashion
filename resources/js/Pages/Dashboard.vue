@@ -1,6 +1,7 @@
 <script setup>
 
 import MyFashionLayout from '@/Layouts/MyFashionLayout.vue'
+import UserFashionLayout from '@/Layouts/UserFashionLayout.vue'
 import { Head } from '@inertiajs/vue3'
 import { computed } from 'vue'
 
@@ -213,7 +214,7 @@ const dashboardTitle = computed(() => {
          USER DASHBOARD
     ========================================================== -->
 
-        <UserDashboard
+        <!-- <UserDashboard
 
             v-if="showUserDashboard"
 
@@ -224,8 +225,21 @@ const dashboardTitle = computed(() => {
             :payments="payments"
             :charts="charts"
 
+        /> -->
+
+
+ <UserFashionLayout v-if="showUserDashboard">
+
+        <UserDashboard
+            :auth="auth"
+            :stats="stats"
+            :cart="cart"
+            :orders="orders"
+            :payments="payments"
+            :charts="charts"
         />
 
+    </UserFashionLayout>
 
     <!-- <MyFashionLayout v-if="showUserDashboard">
 
@@ -239,6 +253,8 @@ const dashboardTitle = computed(() => {
         />
 
     </MyFashionLayout> -->
+
+
 
 
     <!-- =========================================================
