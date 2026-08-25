@@ -42,11 +42,23 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+         /*
+        |--------------------------------------------------------------------------
+        | ASSIGN DEFAULT USER ROLE
+        |--------------------------------------------------------------------------
+        |
+        | Every user who registers through the public registration form
+        | automatically receives the "Users" role.
+        |
+        */
+        $user->assignRole('Users');
+
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        //return redirect(route('dashboard', absolute: false));
+        return redirect()->route('client.dashboard');
     }
 
      public function search(Request $request)

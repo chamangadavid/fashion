@@ -261,21 +261,35 @@ const currentUrl = computed(() => {
 */
 
 const isActive = (href) => {
+
     if (!href) {
+
         return false;
+
     }
+
 
     const current = currentUrl.value;
 
+
     /*
     |--------------------------------------------------------------------------
-    | USER DASHBOARD
+    | DASHBOARD
     |--------------------------------------------------------------------------
     */
 
-    if (href === "/client/user-dashboard") {
-        return current === "/client/user-dashboard";
+    if (
+        href === "/user/dashboard" ||
+        href === "/dashboard"
+    ) {
+
+        return (
+            current === "/user/dashboard" ||
+            current === "/dashboard"
+        );
+
     }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -284,8 +298,11 @@ const isActive = (href) => {
     */
 
     if (current === href) {
+
         return true;
+
     }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -294,62 +311,8 @@ const isActive = (href) => {
     */
 
     return current.startsWith(`${href}/`);
+
 };
-
-
-// const isActive = (href) => {
-
-//     if (!href) {
-
-//         return false;
-
-//     }
-
-
-//     const current = currentUrl.value;
-
-
-//     /*
-//     |--------------------------------------------------------------------------
-//     | DASHBOARD
-//     |--------------------------------------------------------------------------
-//     */
-
-//     if (
-//         href === "/user/dashboard" ||
-//         href === "/dashboard"
-//     ) {
-
-//         return (
-//             current === "/user/dashboard" ||
-//             current === "/dashboard"
-//         );
-
-//     }
-
-
-//     /*
-//     |--------------------------------------------------------------------------
-//     | EXACT URL
-//     |--------------------------------------------------------------------------
-//     */
-
-//     if (current === href) {
-
-//         return true;
-
-//     }
-
-
-//     /*
-//     |--------------------------------------------------------------------------
-//     | CHILD ROUTES
-//     |--------------------------------------------------------------------------
-//     */
-
-//     return current.startsWith(`${href}/`);
-
-// };
 
 
 /*
@@ -985,7 +948,7 @@ const recentOrderTotal = computed(() => {
 
                                 <a-menu-item key="profile">
 
-                                    <Link :href="route('client.profile')" class="account-menu-link">
+                                    <Link :href="route('profile.edit')" class="account-menu-link">
 
                                         <UserOutlined />
 

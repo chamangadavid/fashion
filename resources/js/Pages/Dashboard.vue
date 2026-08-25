@@ -1,12 +1,16 @@
-<script setup>
+<!-- resources/js/Pages/Dashboard.vue -->
 
+<script setup>
 import MyFashionLayout from '@/Layouts/MyFashionLayout.vue'
-import UserFashionLayout from '@/Layouts/UserFashionLayout.vue'
 import { Head } from '@inertiajs/vue3'
 import { computed } from 'vue'
-import UserDashboard from '@/Pages/MyFashions/Clients/Dashboard.vue'
 import AdminBoard from '@/Components/AdminBoard.vue'
 
+/*
+|--------------------------------------------------------------------------
+| PROPS
+|--------------------------------------------------------------------------
+*/
 
 const props = defineProps({
     auth: {
@@ -39,28 +43,12 @@ const props = defineProps({
         default: () => ({}),
     },
 
-    cart: {
-        type: Object,
-        default: () => ({
-            items: [],
-            subtotal: 0,
-            shipping: 0,
-            total: 0,
-            item_count: 0,
-        }),
-    },
-
     orders: {
         type: Array,
         default: () => [],
     },
 
     products: {
-        type: Array,
-        default: () => [],
-    },
-
-    payments: {
         type: Array,
         default: () => [],
     },
@@ -78,26 +66,13 @@ const props = defineProps({
 
 /*
 |--------------------------------------------------------------------------
-| CURRENT USER
-|--------------------------------------------------------------------------
-*/
-
-const user = computed(() => {
-    return props.auth?.user ?? {}
-})
-
-/*
-|--------------------------------------------------------------------------
 | ROLES
 |--------------------------------------------------------------------------
 |
-| IMPORTANT:
-| Use auth.roles because Laravel is sending:
+| Laravel sends roles through:
 |
 | auth.roles = ["Users"]
 |
-| while auth.user.roles contains role objects.
-|--------------------------------------------------------------------------
 */
 
 const roles = computed(() => {
@@ -116,13 +91,9 @@ const permissions = computed(() => {
 
 /*
 |--------------------------------------------------------------------------
-| ROLE CHECKS
+| SUPER ADMIN
 |--------------------------------------------------------------------------
 */
-
-const isUser = computed(() => {
-    return roles.value.includes('Users')
-})
 
 const isSuperAdmin = computed(() => {
     return roles.value.includes('Super Admin')
@@ -135,8 +106,6 @@ const isSuperAdmin = computed(() => {
 */
 
 const can = (permission) => {
-
-    // Super Admin can access everything
     if (isSuperAdmin.value) {
         return true
     }
@@ -146,11 +115,14 @@ const can = (permission) => {
 
 /*
 |--------------------------------------------------------------------------
-| ADMIN / STAFF
+| ADMIN / STAFF ACCESS
 |--------------------------------------------------------------------------
 */
-
 const isAdminOrStaff = computed(() => {
+    // Users role must never access the admin dashboard
+    if (roles.value.includes('Users')) {
+        return false
+    }
 
     return (
         isSuperAdmin.value ||
@@ -159,30 +131,7 @@ const isAdminOrStaff = computed(() => {
     )
 })
 
-/*
-|--------------------------------------------------------------------------
-| WHICH DASHBOARD?
-|--------------------------------------------------------------------------
-|
-| IMPORTANT:
-| A user with the "Users" role MUST always receive UserDashboard.
-|
-| We check the Users role FIRST.
-|--------------------------------------------------------------------------
-*/
 
-const showUserDashboard = computed(() => {
-
-    return isUser.value
-})
-
-const showAdminDashboard = computed(() => {
-
-    return (
-        !isUser.value &&
-        isAdminOrStaff.value
-    )
-})
 
 /*
 |--------------------------------------------------------------------------
@@ -191,82 +140,21 @@ const showAdminDashboard = computed(() => {
 */
 
 const dashboardTitle = computed(() => {
-
-    if (showUserDashboard.value) {
-        return 'Dashboard'
-    }
-
-    if (showAdminDashboard.value) {
-        return 'Admin Dashboard'
-    }
-
-    return 'Dashboard'
+    return isAdminOrStaff.value
+        ? 'Admin Dashboard'
+        : 'Dashboard'
 })
-
 </script>
 
-
 <template>
-
     <Head :title="dashboardTitle" />
-
-    <!-- =========================================================
-         USER DASHBOARD
-    ========================================================== -->
-   <!-- USER DASHBOARD -->
-
-
-
-    <UserDashboard v-if="showUserDashboard"
-        :auth="auth"
-        :stats="stats"
-        :charts="charts"
-        :cart="cart"
-        :orders="orders"
-        :products="products"
-        :payments="payments"
-        :thread_feed="thread_feed"
-        :reports="reports"
-    />
-
-    <!-- <UserFashionLayout v-if="showUserDashboard">
-    <UserDashboard
-        :auth="auth"
-        :stats="stats"
-        :charts="charts"
-        :cart="cart"
-        :orders="orders"
-        :products="products"
-        :payments="payments"
-        :thread_feed="thread_feed"
-        :reports="reports"
-    />
-</UserFashionLayout> -->
-
-    
-
- <!-- <UserFashionLayout v-if="showUserDashboard">
-
-        <UserDashboard
-            :auth="auth"
-            :stats="stats"
-            :cart="cart"
-            :orders="orders"
-            :payments="payments"
-            :charts="charts"
-        />
-
-    </UserFashionLayout> -->
-
-
-
 
     <!-- =========================================================
          ADMIN / STAFF DASHBOARD
     ========================================================== -->
 
     <AdminBoard
-        v-else-if="showAdminDashboard"
+        v-if="isAdminOrStaff"
         :auth="auth"
         :stats="stats"
         :orders="orders"
@@ -276,35 +164,26 @@ const dashboardTitle = computed(() => {
         :charts="charts"
     />
 
-
     <!-- =========================================================
          NO DASHBOARD ACCESS
     ========================================================== -->
 
     <MyFashionLayout v-else>
-
         <div class="flex min-h-[60vh] items-center justify-center">
-
             <div class="text-center">
-
                 <h1 class="text-xl font-semibold text-gray-800">
                     Dashboard
                 </h1>
 
                 <p class="mt-2 text-sm text-gray-500">
-                    You do not currently have access to a dashboard.
+                    You do not currently have access to this dashboard.
                 </p>
 
-                <!-- Debug information -->
                 <div class="mt-6 text-sm text-gray-400">
                     Roles:
                     {{ roles.join(', ') || 'None' }}
                 </div>
-
             </div>
-
         </div>
-
     </MyFashionLayout>
-
 </template>
