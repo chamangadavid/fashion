@@ -1,6 +1,4 @@
 <!-- Resources/js/Pages/Welcome.vue -->
-
-
 <script setup>
 import { Head } from "@inertiajs/vue3";
 import Header from "@/Components/Header.vue";
@@ -195,7 +193,8 @@ const bottomsProducts = [
 
 
 <template>
-    <Head title="Fashion Styles" />
+
+    <Head title="In Styles Asara" />
 
     <div class="min-h-screen bg-white text-gray-800">
 
@@ -203,10 +202,7 @@ const bottomsProducts = [
         <!-- HEADER -->
         <!-- ========================= -->
 
-        <Header
-            :canLogin="canLogin"
-            :canRegister="canRegister"
-        />
+        <Header :canLogin="canLogin" :canRegister="canRegister" />
 
 
         <!-- ========================= -->
@@ -221,19 +217,19 @@ const bottomsProducts = [
 
         <main>
 
-        <!-- ========================= -->
-        <!-- QUICK SHOP -->
-        <!-- ========================= -->
+            <!-- ========================= -->
+            <!-- QUICK SHOP -->
+            <!-- ========================= -->
 
-        <QuickShop />
+            <QuickShop />
 
-        <!-- ========================= -->
-        <!-- ABOUT THE BRAND -->
-        <!-- ========================= -->
+            <!-- ========================= -->
+            <!-- ABOUT THE BRAND -->
+            <!-- ========================= -->
 
-        <section>
-            <AboutBrand />
-        </section>
+            <section>
+                <AboutBrand />
+            </section>
 
             <!-- NEW ARRIVALS -->
             <section>
@@ -258,23 +254,14 @@ const bottomsProducts = [
             </section>
 
             <section>
-            <CategoryProductSection
-                title="Denim Drops – Jeans, Jackets & Skirts"
-                :products="denimProducts"
-                view-more-href="/clothing/denim"
-            />
+                <CategoryProductSection title="Denim Drops – Jeans, Jackets & Skirts" :products="denimProducts"
+                    view-more-href="/clothing/denim" />
 
-            <CategoryProductSection
-                title="Blouses, Tops, & Tees"
-                :products="blouseProducts"
-                view-more-href="/clothing/women/tops"
-            />
+                <CategoryProductSection title="Blouses, Tops, & Tees" :products="blouseProducts"
+                    view-more-href="/clothing/women/tops" />
 
-            <CategoryProductSection
-                title="Flirty Skirts & Effortless Bottoms"
-                :products="bottomsProducts"
-                view-more-href="/clothing/women/bottoms"
-            />
+                <CategoryProductSection title="Flirty Skirts & Effortless Bottoms" :products="bottomsProducts"
+                    view-more-href="/clothing/women/bottoms" />
             </section>
 
         </main>
@@ -285,7 +272,7 @@ const bottomsProducts = [
         <section>
             <AppFooter />
         </section>
-        
+
 
         <!-- ========================= -->
         <!-- PAYMENT METHODS -->

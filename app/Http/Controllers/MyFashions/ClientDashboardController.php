@@ -45,15 +45,27 @@ class ClientDashboardController extends Controller
         });
 
         /*
-        |--------------------------------------------------------------------------
-        | USER ORDERS
-        |--------------------------------------------------------------------------
-        */
+    |--------------------------------------------------------------------------
+    | USER ORDERS
+    |--------------------------------------------------------------------------
+    | Match orders by either:
+    | 1. user_id
+    | 2. customer_email
+    |--------------------------------------------------------------------------
+    */
 
         $orders = Order::with('items')
-            ->where('user_id', $user->id)
+            ->where(function ($query) use ($user) {
+                $query->where('user_id', $user->id)
+                    ->orWhere('customer_email', $user->email);
+            })
             ->latest()
             ->get();
+
+        // $orders = Order::with('items')
+        //     ->where('user_id', $user->id)
+        //     ->latest()
+        //     ->get();
 
         /*
         |--------------------------------------------------------------------------
@@ -181,11 +193,16 @@ class ClientDashboardController extends Controller
     |--------------------------------------------------------------------------
     */
 
+    // public function shop(Request $request)
+    // {
+    //     return Inertia::render(
+    //         'MyFashions/Clients/Shop'
+    //     );
+    // }
+
     public function shop(Request $request)
     {
-        return Inertia::render(
-            'MyFashions/Clients/Shop'
-        );
+        return redirect()->route('welcome');
     }
 
 
@@ -611,6 +628,62 @@ class ClientDashboardController extends Controller
                 'user' => $user,
             ]
         );
+    }
+
+
+    public function editProfile(Request $request)
+    {
+        $user = $request->user();
+
+        return Inertia::render(
+            'MyFashions/Clients/Profile/Edit',
+            [
+                'user' => $user,
+            ]
+        );
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                'unique:users,email,' . $user->id,
+            ],
+
+            'phone' => [
+                'nullable',
+                'string',
+                'max:30',
+            ],
+
+            'address' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+        ]);
+
+        $user->update([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
+            'address' => $validated['address'] ?? null,
+        ]);
+
+        return redirect()
+            ->route('client.profile')
+            ->with('success', 'Your profile has been updated successfully.');
     }
 
 }

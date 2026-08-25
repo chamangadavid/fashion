@@ -4,9 +4,9 @@ import MyFashionLayout from '@/Layouts/MyFashionLayout.vue'
 import UserFashionLayout from '@/Layouts/UserFashionLayout.vue'
 import { Head } from '@inertiajs/vue3'
 import { computed } from 'vue'
-
-import UserDashboard from '@/Components/UserDashboard.vue'
+import UserDashboard from '@/Pages/MyFashions/Clients/Dashboard.vue'
 import AdminBoard from '@/Components/AdminBoard.vue'
+
 
 const props = defineProps({
     auth: {
@@ -213,22 +213,39 @@ const dashboardTitle = computed(() => {
     <!-- =========================================================
          USER DASHBOARD
     ========================================================== -->
-
-        <!-- <UserDashboard
-
-            v-if="showUserDashboard"
-
-            :auth="auth"
-            :stats="stats"
-            :cart="cart"
-            :orders="orders"
-            :payments="payments"
-            :charts="charts"
-
-        /> -->
+   <!-- USER DASHBOARD -->
 
 
- <UserFashionLayout v-if="showUserDashboard">
+
+    <UserDashboard v-if="showUserDashboard"
+        :auth="auth"
+        :stats="stats"
+        :charts="charts"
+        :cart="cart"
+        :orders="orders"
+        :products="products"
+        :payments="payments"
+        :thread_feed="thread_feed"
+        :reports="reports"
+    />
+
+    <!-- <UserFashionLayout v-if="showUserDashboard">
+    <UserDashboard
+        :auth="auth"
+        :stats="stats"
+        :charts="charts"
+        :cart="cart"
+        :orders="orders"
+        :products="products"
+        :payments="payments"
+        :thread_feed="thread_feed"
+        :reports="reports"
+    />
+</UserFashionLayout> -->
+
+    
+
+ <!-- <UserFashionLayout v-if="showUserDashboard">
 
         <UserDashboard
             :auth="auth"
@@ -239,20 +256,7 @@ const dashboardTitle = computed(() => {
             :charts="charts"
         />
 
-    </UserFashionLayout>
-
-    <!-- <MyFashionLayout v-if="showUserDashboard">
-
-        <UserDashboard
-            :auth="auth"
-            :stats="stats"
-            :cart="cart"
-            :orders="orders"
-            :payments="payments"
-            :charts="charts"
-        />
-
-    </MyFashionLayout> -->
+    </UserFashionLayout> -->
 
 
 

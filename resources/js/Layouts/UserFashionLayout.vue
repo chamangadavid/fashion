@@ -3,7 +3,7 @@
 <script setup>
 
 import { ref, computed } from "vue";
-import { Head, Link, router,usePage, } from '@inertiajs/vue3'
+import { Head, Link, router, usePage, } from '@inertiajs/vue3'
 import Swal from 'sweetalert2'
 
 
@@ -13,7 +13,7 @@ import {
     ShoppingCartOutlined,
     CreditCardOutlined,
     FileTextOutlined,
-ClockCircleOutlined,
+    ClockCircleOutlined,
     UserOutlined,
     LogoutOutlined,
     RightOutlined,
@@ -185,7 +185,7 @@ const userInitial = computed(() => {
 const navigation = [
     {
         label: "Dashboard",
-        href: "/client/dashboard",
+        href: "/client/user-dashboard",
         icon: DashboardOutlined,
     },
 
@@ -236,7 +236,7 @@ const navigation = [
 
     {
         label: "My Profile",
-        href: "/client/profile",
+        href: "/client/my-profile",
         icon: UserOutlined,
     },
 ];
@@ -394,15 +394,24 @@ const handleSearch = () => {
 */
 
 const formattedCartTotal = computed(() => {
-
-    const amount = Number(props.cartTotal || 0);
+    const amount = globalCartTotal.value;
 
     return amount.toLocaleString("en-ZM", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     });
-
 });
+
+// const formattedCartTotal = computed(() => {
+
+//     const amount = Number(props.cartTotal || 0);
+
+//     return amount.toLocaleString("en-ZM", {
+//         minimumFractionDigits: 2,
+//         maximumFractionDigits: 2,
+//     });
+
+// });
 
 
 /*
@@ -428,6 +437,21 @@ const recentOrderNumber = computed(() => {
 
 });
 
+
+const globalCart = computed(() => {
+    return page.props.cart ?? {
+        item_count: 0,
+        total: 0,
+    };
+});
+
+const globalCartCount = computed(() => {
+    return Number(globalCart.value.item_count || 0);
+});
+
+const globalCartTotal = computed(() => {
+    return Number(globalCart.value.total || 0);
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -483,7 +507,8 @@ const recentOrderTotal = computed(() => {
 
 
 <template>
-   <Head title="My Orders" />
+
+    <Head title="My Orders" />
 
     <div class="user-fashion-dashboard">
 
@@ -494,11 +519,7 @@ const recentOrderTotal = computed(() => {
 
         <transition name="fade">
 
-            <div
-                v-if="sidebarOpen"
-                class="sidebar-overlay"
-                @click="closeSidebar"
-            ></div>
+            <div v-if="sidebarOpen" class="sidebar-overlay" @click="closeSidebar"></div>
 
         </transition>
 
@@ -507,12 +528,9 @@ const recentOrderTotal = computed(() => {
              SIDEBAR
         ========================================================== -->
 
-        <aside
-            class="user-sidebar"
-            :class="{
-                'sidebar-mobile-open': sidebarOpen
-            }"
-        >
+        <aside class="user-sidebar" :class="{
+            'sidebar-mobile-open': sidebarOpen
+        }">
 
 
             <!-- =====================================================
@@ -521,17 +539,9 @@ const recentOrderTotal = computed(() => {
 
             <div class="sidebar-brand">
 
-                <Link
-                    href="/user/dashboard"
-                    class="user-logo"
-                    @click="closeSidebar"
-                >
+                <Link href="/user/dashboard" class="user-logo" @click="closeSidebar">
 
-                    <img
-                        src="/assets/aaib.png"
-                        alt="Fashion Style"
-                        class="logo-image"
-                    />
+                    <img src="/assets/aaib.png" alt="Fashion Style" class="logo-image" />
 
                     <span class="logo-text">
 
@@ -548,12 +558,7 @@ const recentOrderTotal = computed(() => {
 
                 <!-- MOBILE CLOSE -->
 
-                <button
-                    type="button"
-                    class="mobile-close"
-                    @click="closeSidebar"
-                    aria-label="Close menu"
-                >
+                <button type="button" class="mobile-close" @click="closeSidebar" aria-label="Close menu">
 
                     <CloseOutlined />
 
@@ -606,31 +611,18 @@ const recentOrderTotal = computed(() => {
                      NAVIGATION ITEMS
                 ================================================== -->
 
-                <div
-                    v-for="item in navigation"
-                    :key="item.label"
-                    class="nav-item"
-                >
+                <div v-for="item in navigation" :key="item.label" class="nav-item">
 
 
                     <!-- =================================================
                          NORMAL LINK
                     ================================================== -->
 
-                    <Link
-                        v-if="!item.children"
-                        :href="item.href"
-                        class="sidebar-link"
-                        :class="{
-                            active: isActive(item.href)
-                        }"
-                        @click="closeSidebar"
-                    >
+                    <Link v-if="!item.children" :href="item.href" class="sidebar-link" :class="{
+                        active: isActive(item.href)
+                    }" @click="closeSidebar">
 
-                        <component
-                            :is="item.icon"
-                            class="sidebar-icon"
-                        />
+                        <component :is="item.icon" class="sidebar-icon" />
 
                         <span class="sidebar-link-text">
 
@@ -641,12 +633,10 @@ const recentOrderTotal = computed(() => {
 
                         <!-- CART BADGE -->
 
-                        <span
-                            v-if="item.label === 'My Cart' && cartCount > 0"
-                            class="nav-badge"
-                        >
+                        <span v-if="item.label === 'My Cart' && cartCount > 0" class="nav-badge">
 
-                            {{ cartCount }}
+                            <!-- {{ cartCount }} -->
+                            {{ globalCartCount }}
 
                         </span>
 
@@ -657,24 +647,15 @@ const recentOrderTotal = computed(() => {
                          DROPDOWN BUTTON
                     ================================================== -->
 
-                    <button
-                        v-else
-                        type="button"
-                        class="sidebar-link sidebar-dropdown-trigger"
-                        :class="{
-                            'dropdown-open':
-                                openDropdown === item.label,
+                    <button v-else type="button" class="sidebar-link sidebar-dropdown-trigger" :class="{
+                        'dropdown-open':
+                            openDropdown === item.label,
 
-                            active:
-                                isDropdownActive(item)
-                        }"
-                        @click="toggleDropdown(item.label)"
-                    >
+                        active:
+                            isDropdownActive(item)
+                    }" @click="toggleDropdown(item.label)">
 
-                        <component
-                            :is="item.icon"
-                            class="sidebar-icon"
-                        />
+                        <component :is="item.icon" class="sidebar-icon" />
 
                         <span class="sidebar-link-text">
 
@@ -683,13 +664,10 @@ const recentOrderTotal = computed(() => {
                         </span>
 
 
-                        <ArrowDownOutlined
-                            class="dropdown-arrow"
-                            :class="{
-                                rotated:
-                                    openDropdown === item.label
-                            }"
-                        />
+                        <ArrowDownOutlined class="dropdown-arrow" :class="{
+                            rotated:
+                                openDropdown === item.label
+                        }" />
 
                     </button>
 
@@ -700,25 +678,16 @@ const recentOrderTotal = computed(() => {
 
                     <transition name="sidebar-dropdown">
 
-                        <div
-                            v-if="
-                                item.children &&
-                                openDropdown === item.label
-                            "
-                            class="sidebar-submenu"
-                        >
+                        <div v-if="
+                            item.children &&
+                            openDropdown === item.label
+                        " class="sidebar-submenu">
 
-                            <Link
-                                v-for="child in item.children"
-                                :key="child.label"
-                                :href="child.href"
-                                class="sidebar-submenu-link"
-                                :class="{
+                            <Link v-for="child in item.children" :key="child.label" :href="child.href"
+                                class="sidebar-submenu-link" :class="{
                                     active:
                                         isActive(child.href)
-                                }"
-                                @click="closeSidebar"
-                            >
+                                }" @click="closeSidebar">
 
                                 <span class="submenu-dot"></span>
 
@@ -779,11 +748,7 @@ const recentOrderTotal = computed(() => {
                 </div>
 
 
-                <Link
-                    href="/client/cart"
-                    class="view-cart-button"
-                    @click="closeSidebar"
-                >
+                <Link href="/client/cart" class="view-cart-button" @click="closeSidebar">
 
                     View Cart
 
@@ -844,12 +809,7 @@ const recentOrderTotal = computed(() => {
                      MOBILE MENU
                 ================================================== -->
 
-                <button
-                    type="button"
-                    class="mobile-menu-button"
-                    @click="openSidebar"
-                    aria-label="Open menu"
-                >
+                <button type="button" class="mobile-menu-button" @click="openSidebar" aria-label="Open menu">
 
                     <MenuOutlined />
 
@@ -900,12 +860,7 @@ const recentOrderTotal = computed(() => {
 
                         <SearchOutlined />
 
-                        <input
-                            v-model="search"
-                            type="text"
-                            placeholder="Search products"
-                            @keyup.enter="handleSearch"
-                        />
+                        <input v-model="search" type="text" placeholder="Search products" @keyup.enter="handleSearch" />
 
                         <span class="search-shortcut">
                             ⌘
@@ -922,22 +877,13 @@ const recentOrderTotal = computed(() => {
                          CART BUTTON
                     ================================================== -->
 
-                    <a-tooltip
-                        title="Shopping Cart"
-                        placement="bottom"
-                    >
+                    <a-tooltip title="Shopping Cart" placement="bottom">
 
-                        <Link
-                            href="/client/cart"
-                            class="header-cart-button"
-                        >
+                        <Link href="/client/cart" class="header-cart-button">
 
                             <ShoppingCartOutlined />
 
-                            <span
-                                v-if="cartCount > 0"
-                                class="header-cart-badge"
-                            >
+                            <span v-if="cartCount > 0" class="header-cart-badge">
                                 {{ cartCount }}
                             </span>
 
@@ -950,20 +896,11 @@ const recentOrderTotal = computed(() => {
                          PROFILE
                     ================================================== -->
 
-                    <a-dropdown
-                        placement="bottomRight"
-                        trigger="click"
-                    >
+                    <a-dropdown placement="bottomRight" trigger="click">
 
-                        <a-tooltip
-                            title="Account"
-                            placement="bottom"
-                        >
+                        <a-tooltip title="Account" placement="bottom">
 
-                            <button
-                                type="button"
-                                class="profile-button"
-                            >
+                            <button type="button" class="profile-button">
 
                                 <span class="profile-initial">
                                     {{ userInitial }}
@@ -1011,10 +948,7 @@ const recentOrderTotal = computed(() => {
 
                                 <a-menu-item key="profile">
 
-                                    <Link
-                                        :href="route('profile.edit')"
-                                        class="account-menu-link"
-                                    >
+                                    <Link :href="route('profile.edit')" class="account-menu-link">
 
                                         <UserOutlined />
 
@@ -1031,10 +965,7 @@ const recentOrderTotal = computed(() => {
 
                                 <a-menu-item key="orders">
 
-                                    <Link
-                                       href="/client/orders"
-                                        class="account-menu-link"
-                                    >
+                                    <Link href="/client/orders" class="account-menu-link">
 
                                         <FileTextOutlined />
 
@@ -1051,10 +982,7 @@ const recentOrderTotal = computed(() => {
 
                                 <a-menu-item key="cart">
 
-                                    <Link
-                                        href="/client/cart"
-                                        class="account-menu-link"
-                                    >
+                                    <Link href="/client/cart" class="account-menu-link">
 
                                         <ShoppingCartOutlined />
 
@@ -1074,12 +1002,8 @@ const recentOrderTotal = computed(() => {
 
                                 <a-menu-item key="logout">
 
-                                    <Link
-                                        :href="route('logout')"
-                                        method="post"
-                                        as="button"
-                                        class="account-menu-link logout-link"
-                                    >
+                                    <Link :href="route('logout')" method="post" as="button"
+                                        class="account-menu-link logout-link">
 
                                         <LogoutOutlined />
 
@@ -1213,7 +1137,6 @@ const recentOrderTotal = computed(() => {
 
 
 <style scoped>
-
 /*
 |--------------------------------------------------------------------------
 | MAIN DASHBOARD
@@ -3133,5 +3056,4 @@ const recentOrderTotal = computed(() => {
     }
 
 }
-
 </style>

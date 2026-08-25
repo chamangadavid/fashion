@@ -141,12 +141,12 @@ onBeforeUnmount(() => {
 
 
       <h1>
-        FASHION
+        IN STYLE
       </h1>
 
 
       <p class="hero-subtitle">
-        Discover your signature style
+        ASARA - Discover your signature style
       </p>
 
 

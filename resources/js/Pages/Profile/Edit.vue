@@ -1,3 +1,4 @@
+<!-- resources\js\Pages\Profile\Edit.vue -->
 <script setup>
 import MyFashionLayout from '@/Layouts/MyFashionLayout.vue'
 import DeleteUserForm from './Partials/DeleteUserForm.vue';

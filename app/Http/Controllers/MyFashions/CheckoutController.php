@@ -28,8 +28,14 @@ class CheckoutController extends Controller
         |--------------------------------------------------------------------------
         */
 
+        // $subtotal = collect($cart)->sum(function ($item) {
+        //     return (float) $item['price'] * (int) $item['quantity'];
+        // });
+
         $subtotal = collect($cart)->sum(function ($item) {
-            return (float) $item['price'] * (int) $item['quantity'];
+            $price = $item['sale_price'] ?? $item['price'];
+
+            return (float) $price * (int) $item['quantity'];
         });
 
         $totalItems = collect($cart)->sum('quantity');
@@ -149,6 +155,163 @@ class CheckoutController extends Controller
         */
 
         return Inertia::render('Site/Checkout/Index', [
+
+            'cart' => array_values($cart),
+
+            'subtotal' => $subtotal,
+
+            'totalItems' => $totalItems,
+
+            'paymentSettings' => $paymentSettings,
+
+            'shippingSettings' => $shippingSettings,
+
+        ]);
+    }
+
+    public function myCheckoutIndex(Request $request)
+    {
+        $cart = session()->get('cart', []);
+
+        if (empty($cart)) {
+            return redirect()
+                ->route('client.cart')
+                ->with('error', 'Your shopping bag is empty.');
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | SUBTOTAL
+        |--------------------------------------------------------------------------
+        */
+
+        // $subtotal = collect($cart)->sum(function ($item) {
+        //     return (float) $item['price'] * (int) $item['quantity'];
+        // });
+
+        $subtotal = collect($cart)->sum(function ($item) {
+            $price = $item['sale_price'] ?? $item['price'];
+
+            return (float) $price * (int) $item['quantity'];
+        });
+
+        $totalItems = collect($cart)->sum('quantity');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | PAYMENT SETTINGS
+        |--------------------------------------------------------------------------
+        */
+
+        $paymentSettings = [
+
+            'cash_on_delivery' => $this->getSetting(
+                'cash_on_delivery',
+                true
+            ),
+
+            'mobile_money' => $this->getSetting(
+                'mobile_money',
+                true
+            ),
+
+            'card' => $this->getSetting(
+                'card',
+                false
+            ),
+
+            'mobile_money_provider' => $this->getSetting(
+                'mobile_money_provider',
+                ''
+            ),
+
+            'mobile_money_number' => $this->getSetting(
+                'mobile_money_number',
+                ''
+            ),
+
+            'card_provider' => $this->getSetting(
+                'card_provider',
+                ''
+            ),
+
+            'currency' => $this->getSetting(
+                'currency',
+                'ZMW'
+            ),
+
+            'payment_instructions' => $this->getSetting(
+                'payment_instructions',
+                ''
+            ),
+
+        ];
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SHIPPING SETTINGS
+        |--------------------------------------------------------------------------
+        */
+
+        $shippingSettings = [
+
+            'enabled' => $this->getSetting(
+                'shipping_enabled',
+                true
+            ),
+
+            'method' => $this->getSetting(
+                'shipping_method',
+                'flat_rate'
+            ),
+
+            'flat_rate' => (float) $this->getSetting(
+                'shipping_flat_rate',
+                0
+            ),
+
+            'free_shipping_enabled' => $this->getSetting(
+                'free_shipping_enabled',
+                false
+            ),
+
+            'free_shipping_threshold' => (float) $this->getSetting(
+                'free_shipping_threshold',
+                0
+            ),
+
+            'local_shipping_enabled' => $this->getSetting(
+                'local_shipping_enabled',
+                true
+            ),
+
+            'local_shipping_rate' => (float) $this->getSetting(
+                'local_shipping_rate',
+                0
+            ),
+
+            'international_shipping_enabled' => $this->getSetting(
+                'international_shipping_enabled',
+                false
+            ),
+
+            'international_shipping_rate' => (float) $this->getSetting(
+                'international_shipping_rate',
+                0
+            ),
+
+        ];
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RESPONSE
+        |--------------------------------------------------------------------------
+        */
+
+        return Inertia::render('MyFashions/Clients/Checkout/Index', [
 
             'cart' => array_values($cart),
 
@@ -546,6 +709,8 @@ class CheckoutController extends Controller
     }
 
 
+
+
     /*
     |--------------------------------------------------------------------------
     | ENABLED PAYMENT METHODS
@@ -635,6 +800,8 @@ class CheckoutController extends Controller
 
         return $setting->value;
     }
+
+    
 
 
     

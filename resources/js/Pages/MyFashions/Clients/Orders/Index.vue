@@ -1,112 +1,4 @@
 <!-- resources\js\Pages\MyFashions\Clients\Orders\Index.vue -->
-<!-- <script setup>
-import { computed } from "vue";
-import { Link } from "@inertiajs/vue3";
-import {
-    ShoppingOutlined,
-    EyeOutlined,
-    ArrowRightOutlined,
-    ClockCircleOutlined,
-    CheckCircleOutlined,
-    CloseCircleOutlined,
-    SyncOutlined,
-    InboxOutlined,
-} from "@ant-design/icons-vue";
-
-import UserFashionLayout from "@/Layouts/UserFashionLayout.vue";
-
-const props = defineProps({
-    orders: {
-        type: Array,
-        default: () => [],
-    },
-
-    stats: {
-        type: Object,
-        default: () => ({
-            total: 0,
-            pending: 0,
-            processing: 0,
-            completed: 0,
-            cancelled: 0,
-        }),
-    },
-});
-
-const formatCurrency = (amount) => {
-    return Number(amount || 0).toLocaleString("en-ZM", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    });
-};
-
-const formatDate = (date) => {
-    if (!date) {
-        return "-";
-    }
-
-    return new Date(date).toLocaleDateString("en-ZM", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-    });
-};
-
-const getStatusLabel = (status) => {
-    if (!status) {
-        return "Pending";
-    }
-
-    return status.charAt(0).toUpperCase() + status.slice(1);
-};
-
-const getStatusClass = (status) => {
-    switch (String(status || "").toLowerCase()) {
-        case "pending":
-            return "status-pending";
-
-        case "processing":
-            return "status-processing";
-
-        case "completed":
-        case "delivered":
-            return "status-completed";
-
-        case "cancelled":
-        case "canceled":
-            return "status-cancelled";
-
-        default:
-            return "status-default";
-    }
-};
-
-const getStatusIcon = (status) => {
-    switch (String(status || "").toLowerCase()) {
-        case "pending":
-            return ClockCircleOutlined;
-
-        case "processing":
-            return SyncOutlined;
-
-        case "completed":
-        case "delivered":
-            return CheckCircleOutlined;
-
-        case "cancelled":
-        case "canceled":
-            return CloseCircleOutlined;
-
-        default:
-            return ClockCircleOutlined;
-    }
-};
-
-const orderCount = computed(() => {
-    return props.orders.length;
-});
-</script> -->
-
 <script setup>
 import { computed } from "vue";
 import { Link } from "@inertiajs/vue3";
@@ -147,6 +39,7 @@ const props = defineProps({
             cancelled: 0,
         }),
     },
+      
 
     cart: {
         type: Object,
@@ -410,9 +303,14 @@ const getOrderTotal = (order) => {
     <UserFashionLayout
         :total-orders="stats.total"
         :pending-orders="stats.pending"
+    >
+
+    <!-- <UserFashionLayout
+        :total-orders="stats.total"
+        :pending-orders="stats.pending"
         :cart-count="0"
         :cart-total="0"
-    >
+    > -->
         <template #title>
             My Orders
         </template>

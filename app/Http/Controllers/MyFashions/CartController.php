@@ -36,6 +36,31 @@ class CartController extends Controller
         ]);
     }
 
+    public function myCartIndex(Request $request)
+    {
+        $cart = $request->session()->get('cart', []);
+
+        $subtotal = collect($cart)->sum(function ($item) {
+
+            // Use sale price when available,
+            // otherwise use the regular price.
+            $price = $item['sale_price'] ?? $item['price'];
+
+            return $price * $item['quantity'];
+        });
+
+        $totalItems = collect($cart)->sum('quantity');
+
+        return Inertia::render('MyFashions/Clients/Cart/Index', [
+            'cart' => array_values($cart),
+            'subtotal' => $subtotal,
+            'totalItems' => $totalItems,
+        ]);
+    }
+
+
+
+    
 
     /**
      * Add product to cart.

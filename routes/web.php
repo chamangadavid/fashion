@@ -37,6 +37,15 @@ use Inertia\Inertia;
 |--------------------------------------------------------------------------
 */
 
+// Route::get('/', function () {
+//     return Inertia::render('Welcome', [
+//         'canLogin' => Route::has('login'),
+//         'canRegister' => Route::has('register'),
+//         'laravelVersion' => Application::VERSION,
+//         'phpVersion' => PHP_VERSION,
+//     ]);
+// });
+
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -44,7 +53,7 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
-});
+})->name('welcome');
 
 
 
@@ -171,7 +180,7 @@ Route::post('/contact', [ContactController::class, 'store']);
 
 Route::middleware('auth')->group(function () {
 
- Route::get('/user-dashboard', [DashboardController::class, 'index'])->name('user.dashboard');
+ //Route::get('/user-dashboard', [DashboardController::class, 'index'])->name('user.dashboard');
 
 
 
@@ -403,6 +412,8 @@ Route::middleware('auth')->group(function () {
 
 
 
+
+
     Route::prefix('client')->group(function () {
 
     /*
@@ -411,25 +422,8 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/dashboard', [ClientDashboardController::class, 'dashboard'])->name('client.dashboard');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CLIENT SHOP
-    |--------------------------------------------------------------------------
-    */
-
+    Route::get('/user-dashboard', [ClientDashboardController::class, 'dashboard'])->name('client.dashboard');
     Route::get('/shop', [ClientDashboardController::class, 'shop' ])->name('client.shop');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CLIENT CART
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get('/cart', [ClientDashboardController::class, 'cart'])->name('client.cart');
 
 
     /*
@@ -470,17 +464,46 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/payments', [ClientDashboardController::class, 'paymentHistory'])->name('client.payments');
+        Route::get('/payments', [ClientDashboardController::class, 'paymentHistory'])->name('client.payments');
+     
+
+        //my cart routes
+        Route::get('/cart', [CartController::class, 'myCartIndex'])->name('client.cart');
+        Route::post('/cart/{product}/add', [CartController::class, 'add'])->name('client.cart.add');
+        Route::patch('/cart/{productId}', [CartController::class, 'update'])->name('client.cart.update');
+        Route::delete('/cart/{productId}', [CartController::class, 'remove'])->name('client.cart.remove');
+        Route::delete('/cart', [CartController::class, 'clear'])->name('client.cart.clear');
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | PROFILE
-    |--------------------------------------------------------------------------
-    */
+        //my checkout routes
+Route::get('/checkout', [CheckoutController::class, 'myCheckoutIndex'])->name('client.checkout');
 
-    Route::get('/profile', [ClientDashboardController::class, 'profile'])->name('client.profile');
-});
+
+
+    Route::post('/checkout/shipping', [CheckoutController::class, 'calculateShipping'])->name('client.checkout.shipping');
+    Route::post('/checkout', [OrderController::class, 'myStore'])->name('client.checkout.store');
+    Route::get('/checkout/confirmation/{order}', [OrderController::class, 'myConfirmation'])->name('checkout.my-confirmation');
+    Route::get('/payments', [OrderController::class, 'myPayments'])->name('client.my-payments');
+
+
+
+
+    Route::get('/my-profile', [ClientDashboardController::class, 'profile'])->name('client.profile');
+    Route::get('/my-profile/edit', [ProfileController::class, 'clientEdit'])->name('client.profile.edit');
+    Route::patch('/my-profile', [ProfileController::class, 'clientUpdate'])->name('client.profile.update');
+
+
+
+
+
+
+
+
+
+
+    });
+
+
 
 
 

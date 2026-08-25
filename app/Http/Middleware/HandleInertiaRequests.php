@@ -29,21 +29,57 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        
+        $cart = session()->get('cart', []);
+
+        $cartCount = collect($cart)->sum(function ($item) {
+            return (int) ($item['quantity'] ?? 0);
+        });
+
+        $cartTotal = collect($cart)->sum(function ($item) {
+            return (float) ($item['price'] ?? 0)
+                * (int) ($item['quantity'] ?? 0);
+        });
 
         return [
             ...parent::share($request),
+
             'auth' => [
-                //'user' => $request->user(),
-                'user' => $request->user() ? [
-                ...$request->user()->toArray(),
-                'roles' => $request->user()->getRoleNames() // Add this line
-                ] : null,
-                
+                'user' => $request->user()
+                    ? [
+                        ...$request->user()->toArray(),
+                        'roles' => $request->user()->getRoleNames(),
+                    ]
+                    : null,
+
                 'permissions' => $request->user()
-                ? $request->user()->getAllPermissions()->pluck('name')
-                : [],
+                    ? $request->user()->getAllPermissions()->pluck('name')
+                    : [],
+            ],
+
+            'cart' => [
+                'item_count' => $cartCount,
+                'total' => $cartTotal,
             ],
         ];
     }
+
+    // public function share(Request $request): array
+    // {
+        
+
+    //     return [
+    //         ...parent::share($request),
+    //         'auth' => [
+    //             //'user' => $request->user(),
+    //             'user' => $request->user() ? [
+    //             ...$request->user()->toArray(),
+    //             'roles' => $request->user()->getRoleNames() // Add this line
+    //             ] : null,
+                
+    //             'permissions' => $request->user()
+    //             ? $request->user()->getAllPermissions()->pluck('name')
+    //             : [],
+    //         ],
+    //     ];
+    // }
 }

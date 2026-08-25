@@ -21,6 +21,8 @@ import {
 
 const page = usePage();
 
+const user = computed(() => page.props.auth?.user);
+
 const cartCount = computed(() => {
     return Number(page.props.cartCount ?? 0);
 });
@@ -52,15 +54,7 @@ defineProps({
             <div class="top-message">
                 NOTHING OVER K50.00 - SHOP NOW
             </div>
-
         </div>
-
-
-        <!-- ============================= -->
-        <!-- LOGO + ICONS -->
-        <!-- ============================= -->
-
-
 
 
         <!-- ============================= -->
@@ -77,7 +71,7 @@ defineProps({
             <!-- ============================= -->
 
             <Link href="/" class="brand-logo">
-                FASHION STYLES
+                IN STYLE ASARA
             </Link>
 
 
@@ -87,17 +81,13 @@ defineProps({
 
             <div class="header-icons">
 
-
                 <!-- ========================= -->
                 <!-- SEARCH -->
                 <!-- ========================= -->
-
                 <a-tooltip title="Search" placement="bottom">
-
                     <Link href="/search" class="header-icon" aria-label="Search">
                         <SearchOutlined />
                     </Link>
-
                 </a-tooltip>
 
 
@@ -105,19 +95,28 @@ defineProps({
                 <!-- LOGIN / ACCOUNT -->
                 <!-- ========================= -->
 
-                <a-tooltip v-if="canLogin" title="Login" placement="bottom">
+                <a-tooltip v-if="user" :title="user.name" placement="bottom">
+                    <Link href="/dashboard" class="header-user">
+                        <span>{{ user.name }}</span>
+                    </Link>
+                </a-tooltip>
 
+                <a-tooltip v-else-if="canLogin" title="Login" placement="bottom">
                     <Link href="/login" class="header-icon" aria-label="Login">
                         <UserOutlined />
                     </Link>
-
                 </a-tooltip>
+
+                <!-- <a-tooltip v-if="canLogin" title="Login" placement="bottom">
+                    <Link href="/login" class="header-icon" aria-label="Login">
+                        <UserOutlined />
+                    </Link>
+                </a-tooltip> -->
 
 
                 <!-- ========================= -->
                 <!-- REGISTER / WISHLIST -->
                 <!-- ========================= -->
-
                 <a-tooltip v-if="canRegister" title="Create Account" placement="bottom">
                     <Link href="/register" class="header-icon" aria-label="Create Account">
                         <UserAddOutlined />
@@ -128,25 +127,15 @@ defineProps({
                 <!-- ========================= -->
                 <!-- CART -->
                 <!-- ========================= -->
-
                 <a-tooltip title="Shopping Cart" placement="bottom">
-
-                    <!-- <Link href="/cart" class="header-icon" aria-label="Shopping Cart">
-                        <ShoppingOutlined />
-                    </Link> -->
-
                     <Link href="/cart" class="header-icon cart-icon" aria-label="Shopping Cart">
                         <ShoppingOutlined />
-
                         <span v-if="cartCount > 0" class="cart-badge">
                             {{ cartCount > 99 ? '99+' : cartCount }}
                         </span>
                     </Link>
-
                 </a-tooltip>
-
             </div>
-
         </div>
 
         <!-- ============================= -->
