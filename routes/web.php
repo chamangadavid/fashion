@@ -24,6 +24,7 @@ use App\Http\Controllers\MyFashions\CartController;
 use App\Http\Controllers\MyFashions\SettingsController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\HomeController;
 
 use App\Http\Controllers\ShopController;
 use Illuminate\Foundation\Application;
@@ -45,6 +46,9 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 })->name('welcome');
+
+Route::get('/', [HomeController::class, 'index'])
+    ->name('home');
 
 
 Route::get('/dashboard', [DashboardController::class, 'dashboard'])

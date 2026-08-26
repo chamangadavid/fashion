@@ -1,49 +1,360 @@
 <script setup>
+
 import { Link } from "@inertiajs/vue3";
 
-const categories = [
-    {
-        name: "New Arrivals",
-        image: "/assets/quick-shop/new-arrivals.jpg",
-        href: "/new-arrivals",
+import {
+    ref,
+    onMounted,
+    onBeforeUnmount,
+} from "vue";
+
+
+/*
+|--------------------------------------------------------------------------
+| PROPS
+|--------------------------------------------------------------------------
+*/
+
+const props = defineProps({
+
+    categories: {
+
+        type: Array,
+
+        default: () => [],
+
     },
-    {
-        name: "Dresses",
-        image: "/assets/quick-shop/dresses.jpg",
-        href: "/clothing/women/dresses",
-    },
-    {
-        name: "Denim Drops",
-        image: "/assets/quick-shop/denim.jpg",
-        href: "/clothing/denim",
-    },
-    {
-        name: "Tops & Blouses",
-        image: "/assets/quick-shop/tops-blouses.jpg",
-        href: "/clothing/women/tops",
-    },
-    {
-        name: "Sets / Co-ords",
-        image: "/assets/quick-shop/sets.jpg",
-        href: "/clothing/women/sets",
-    },
-    {
-        name: "Plus Sizes / Curvy",
-        image: "/assets/quick-shop/plus-size.jpg",
-        href: "/clothing/women/plus-size",
-    },
-    {
-        name: "Mega Sale",
-        image: "/assets/quick-shop/mega-sale.jpg",
-        href: "/sale",
-    },
-];
+
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| CATEGORY URL
+|--------------------------------------------------------------------------
+*/
+
+const categoryHref = (category) => {
+
+    if (category.group === "clothing") {
+
+        return `/clothing/${category.slug}`;
+
+    }
+
+    if (category.group === "accessories") {
+
+        return `/accessories/${category.slug}`;
+
+    }
+
+    return `/categories/${category.slug}`;
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| CATEGORY IMAGE
+|--------------------------------------------------------------------------
+*/
+
+const categoryImage = (category) => {
+
+    if (!category.image) {
+
+        return "/assets/placeholder.jpg";
+
+    }
+
+
+    if (
+        category.image.startsWith("http://") ||
+        category.image.startsWith("https://")
+    ) {
+
+        return category.image;
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | If image is already stored with /storage/
+    |--------------------------------------------------------------------------
+    */
+
+    if (category.image.startsWith("/storage/")) {
+
+        return category.image;
+
+    }
+
+
+    return `/storage/${category.image}`;
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| CAROUSEL
+|--------------------------------------------------------------------------
+*/
+
+const quickShopItems = ref(null);
+
+let autoScrollTimer = null;
+
+
+/*
+|--------------------------------------------------------------------------
+| NUMBER OF CATEGORIES
+|--------------------------------------------------------------------------
+*/
+
+const categoryCount = () => {
+
+    return props.categories.length;
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| GET ITEM WIDTH
+|--------------------------------------------------------------------------
+|
+| Calculates the actual width of one category + the gap.
+|
+*/
+
+const getScrollAmount = () => {
+
+    if (!quickShopItems.value) {
+
+        return 0;
+
+    }
+
+
+    const item =
+        quickShopItems.value.querySelector(
+            ".quick-shop-item"
+        );
+
+
+    if (!item) {
+
+        return 0;
+
+    }
+
+
+    const itemWidth = item.offsetWidth;
+
+
+    const styles =
+        window.getComputedStyle(
+            quickShopItems.value
+        );
+
+
+    const gap =
+        parseFloat(styles.gap) || 0;
+
+
+    return itemWidth + gap;
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| SCROLL TO NEXT CATEGORY
+|--------------------------------------------------------------------------
+*/
+
+const scrollNext = () => {
+
+    if (!quickShopItems.value) {
+
+        return;
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Don't scroll if there aren't enough categories.
+    |--------------------------------------------------------------------------
+    */
+
+    if (categoryCount() <= 1) {
+
+        return;
+
+    }
+
+
+    const scrollAmount =
+        getScrollAmount();
+
+
+    if (!scrollAmount) {
+
+        return;
+
+    }
+
+
+    const element =
+        quickShopItems.value;
+
+
+    const maxScroll =
+        element.scrollWidth -
+        element.clientWidth;
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | If we reached the end
+    |--------------------------------------------------------------------------
+    |
+    | Smoothly return to the beginning.
+    |
+    */
+
+    if (
+        element.scrollLeft >=
+        maxScroll - 2
+    ) {
+
+        element.scrollTo({
+
+            left: 0,
+
+            behavior: "smooth",
+
+        });
+
+        return;
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Move exactly ONE category.
+    |--------------------------------------------------------------------------
+    */
+
+    element.scrollBy({
+
+        left: scrollAmount,
+
+        behavior: "smooth",
+
+    });
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| START AUTOMATIC SCROLL
+|--------------------------------------------------------------------------
+*/
+
+const startAutoScroll = () => {
+
+    stopAutoScroll();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Only start when there is something to scroll.
+    |--------------------------------------------------------------------------
+    */
+
+    if (categoryCount() <= 1) {
+
+        return;
+
+    }
+
+
+    autoScrollTimer = setInterval(() => {
+
+        scrollNext();
+
+    }, 3000);
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| STOP AUTOMATIC SCROLL
+|--------------------------------------------------------------------------
+*/
+
+const stopAutoScroll = () => {
+
+    if (autoScrollTimer !== null) {
+
+        clearInterval(autoScrollTimer);
+
+        autoScrollTimer = null;
+
+    }
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| MOUNT
+|--------------------------------------------------------------------------
+*/
+
+onMounted(() => {
+
+    /*
+    |--------------------------------------------------------------------------
+    | Small delay allows the DOM to calculate widths.
+    |--------------------------------------------------------------------------
+    */
+
+    setTimeout(() => {
+
+        startAutoScroll();
+
+    }, 800);
+
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| UNMOUNT
+|--------------------------------------------------------------------------
+*/
+
+onBeforeUnmount(() => {
+
+    stopAutoScroll();
+
+});
+
 </script>
 
 
 <template>
 
     <section class="quick-shop">
+
 
         <!-- ============================= -->
         <!-- INTRODUCTION -->
@@ -52,21 +363,32 @@ const categories = [
         <div class="quick-shop-intro">
 
             <p class="quick-shop-title">
+
                 Shop what you love—faster and easier.
+
             </p>
+
 
             <p class="account-links">
 
                 <Link href="/login">
+
                     Sign In
+
                 </Link>
 
+
                 <span class="separator">
+
                     or
+
                 </span>
 
+
                 <Link href="/register">
+
                     Create an Account
+
                 </Link>
 
             </p>
@@ -74,43 +396,94 @@ const categories = [
         </div>
 
 
+
         <!-- ============================= -->
-        <!-- CATEGORY ITEMS -->
+        <!-- CATEGORY CONTAINER -->
         <!-- ============================= -->
 
         <div class="quick-shop-container">
 
-            <div class="quick-shop-items">
+
+            <!-- ============================= -->
+            <!-- CATEGORY ITEMS -->
+            <!-- ============================= -->
+
+            <div
+                v-if="categories.length"
+
+                ref="quickShopItems"
+
+                class="quick-shop-items"
+
+                @mouseenter="stopAutoScroll"
+
+                @mouseleave="startAutoScroll"
+            >
+
 
                 <Link
                     v-for="category in categories"
-                    :key="category.name"
-                    :href="category.href"
+
+                    :key="category.id"
+
+                    :href="categoryHref(category)"
+
                     class="quick-shop-item"
                 >
 
-                    <!-- Image -->
+
+                    <!-- ============================= -->
+                    <!-- IMAGE -->
+                    <!-- ============================= -->
 
                     <div class="quick-shop-image-wrapper">
 
                         <img
-                            :src="category.image"
+                            :src="categoryImage(category)"
+
                             :alt="category.name"
+
                             class="quick-shop-image"
+
+                            loading="lazy"
                         />
 
                     </div>
 
 
-                    <!-- Label -->
+
+                    <!-- ============================= -->
+                    <!-- LABEL -->
+                    <!-- ============================= -->
 
                     <span class="quick-shop-label">
+
                         {{ category.name }}
+
                     </span>
+
 
                 </Link>
 
+
             </div>
+
+
+
+            <!-- ============================= -->
+            <!-- EMPTY STATE -->
+            <!-- ============================= -->
+
+            <div
+                v-else
+
+                class="quick-shop-empty"
+            >
+
+                No categories available.
+
+            </div>
+
 
         </div>
 
@@ -153,7 +526,9 @@ const categories = [
 }
 
 
-/* Main text */
+/* =========================================
+   MAIN TEXT
+========================================= */
 
 .quick-shop-title {
 
@@ -210,7 +585,9 @@ const categories = [
 }
 
 
-/* "or" */
+/* =========================================
+   "OR"
+========================================= */
 
 .separator {
 
@@ -233,22 +610,54 @@ const categories = [
 
     justify-content: center;
 
+    overflow: hidden;
+
 }
 
 
 /* =========================================
    CATEGORY ITEMS
 ========================================= */
-
 .quick-shop-items {
-
     display: flex;
-
     align-items: flex-start;
-
-    justify-content: center;
+    justify-content: flex-start;
 
     gap: 12px;
+
+    /*
+    |--------------------------------------------------------------------------
+    | Display 5 categories
+    |--------------------------------------------------------------------------
+    */
+    width: calc((48px * 5) + (12px * 4));
+
+    max-width: 100%;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    scroll-behavior: smooth;
+
+    scrollbar-width: none;
+
+    -ms-overflow-style: none;
+
+    overscroll-behavior-x: contain;
+
+    -webkit-overflow-scrolling: touch;
+}
+
+
+
+
+/* =========================================
+   HIDE WEBKIT SCROLLBAR
+========================================= */
+
+.quick-shop-items::-webkit-scrollbar {
+
+    display: none;
 
 }
 
@@ -260,6 +669,8 @@ const categories = [
 .quick-shop-item {
 
     width: 48px;
+
+    flex: 0 0 48px;
 
     display: flex;
 
@@ -309,6 +720,7 @@ const categories = [
 
     transition:
         transform 0.45s ease,
+
         filter 0.45s ease;
 
 }
@@ -354,12 +766,27 @@ const categories = [
 }
 
 
-/* Label hover */
+/* =========================================
+   LABEL HOVER
+========================================= */
 
 .quick-shop-item:hover
 .quick-shop-label {
 
     color: #000000;
+
+}
+
+
+/* =========================================
+   EMPTY STATE
+========================================= */
+
+.quick-shop-empty {
+
+    color: #999999;
+
+    font-size: 8px;
 
 }
 
@@ -379,9 +806,20 @@ const categories = [
     }
 
 
+    .quick-shop-container {
+
+        justify-content: flex-start;
+
+        overflow: hidden;
+
+    }
+
+
     .quick-shop-items {
 
         width: 100%;
+
+        max-width: none;
 
         justify-content: flex-start;
 
@@ -392,6 +830,8 @@ const categories = [
         gap: 14px;
 
         scrollbar-width: none;
+
+        -webkit-overflow-scrolling: touch;
 
     }
 
