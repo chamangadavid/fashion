@@ -39,20 +39,20 @@ const props = defineProps({
         default: () => [],
     },
 
-    denimProducts: {
-        type: Array,
-        default: () => [],
-    },
+    // denimProducts: {
+    //     type: Array,
+    //     default: () => [],
+    // },
 
-    blouseProducts: {
-        type: Array,
-        default: () => [],
-    },
+    // blouseProducts: {
+    //     type: Array,
+    //     default: () => [],
+    // },
 
-    bottomsProducts: {
-        type: Array,
-        default: () => [],
-    },
+    // bottomsProducts: {
+    //     type: Array,
+    //     default: () => [],
+    // },
 });
 
 
@@ -256,11 +256,7 @@ const props = defineProps({
             <!-- QUICK SHOP -->
             <!-- ========================= -->
 
-            <QuickShop
-    :categories="quickShopCategories"
-/>
-
-            <!-- <QuickShop /> -->
+            <QuickShop :categories="quickShopCategories" />
 
             <!-- ========================= -->
             <!-- ABOUT THE BRAND -->
@@ -270,10 +266,18 @@ const props = defineProps({
                 <AboutBrand />
             </section>
 
+            <!-- ========================= -->
             <!-- NEW ARRIVALS -->
+            <!-- ========================= -->
+
             <section>
-                <NewArrivals />
+                <NewArrivals :products="newArrivals" />
             </section>
+
+            <!-- NEW ARRIVALS -->
+            <!-- <section>
+                <NewArrivals />
+            </section> -->
 
             <section>
                 <FeaturedProducts />

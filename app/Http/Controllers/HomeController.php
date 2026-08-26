@@ -61,64 +61,6 @@ public function index()
             ->take(5)
             ->get();
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Denim
-        |--------------------------------------------------------------------------
-        */
-
-        // $denimProducts = Product::query()
-        //     ->with('category')
-        //     ->where('is_active', true)
-        //     ->whereHas('category', function ($query) {
-        //         $query->where('slug', 'denim');
-        //     })
-        //     ->latest()
-        //     ->take(8)
-        //     ->get();
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Blouses / Tops
-        |--------------------------------------------------------------------------
-        */
-
-        // $blouseProducts = Product::query()
-        //     ->with('category')
-        //     ->where('is_active', true)
-        //     ->whereHas('category', function ($query) {
-        //         $query->whereIn('slug', [
-        //             'tops',
-        //             'blouses',
-        //         ]);
-        //     })
-        //     ->latest()
-        //     ->take(8)
-        //     ->get();
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Bottoms
-        |--------------------------------------------------------------------------
-        */
-
-        // $bottomsProducts = Product::query()
-        //     ->with('category')
-        //     ->where('is_active', true)
-        //     ->whereHas('category', function ($query) {
-        //         $query->whereIn('slug', [
-        //             'bottoms',
-        //             'skirts',
-        //         ]);
-        //     })
-        //     ->latest()
-        //     ->take(8)
-        //     ->get();
-
-
         return Inertia::render('Welcome', [
             'quickShopCategories' => $quickShopCategories,
 
@@ -126,11 +68,6 @@ public function index()
 
             'featuredProducts' => $featuredProducts,
 
-            // 'denimProducts' => $denimProducts,
-
-            // 'blouseProducts' => $blouseProducts,
-
-            // 'bottomsProducts' => $bottomsProducts,
         ]);
     }
 }

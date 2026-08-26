@@ -6,10 +6,15 @@ import { ref, onMounted, onBeforeUnmount } from "vue";
 
 //Hero slides with images and directions for animation
 const slides = [
-  {
+   {
     image: "/assets/bg5.png",
     direction: "right",
   },
+  {
+    image: "/assets/bg-hero.png",
+    direction: "right",
+  },
+ 
   {
     image: "/assets/bg4.png",
     direction: "bottom",

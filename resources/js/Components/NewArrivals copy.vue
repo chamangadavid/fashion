@@ -157,10 +157,12 @@ const stockClass = (product) => {
 };
 </script>
 
-
 <template>
-
     <section class="new-arrivals">
+
+        <!-- =========================================
+             CONTAINER
+        ========================================== -->
 
         <div class="new-arrivals-container">
 
@@ -169,9 +171,7 @@ const stockClass = (product) => {
             ====================================== -->
 
             <div class="new-arrivals-header">
-
                 <div>
-
                     <span class="section-kicker">
                         <FireOutlined />
                         JUST IN
@@ -180,9 +180,7 @@ const stockClass = (product) => {
                     <h2 class="new-arrivals-title">
                         New Arrivals
                     </h2>
-
                 </div>
-
             </div>
 
 
@@ -211,25 +209,27 @@ const stockClass = (product) => {
                             :href="productHref(product)"
                             class="product-image-link"
                         >
-
                             <img
                                 :src="getImageUrl(product.image)"
                                 :alt="product.name"
                                 class="product-image"
                                 loading="lazy"
                             />
-
                         </Link>
 
 
-                        <!-- NEW BADGE -->
+                        <!-- =============================
+                             NEW BADGE
+                        ============================== -->
 
                         <div class="new-badge">
                             NEW
                         </div>
 
 
-                        <!-- SOLD OUT -->
+                        <!-- =============================
+                             SOLD OUT
+                        ============================== -->
 
                         <div
                             v-if="Number(product.stock_quantity) <= 0"
@@ -239,19 +239,19 @@ const stockClass = (product) => {
                         </div>
 
 
-                        <!-- QUICK VIEW -->
+                        <!-- =============================
+                             QUICK VIEW
+                        ============================== -->
 
                         <Link
                             :href="productHref(product)"
                             class="quick-view"
                         >
-
                             <EyeOutlined />
 
                             <span>
                                 Quick View
                             </span>
-
                         </Link>
 
                     </div>
@@ -284,17 +284,19 @@ const stockClass = (product) => {
 
                         <div class="price-row">
 
-                            <span class="product-price">
+                            <!-- SALE PRICE -->
 
+                            <span class="product-price">
                                 {{
                                     formatPrice(
                                         product.sale_price ??
                                         product.price
                                     )
                                 }}
-
                             </span>
 
+
+                            <!-- ORIGINAL PRICE -->
 
                             <span
                                 v-if="
@@ -304,11 +306,9 @@ const stockClass = (product) => {
                                 "
                                 class="old-price"
                             >
-
                                 {{
                                     formatPrice(product.price)
                                 }}
-
                             </span>
 
                         </div>
@@ -320,11 +320,9 @@ const stockClass = (product) => {
                             class="stock-status"
                             :class="stockClass(product)"
                         >
-
                             <span class="stock-dot"></span>
 
                             {{ stockLabel(product) }}
-
                         </div>
 
 
@@ -338,7 +336,6 @@ const stockClass = (product) => {
                             "
                             @click="addToCart(product)"
                         >
-
                             <ShoppingCartOutlined />
 
                             <span>
@@ -348,7 +345,6 @@ const stockClass = (product) => {
                                         : "Sold Out"
                                 }}
                             </span>
-
                         </button>
 
                     </div>
@@ -366,7 +362,6 @@ const stockClass = (product) => {
                 v-else
                 class="empty-state"
             >
-
                 <div class="empty-icon">
                     <FireOutlined />
                 </div>
@@ -379,7 +374,6 @@ const stockClass = (product) => {
                     We're preparing something special.
                     Check back soon for our latest collection.
                 </p>
-
             </div>
 
 
@@ -393,11 +387,9 @@ const stockClass = (product) => {
                     href="/new-arrivals"
                     class="view-more-button"
                 >
-
                     View More
 
                     <ArrowRightOutlined />
-
                 </Link>
 
             </div>
@@ -405,7 +397,6 @@ const stockClass = (product) => {
         </div>
 
     </section>
-
 </template>
 
 
@@ -525,19 +516,21 @@ const stockClass = (product) => {
 
 /* =========================================
    IMAGE WRAPPER
-   KEEP 100% WIDTH
+   MEDIUM SIZE
 ========================================= */
 
 .product-image-wrapper {
-    width: 100%;
+    width: 85%;
 
-    aspect-ratio: 1 / 1.05;
+    aspect-ratio: 1 / 1;
 
     overflow: hidden;
 
     background: #eeeeee;
 
     position: relative;
+
+    margin: 0 auto;
 }
 
 
@@ -577,7 +570,8 @@ const stockClass = (product) => {
    IMAGE HOVER
 ========================================= */
 
-.product-card:hover .product-image {
+.product-card:hover
+.product-image {
     transform: scale(1.035);
 
     filter: brightness(0.96);
@@ -591,9 +585,9 @@ const stockClass = (product) => {
 .new-badge {
     position: absolute;
 
-    top: 12px;
+    top: 10px;
 
-    left: 12px;
+    left: 10px;
 
     padding: 6px 9px;
 
@@ -651,7 +645,8 @@ const stockClass = (product) => {
 
     bottom: 14px;
 
-    transform: translate(-50%, 12px);
+    transform:
+        translate(-50%, 12px);
 
     display: flex;
 
@@ -684,7 +679,8 @@ const stockClass = (product) => {
 .product-card:hover .quick-view {
     opacity: 1;
 
-    transform: translate(-50%, 0);
+    transform:
+        translate(-50%, 0);
 }
 
 
@@ -1014,14 +1010,20 @@ const stockClass = (product) => {
         width: calc(100% - 40px);
     }
 
+
     .new-arrivals-title {
         font-size: 28px;
     }
+
 
     .products-grid {
         gap: 25px 12px;
     }
 
+
+    .product-image-wrapper {
+        width: 90%;
+    }
 }
 
 
@@ -1035,17 +1037,21 @@ const stockClass = (product) => {
         padding: 28px 0 32px;
     }
 
+
     .new-arrivals-container {
         width: calc(100% - 28px);
     }
+
 
     .new-arrivals-header {
         margin-bottom: 22px;
     }
 
+
     .new-arrivals-title {
         font-size: 25px;
     }
+
 
     .products-grid {
         grid-template-columns:
@@ -1056,15 +1062,24 @@ const stockClass = (product) => {
         row-gap: 30px;
     }
 
+
+    /*
+    |------------------------------------------------
+    | MOBILE IMAGE
+    |------------------------------------------------
+    */
+
     .product-image-wrapper {
         width: 100%;
 
-        aspect-ratio: 1 / 1.05;
+        aspect-ratio: 1 / 1;
     }
+
 
     .product-information {
         padding-top: 11px;
     }
+
 
     .product-name {
         font-size: 10px;
@@ -1072,16 +1087,17 @@ const stockClass = (product) => {
         line-height: 1.35;
     }
 
+
     .product-price {
         font-size: 11px;
     }
+
 
     .add-cart-button {
         min-height: 32px;
 
         font-size: 8px;
     }
-
 }
 
 
@@ -1095,14 +1111,20 @@ const stockClass = (product) => {
         width: calc(100% - 20px);
     }
 
+
     .products-grid {
         column-gap: 8px;
     }
+
 
     .new-arrivals-title {
         font-size: 23px;
     }
 
+
+    .product-image-wrapper {
+        width: 100%;
+    }
 }
 
 </style>
