@@ -1,5 +1,5 @@
+<!-- resources\js\Pages\MyFashions\Products\Index.vue -->
 <script setup>
-
 import MyFashionLayout from '@/Layouts/MyFashionLayout.vue';
 
 import {

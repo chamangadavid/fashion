@@ -39,6 +39,11 @@ class User extends Authenticatable
         return $this->hasMany(Order::class);
     }
 
+    public function contactMessages(): HasMany
+    {
+        return $this->hasMany(ContactMessage::class);
+    }
+
 
 
 

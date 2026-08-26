@@ -283,6 +283,12 @@ const navigation = [
                 href: "/fashion/customers/vip",
             },
 
+            {
+                label: "Contact Us",
+
+                href: "/admin/contact-messages",
+            },
+
         ],
     },
 

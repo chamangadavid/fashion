@@ -4,6 +4,7 @@
 import { computed } from 'vue'
 import { Head, Link, router } from '@inertiajs/vue3'
 import Header from "@/Components/Header.vue";
+import AppFooter from "@/Components/AppFooter.vue";
 
 import {
     ShoppingCartOutlined,
@@ -352,6 +353,13 @@ const stockClass = (product) => {
 
         </main>
 
+        
+        <!-- =================================================
+             FOOTER
+        ================================================== -->
+
+        <AppFooter />
+        
     </div>
 
 </template>

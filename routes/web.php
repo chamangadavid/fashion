@@ -2,7 +2,6 @@
 
 
 use App\Http\Controllers\Audit\AuditLogController;
-use App\Http\Controllers\Contacts\ContactController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\Staff\StaffsController;
@@ -24,6 +23,7 @@ use App\Http\Controllers\MyFashions\CheckoutController;
 use App\Http\Controllers\MyFashions\CartController;
 use App\Http\Controllers\MyFashions\SettingsController;
 use App\Http\Controllers\UserFashionController;
+use App\Http\Controllers\ContactController;
 
 use App\Http\Controllers\ShopController;
 use Illuminate\Foundation\Application;
@@ -74,7 +74,8 @@ Route::get('/dashboard', [DashboardController::class, 'dashboard'])
     | Site Pages Public pages
     |--------------------------------------------------------------------------
     */
-
+   
+    Route::post('/contact-us', [ContactController::class, 'store'])->name('contact.store');
     Route::get('/collections', [CollectionController::class, 'publicIndex'])->name('collections.index');
     Route::get('/collections/{collection:slug}', [CollectionController::class, 'publicShow'])->name('collections.show');
     Route::get('/products/{product:slug}', [ProductController::class, 'publicShow'])->name('products.show');
@@ -93,11 +94,8 @@ Route::get('/dashboard', [DashboardController::class, 'dashboard'])
     Route::delete('/cart/{product}', [CartController::class, 'remove'])->name('cart.remove');
     Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
 
-
-
     //New Arrivals
     Route::get('/new-arrivals', [ClientDashboardController::class, 'newArrivals'])->name('new-arrivals');
-
 
 
 Route::get('/about-us', function () {
@@ -158,20 +156,9 @@ Route::get('/announcement', function () {
 
 
 //public
-Route::post('/contact', [ContactController::class, 'store']);
-// Route::get('/faqs/all', [FaqController::class, 'getfrontIndex']); // For your FAQ page
-// Route::get('/public/announcements', [AnnouncementsController::class, 'publicAnnouncementsIndex']);
-// Route::get('/public/news', [NewsController::class, 'publicNewsIndex']);
-// Route::get('/all-news/{id}', [NewsController::class, 'show']);
-// Route::get('/public-documents/folders', [DocumentController::class, 'Publicindex']);
+//Route::post('/contact', [ContactController::class, 'store']);
 
-// Route::get('/jobs/active', [JobController::class, 'getActiveJobs']);
-// Route::get('/public-members', [TeamController::class, 'publicMember']);
-// Route::get('/all-jobs-details/{job}', [JobController::class, 'details']);
 
-// Route::get('/frontend/faqs', [FaqController::class, 'getfrontIndex']); 
-// Route::get('/frontend/testimonials', [TestimonyController::class, 'frontendTestimonials']);
-// Route::get('/frontend/gallery', [GalleryController::class,'frontendGallery']);
 
 
 
@@ -201,13 +188,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/users/{user}', [UserSearchController::class, 'show'])->name('users.show');
 
 
-    //contact routes
-    Route::get('/contact-messages', [ContactController::class, 'ContactUs'])->name('contact.index');
-    Route::get('/contacts', [ContactController::class, 'index']);
-    Route::delete('/contacts/{id}', [ContactController::class, 'destroy']);
-    
-
-
      //Cards & Assign
     Route::get('/eBusinessCards', [RolePermissionController::class, 'eBusinessCards'])->name('admin.eBusinessCards');
     Route::get('/users', [RolePermissionController::class, 'users']);
@@ -228,10 +208,10 @@ Route::middleware('auth')->group(function () {
 
 
     /*
-|--------------------------------------------------------------------------
-| MY FASHION
-|--------------------------------------------------------------------------
-*/
+    |--------------------------------------------------------------------------
+    | MY FASHION
+    |--------------------------------------------------------------------------
+    */
 
     Route::prefix('fashion')->group(function () {
         
@@ -408,9 +388,11 @@ Route::middleware('auth')->group(function () {
     });
 
 
-
-
-
+    /*
+    |--------------------------------------------------------------------------
+    | MY CLIENTS
+    |--------------------------------------------------------------------------
+    */
     Route::prefix('client')->group(function () {
 
     /*
@@ -473,7 +455,7 @@ Route::middleware('auth')->group(function () {
 
 
         //my checkout routes
-Route::get('/checkout', [CheckoutController::class, 'myCheckoutIndex'])->name('client.checkout');
+        Route::get('/checkout', [CheckoutController::class, 'myCheckoutIndex'])->name('client.checkout');
 
 
 
@@ -499,6 +481,31 @@ Route::get('/checkout', [CheckoutController::class, 'myCheckoutIndex'])->name('c
 
 
     });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CONTACTS
+    |--------------------------------------------------------------------------
+    */
+     Route::get('/admin/contact-messages', [ContactController::class, 'messages'])->name('admin.contact.messages');
+
+      Route::patch(
+        '/admin/contact-messages/{contactMessage}/read',
+        [ContactController::class, 'markAsRead']
+    )->name('admin.contact.messages.read');
+
+
+    Route::post(
+        '/admin/contact-messages/{contactMessage}/reply',
+        [ContactController::class, 'reply']
+    )->name('admin.contact.messages.reply');
+
+
+    Route::delete(
+        '/admin/contact-messages/{contactMessage}',
+        [ContactController::class, 'destroy']
+    )->name('admin.contact.messages.destroy');
 
 
 
