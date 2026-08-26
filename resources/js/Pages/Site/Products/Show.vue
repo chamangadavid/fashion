@@ -117,16 +117,9 @@ const addToBag = () => {
 
             <div class="product-image">
 
-                <img
-                    v-if="product.image"
-                    :src="product.image"
-                    :alt="product.name"
-                />
+                <img v-if="product.image" :src="product.image" :alt="product.name" />
 
-                <div
-                    v-else
-                    class="no-image"
-                >
+                <div v-else class="no-image">
                     NO IMAGE
                 </div>
 
@@ -135,10 +128,7 @@ const addToBag = () => {
 
             <div class="product-details">
 
-                <span
-                    v-if="product.category"
-                    class="category"
-                >
+                <span v-if="product.category" class="category">
                     {{ product.category.name }}
                 </span>
 
@@ -153,28 +143,20 @@ const addToBag = () => {
 
                 <div class="price">
 
-                    <span
-                        v-if="product.sale_price"
-                        class="sale-price"
-                    >
+                    <span v-if="product.sale_price" class="sale-price">
                         {{ product.sale_price }}
                     </span>
 
-                    <span
-                        :class="{
-                            'old-price': product.sale_price
-                        }"
-                    >
+                    <span :class="{
+                        'old-price': product.sale_price
+                    }">
                         {{ product.price }}
                     </span>
 
                 </div>
 
 
-                <p
-                    v-if="product.description"
-                    class="description"
-                >
+                <p v-if="product.description" class="description">
                     {{ product.description }}
                 </p>
 
@@ -191,70 +173,35 @@ const addToBag = () => {
 
                 </div>
 
-
-                <!-- <button
-                    class="add-button"
-                    :disabled="product.stock_quantity <= 0"
-                >
-                    {{
-                        product.stock_quantity > 0
-                            ? 'ADD TO BAG'
-                            : 'OUT OF STOCK'
-                    }}
-                </button> -->
-
-                <button
-    type="button"
-    class="add-button"
-    :disabled="
-        addingToBag ||
-        !product.is_active ||
-        product.stock_quantity <= 0
-    "
-    @click="addToBag"
->
-
-    <!-- LOADING -->
-    <span
-        v-if="addingToBag"
-        class="button-loading"
-    >
-        <span class="spinner"></span>
-        ADDING...
-    </span>
-
-
-    <!-- NORMAL -->
-    <span v-else>
-        {{
-            !product.is_active
-                ? 'UNAVAILABLE'
-                : product.stock_quantity > 0
-                    ? 'ADD TO BAG'
-                    : 'OUT OF STOCK'
-        }}
-    </span>
-
-</button>
-
-
-                <!-- <button type="button" class="add-button" :disabled="!product.is_active ||
+                <button type="button" class="add-button" :disabled="addingToBag ||
+                    !product.is_active ||
                     product.stock_quantity <= 0
                     " @click="addToBag">
-                    {{
-                        !product.is_active
-                            ? 'UNAVAILABLE'
-                            : product.stock_quantity > 0
-                                ? 'ADD TO BAG'
-                    : 'OUT OF STOCK'
-                    }}
-                </button> -->
+
+                    <!-- LOADING -->
+                    <span v-if="addingToBag" class="button-loading">
+                        <span class="spinner"></span>
+                        ADDING...
+                    </span>
 
 
-                <Link
-                    href="/collections"
-                    class="back-link"
-                >
+                    <!-- NORMAL -->
+                    <span v-else>
+                        {{
+                            !product.is_active
+                                ? 'UNAVAILABLE'
+                                : product.stock_quantity > 0
+                                    ? 'ADD TO BAG'
+                        : 'OUT OF STOCK'
+                        }}
+                    </span>
+
+                </button>
+
+
+
+
+                <Link href="/collections" class="back-link">
                     ← BACK TO COLLECTIONS
                 </Link>
 
@@ -273,7 +220,6 @@ const addToBag = () => {
 
 
 <style scoped>
-
 .product-page {
     background: white;
 
@@ -492,5 +438,4 @@ const addToBag = () => {
     }
 
 }
-
 </style>

@@ -56,12 +56,6 @@ Route::get('/', function () {
 })->name('welcome');
 
 
-
-// Route::get('/dashboard', function () {
-//     return Inertia::render('Dashboard');
-// })->middleware(['auth', 'verified'])->name('dashboard');
-
-
 Route::get('/dashboard', [DashboardController::class, 'dashboard'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
@@ -100,6 +94,9 @@ Route::get('/dashboard', [DashboardController::class, 'dashboard'])
     Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
 
 
+
+    //New Arrivals
+    Route::get('/new-arrivals', [ClientDashboardController::class, 'newArrivals'])->name('new-arrivals');
 
 
 

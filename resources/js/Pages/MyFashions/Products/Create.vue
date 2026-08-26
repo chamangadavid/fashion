@@ -56,13 +56,15 @@ const form = useForm({
 
     cost_price: '',
 
+    is_new_arrival: false,
+
     stock_quantity: 0,
 
     low_stock_threshold: 5,
 
     image: null,
 
-    
+
 
     status: 'active',
 
@@ -167,10 +169,7 @@ const submit = () => {
                 </div>
 
 
-                <Link
-                    href="/products"
-                    class="back-button"
-                >
+                <Link href="/products" class="back-button">
 
                     <ArrowLeftOutlined />
 
@@ -188,10 +187,7 @@ const submit = () => {
                  FORM
             ====================================================== -->
 
-            <form
-                @submit.prevent="submit"
-                enctype="multipart/form-data"
-            >
+            <form @submit.prevent="submit" enctype="multipart/form-data">
 
 
                 <!-- =================================================
@@ -229,17 +225,10 @@ const submit = () => {
                                 <span>*</span>
                             </label>
 
-                            <input
-                                v-model="form.name"
-                                type="text"
-                                placeholder="e.g. Elegant Evening Dress"
-                                class="form-control"
-                            />
+                            <input v-model="form.name" type="text" placeholder="e.g. Elegant Evening Dress"
+                                class="form-control" />
 
-                            <div
-                                v-if="form.errors.name"
-                                class="error"
-                            >
+                            <div v-if="form.errors.name" class="error">
                                 {{ form.errors.name }}
                             </div>
 
@@ -256,17 +245,9 @@ const submit = () => {
                                 <span>*</span>
                             </label>
 
-                            <input
-                                v-model="form.sku"
-                                type="text"
-                                placeholder="e.g. DRESS-001"
-                                class="form-control"
-                            />
+                            <input v-model="form.sku" type="text" placeholder="e.g. DRESS-001" class="form-control" />
 
-                            <div
-                                v-if="form.errors.sku"
-                                class="error"
-                            >
+                            <div v-if="form.errors.sku" class="error">
                                 {{ form.errors.sku }}
                             </div>
 
@@ -282,29 +263,19 @@ const submit = () => {
                                 Category
                             </label>
 
-                            <select
-                                v-model="form.product_category_id"
-                                class="form-control"
-                            >
+                            <select v-model="form.product_category_id" class="form-control">
 
                                 <option value="">
                                     Select Category
                                 </option>
 
-                                <option
-                                    v-for="category in categories"
-                                    :key="category.id"
-                                    :value="category.id"
-                                >
+                                <option v-for="category in categories" :key="category.id" :value="category.id">
                                     {{ category.name }}
                                 </option>
 
                             </select>
 
-                            <div
-                                v-if="form.errors.product_category_id"
-                                class="error"
-                            >
+                            <div v-if="form.errors.product_category_id" class="error">
                                 {{ form.errors.product_category_id }}
                             </div>
 
@@ -320,17 +291,10 @@ const submit = () => {
                                 Description
                             </label>
 
-                            <textarea
-                                v-model="form.description"
-                                rows="5"
-                                placeholder="Describe the product..."
-                                class="form-control"
-                            ></textarea>
+                            <textarea v-model="form.description" rows="5" placeholder="Describe the product..."
+                                class="form-control"></textarea>
 
-                            <div
-                                v-if="form.errors.description"
-                                class="error"
-                            >
+                            <div v-if="form.errors.description" class="error">
                                 {{ form.errors.description }}
                             </div>
 
@@ -383,20 +347,11 @@ const submit = () => {
                                     ZMW
                                 </span>
 
-                                <input
-                                    v-model="form.price"
-                                    type="number"
-                                    min="0"
-                                    step="0.01"
-                                    placeholder="0.00"
-                                />
+                                <input v-model="form.price" type="number" min="0" step="0.01" placeholder="0.00" />
 
                             </div>
 
-                            <div
-                                v-if="form.errors.price"
-                                class="error"
-                            >
+                            <div v-if="form.errors.price" class="error">
                                 {{ form.errors.price }}
                             </div>
 
@@ -418,20 +373,12 @@ const submit = () => {
                                     ZMW
                                 </span>
 
-                                <input
-                                    v-model="form.compare_price"
-                                    type="number"
-                                    min="0"
-                                    step="0.01"
-                                    placeholder="0.00"
-                                />
+                                <input v-model="form.compare_price" type="number" min="0" step="0.01"
+                                    placeholder="0.00" />
 
                             </div>
 
-                            <div
-                                v-if="form.errors.compare_price"
-                                class="error"
-                            >
+                            <div v-if="form.errors.compare_price" class="error">
                                 {{ form.errors.compare_price }}
                             </div>
 
@@ -453,20 +400,11 @@ const submit = () => {
                                     ZMW
                                 </span>
 
-                                <input
-                                    v-model="form.cost_price"
-                                    type="number"
-                                    min="0"
-                                    step="0.01"
-                                    placeholder="0.00"
-                                />
+                                <input v-model="form.cost_price" type="number" min="0" step="0.01" placeholder="0.00" />
 
                             </div>
 
-                            <div
-                                v-if="form.errors.cost_price"
-                                class="error"
-                            >
+                            <div v-if="form.errors.cost_price" class="error">
                                 {{ form.errors.cost_price }}
                             </div>
 
@@ -512,17 +450,9 @@ const submit = () => {
                                 Stock Quantity
                             </label>
 
-                            <input
-                                v-model="form.stock_quantity"
-                                type="number"
-                                min="0"
-                                class="form-control"
-                            />
+                            <input v-model="form.stock_quantity" type="number" min="0" class="form-control" />
 
-                            <div
-                                v-if="form.errors.stock_quantity"
-                                class="error"
-                            >
+                            <div v-if="form.errors.stock_quantity" class="error">
                                 {{ form.errors.stock_quantity }}
                             </div>
 
@@ -538,17 +468,9 @@ const submit = () => {
                                 Low Stock Threshold
                             </label>
 
-                            <input
-                                v-model="form.low_stock_threshold"
-                                type="number"
-                                min="0"
-                                class="form-control"
-                            />
+                            <input v-model="form.low_stock_threshold" type="number" min="0" class="form-control" />
 
-                            <div
-                                v-if="form.errors.low_stock_threshold"
-                                class="error"
-                            >
+                            <div v-if="form.errors.low_stock_threshold" class="error">
                                 {{ form.errors.low_stock_threshold }}
                             </div>
 
@@ -586,23 +508,14 @@ const submit = () => {
                     <div class="image-upload-area">
 
 
-                        <div
-                            v-if="imagePreview"
-                            class="image-preview"
-                        >
+                        <div v-if="imagePreview" class="image-preview">
 
-                            <img
-                                :src="imagePreview"
-                                alt="Product preview"
-                            />
+                            <img :src="imagePreview" alt="Product preview" />
 
                         </div>
 
 
-                        <label
-                            v-else
-                            class="upload-box"
-                        >
+                        <label v-else class="upload-box">
 
                             <UploadOutlined />
 
@@ -614,19 +527,12 @@ const submit = () => {
                                 PNG, JPG or JPEG
                             </span>
 
-                            <input
-                                type="file"
-                                accept="image/png,image/jpeg,image/jpg"
-                                @change="handleImageUpload"
-                            />
+                            <input type="file" accept="image/png,image/jpeg,image/jpg" @change="handleImageUpload" />
 
                         </label>
 
 
-                        <div
-                            v-if="imagePreview"
-                            class="change-image"
-                        >
+                        <div v-if="imagePreview" class="change-image">
 
                             <label>
 
@@ -634,21 +540,15 @@ const submit = () => {
 
                                 Change Image
 
-                                <input
-                                    type="file"
-                                    accept="image/png,image/jpeg,image/jpg"
-                                    @change="handleImageUpload"
-                                />
+                                <input type="file" accept="image/png,image/jpeg,image/jpg"
+                                    @change="handleImageUpload" />
 
                             </label>
 
                         </div>
 
 
-                        <div
-                            v-if="form.errors.image"
-                            class="error"
-                        >
+                        <div v-if="form.errors.image" class="error">
                             {{ form.errors.image }}
                         </div>
 
@@ -683,7 +583,6 @@ const submit = () => {
 
                     <div class="form-grid">
 
-
                         <!-- STATUS -->
 
                         <div class="form-group">
@@ -692,10 +591,7 @@ const submit = () => {
                                 Status
                             </label>
 
-                            <select
-                                v-model="form.status"
-                                class="form-control"
-                            >
+                            <select v-model="form.status" class="form-control">
 
                                 <option value="active">
                                     Active
@@ -711,15 +607,11 @@ const submit = () => {
 
                             </select>
 
-                            <div
-                                v-if="form.errors.status"
-                                class="error"
-                            >
+                            <div v-if="form.errors.status" class="error">
                                 {{ form.errors.status }}
                             </div>
 
                         </div>
-
 
 
                         <!-- FEATURED -->
@@ -728,10 +620,7 @@ const submit = () => {
 
                             <label class="checkbox-label">
 
-                                <input
-                                    v-model="form.featured"
-                                    type="checkbox"
-                                />
+                                <input v-model="form.featured" type="checkbox" />
 
                                 <span>
                                     Featured Product
@@ -745,7 +634,30 @@ const submit = () => {
 
                         </div>
 
+
+                        <!-- NEW ARRIVAL -->
+
+                        <div class="form-group checkbox-group">
+
+                            <label class="checkbox-label">
+
+                                <input id="is_new_arrival" v-model="form.is_new_arrival" type="checkbox" />
+
+                                <span>
+                                    New Arrival
+                                </span>
+
+                            </label>
+
+                            <small>
+                                Display this product in the New Arrivals section.
+                            </small>
+
+                        </div>
+
                     </div>
+
+
 
                 </div>
 
@@ -757,19 +669,12 @@ const submit = () => {
 
                 <div class="form-actions">
 
-                    <Link
-                        href="/products"
-                        class="cancel-button"
-                    >
+                    <Link href="/products" class="cancel-button">
                         Cancel
                     </Link>
 
 
-                    <button
-                        type="submit"
-                        class="save-button"
-                        :disabled="form.processing"
-                    >
+                    <button type="submit" class="save-button" :disabled="form.processing">
 
                         <SaveOutlined />
 
@@ -796,7 +701,6 @@ const submit = () => {
 
 
 <style scoped>
-
 .product-create-page {
     padding: 10px;
     max-width: 1200px;
@@ -1194,5 +1098,4 @@ textarea.form-control {
     }
 
 }
-
 </style>

@@ -27,6 +27,7 @@ use HasFactory;
         'image',
         'is_active',
         'is_featured',
+        'is_new_arrival',
     ];
 
    protected $casts = [
@@ -35,6 +36,7 @@ use HasFactory;
         'cost_price' => 'decimal:2',
         'is_active' => 'boolean',
         'is_featured' => 'boolean',
+        'is_new_arrival' => 'boolean',
         'stock_quantity' => 'integer',
         'low_stock_threshold' => 'integer',
     ];

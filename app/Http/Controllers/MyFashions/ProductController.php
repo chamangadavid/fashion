@@ -185,6 +185,11 @@ class ProductController extends Controller
                 'boolean'
             ],
 
+            'is_new_arrival' => [
+                'nullable',
+                'boolean'
+            ],
+
             'image' => [
                 'nullable',
                 'image',
@@ -241,6 +246,8 @@ class ProductController extends Controller
             'is_active' => $validated['status'] === 'active',
 
             'is_featured' => $request->boolean('featured'),
+
+            'is_new_arrival' => $request->boolean('is_new_arrival'),
 
         ]);
 
@@ -337,6 +344,10 @@ class ProductController extends Controller
                 'boolean',
             ],
 
+             'is_new_arrival' => [
+                'boolean',
+            ],
+
             'image' => [
                 'nullable',
                 'image',
@@ -388,6 +399,11 @@ class ProductController extends Controller
 
         $validated['is_featured'] =
             $request->boolean('is_featured');
+
+         $validated['is_new_arrival'] =
+            $request->boolean('is_new_arrival');
+
+            
 
         $product->update($validated);
 

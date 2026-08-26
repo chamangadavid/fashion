@@ -57,8 +57,9 @@ const form = useForm({
     is_active:
         Boolean(props.product.is_active),
 
-    is_featured:
-        Boolean(props.product.is_featured),
+    is_featured: Boolean(props.product.is_featured),
+
+    is_new_arrival: Boolean(props.product.is_new_arrival),
 
     image: null,
 
@@ -697,6 +698,30 @@ const submit = () => {
                                 <span>
                                     Display this product in featured
                                     product sections.
+                                </span>
+
+                            </div>
+
+                        </label>
+
+                         <!-- NEW ARRIVAL -->
+
+                        <label class="switch-row">
+
+                            <input
+                                v-model="form.is_new_arrival"
+                                type="checkbox"
+                            />
+
+                            <div>
+
+                                <strong>
+                                     New Arrival
+                                </strong>
+
+                                <span>
+                                    Display this product in the New Arrivals section.
+
                                 </span>
 
                             </div>

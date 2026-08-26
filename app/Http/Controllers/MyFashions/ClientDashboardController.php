@@ -5,6 +5,7 @@ namespace App\Http\Controllers\MyFashions;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Product;
 use Inertia\Inertia;
 use App\Models\Order;
 
@@ -192,13 +193,6 @@ class ClientDashboardController extends Controller
     | SHOP
     |--------------------------------------------------------------------------
     */
-
-    // public function shop(Request $request)
-    // {
-    //     return Inertia::render(
-    //         'MyFashions/Clients/Shop'
-    //     );
-    // }
 
     public function shop(Request $request)
     {
@@ -488,7 +482,6 @@ class ClientDashboardController extends Controller
     }
 
 
-
     /*
     |--------------------------------------------------------------------------
     | CANCELLED ORDERS
@@ -503,7 +496,6 @@ class ClientDashboardController extends Controller
             'Cancelled Orders'
         );
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -541,9 +533,6 @@ class ClientDashboardController extends Controller
             ],
         ]);
     }
-
-
-    
 
     /*
     |--------------------------------------------------------------------------
@@ -610,7 +599,6 @@ class ClientDashboardController extends Controller
             ]
         );
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -685,5 +673,24 @@ class ClientDashboardController extends Controller
             ->route('client.profile')
             ->with('success', 'Your profile has been updated successfully.');
     }
+
+    public function newArrivals(Request $request)
+    {
+        $products = Product::with('category')
+            ->where('is_new_arrival', true)
+            ->where('is_active', true)
+            ->where('stock_quantity', '>', 0)
+            ->latest()
+            ->paginate(12)
+            ->withQueryString();
+
+        return Inertia::render(
+            'Site/NewArrivals/Index',
+            [
+                'products' => $products,
+            ]
+        );
+    }
+
 
 }
