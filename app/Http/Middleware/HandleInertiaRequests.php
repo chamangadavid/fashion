@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -60,6 +61,18 @@ class HandleInertiaRequests extends Middleware
                 'item_count' => $cartCount,
                 'total' => $cartTotal,
             ],
+
+             'productCategories' => fn () => ProductCategory::query()
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get([
+                'id',
+                'name',
+                'slug',
+                'group',
+                'image',
+            ]),
         ];
     }
 

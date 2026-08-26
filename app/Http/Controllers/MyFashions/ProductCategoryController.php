@@ -107,6 +107,7 @@ class ProductCategoryController extends Controller
      */
     public function store(Request $request)
     {
+        //dd($request->all());
         $validated = $request->validate([
 
             'name' => [
@@ -115,6 +116,8 @@ class ProductCategoryController extends Controller
                 'max:255',
                 'unique:product_categories,name',
             ],
+
+            'group' => ['required', 'in:clothing,accessories'],
 
             'description' => [
                 'nullable',
@@ -175,14 +178,11 @@ class ProductCategoryController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $validated['is_active'] =
-            $request->boolean('is_active', true);
+        $validated['is_active'] = $request->boolean('is_active', true);
 
-        $validated['is_featured'] =
-            $request->boolean('is_featured', false);
+        $validated['is_featured'] = $request->boolean('is_featured', false);
 
-        $validated['sort_order'] =
-            $validated['sort_order'] ?? 0;
+        $validated['sort_order'] = $validated['sort_order'] ?? 0;
 
         ProductCategory::create($validated);
 
@@ -212,6 +212,8 @@ class ProductCategoryController extends Controller
                 'unique:product_categories,name,' .
                     $category->id,
             ],
+
+            'group' => ['required', 'in:clothing,accessories'],
 
             'description' => [
                 'nullable',
@@ -321,6 +323,28 @@ class ProductCategoryController extends Controller
 
 
 
+
+     public function show(Request $request, $slug)
+    {
+        $category = ProductCategory::where('slug', $slug)
+            ->where('is_active', true)
+            ->firstOrFail();
+
+        $products = $category->products()
+            ->where('is_active', true)
+            ->where('stock_quantity', '>', 0)
+            ->latest()
+            ->paginate(12)
+            ->withQueryString();
+
+        return Inertia::render(
+            'Site/Shop/Category',
+            [
+                'category' => $category,
+                'products' => $products,
+            ]
+        );
+    }
 
 
 }

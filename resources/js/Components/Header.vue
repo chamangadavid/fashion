@@ -21,10 +21,65 @@ import {
 
 const page = usePage();
 
+
+/*
+|--------------------------------------------------------------------------
+| USER
+|--------------------------------------------------------------------------
+*/
+
 const user = computed(() => page.props.auth?.user);
+
+
+/*
+|--------------------------------------------------------------------------
+| CART
+|--------------------------------------------------------------------------
+*/
 
 const cartCount = computed(() => {
     return Number(page.props.cartCount ?? 0);
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| PRODUCT CATEGORIES
+|--------------------------------------------------------------------------
+*/
+
+const productCategories = computed(() => {
+    return page.props.productCategories ?? [];
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| CLOTHING CATEGORIES
+|--------------------------------------------------------------------------
+*/
+
+const clothingCategories = computed(() => {
+
+    return productCategories.value.filter(
+        category => category.group === 'clothing'
+    );
+
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| ACCESSORIES CATEGORIES
+|--------------------------------------------------------------------------
+*/
+
+const accessoryCategories = computed(() => {
+
+    return productCategories.value.filter(
+        category => category.group === 'accessories'
+    );
+
 });
 
 
@@ -152,58 +207,63 @@ defineProps({
             <!-- ============================= -->
             <!-- CLOTHING DROPDOWN -->
             <!-- ============================= -->
-
             <div class="nav-dropdown">
-                <button class="nav-link dropdown-trigger">CLOTHING
-                    <span class="dropdown-arrow"> ▾ </span>
-                </button>
-                <div class="dropdown-menu">
-                    <Link href="/clothing/women"> WOMEN </Link>
-                    <Link href="/clothing/men"> MEN </Link>
-                    <Link href="/clothing/kids"> KIDS </Link>
-                    <Link href="/clothing/beauty"> BEAUTY </Link>
-                </div>
-            </div>
 
+                <button type="button" class="nav-link dropdown-trigger">
+                    CLOTHING
+
+                    <span class="dropdown-arrow">
+                        ▾
+                    </span>
+                </button>
+
+
+                <div class="dropdown-menu">
+
+                    <Link v-for="category in clothingCategories" :key="category.id"
+                        :href="`/clothing/${category.slug}`">
+                        {{ category.name }}
+                    </Link>
+
+
+                    <div v-if="!clothingCategories.length" class="dropdown-empty">
+                        No clothing categories
+                    </div>
+
+                </div>
+
+            </div>
 
             <!-- ============================= -->
             <!-- HANDBAGS & ACCESSORIES -->
             <!-- ============================= -->
-
             <div class="nav-dropdown">
-                <button class="nav-link dropdown-trigger"> HANDBAGS & ACCESSORIES
-                    <span class="dropdown-arrow"> ▾ </span>
-                </button>
-                <div class="dropdown-menu">
-                    <Link href="/accessories/handbags"> HANDBAGS </Link>
-                    <Link href="/accessories/shoes"> SHOES </Link>
-                    <Link href="/accessories/jewellery"> JEWELLERY </Link>
-                    <Link href="/accessories/belts"> BELTS </Link>
-                    <Link href="/accessories/sunglasses"> SUNGLASSES </Link>
-                    <Link href="/accessories/watches"> WATCHES </Link>
-                </div>
-            </div>
 
+                <button type="button" class="nav-link dropdown-trigger">
+                    HANDBAGS & ACCESSORIES
 
-            <!-- ============================= -->
-            <!-- MENS COLLECTION -->
-            <!-- ============================= -->
-
-            <div class="nav-dropdown">
-                <button class="nav-link dropdown-trigger"> MENS COLLECTION
-                    <span class="dropdown-arrow"> ▾ </span>
+                    <span class="dropdown-arrow">
+                        ▾
+                    </span>
                 </button>
 
 
                 <div class="dropdown-menu">
-                    <Link href="/men/new-arrivals"> NEW ARRIVALS </Link>
-                    <Link href="/men/shirts"> SHIRTS </Link>
-                    <Link href="/men/t-shirts"> T-SHIRTS </Link>
-                    <Link href="/men/trousers"> TROUSERS </Link>
-                    <Link href="/men/jackets"> JACKETS </Link>
-                    <Link href="/men/accessories"> ACCESSORIES </Link>
+
+                    <Link v-for="category in accessoryCategories" :key="category.id"
+                        :href="`/accessories/${category.slug}`">
+                        {{ category.name }}
+                    </Link>
+
+
+                    <div v-if="!accessoryCategories.length" class="dropdown-empty">
+                        No accessory categories
+                    </div>
+
                 </div>
+
             </div>
+
 
 
             <!-- CONTACT -->
@@ -627,8 +687,77 @@ defineProps({
 /* =========================================
    DROPDOWN MENU
 ========================================= */
-
 .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 1px);
+    left: 50%;
+
+    transform:
+        translateX(-50%) translateY(10px);
+
+    min-width: 190px;
+
+    /* =========================================
+       LIMIT DROPDOWN HEIGHT
+       ========================================= */
+    max-height: 200px;
+
+    /* =========================================
+       VERTICAL SCROLL
+       ========================================= */
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    padding: 12px 0;
+
+    background: #ffffff;
+
+    border: 1px solid #eeeeee;
+
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.08);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition:
+        opacity 0.3s ease,
+        transform 0.3s ease,
+        visibility 0.3s ease;
+
+    /* =========================================
+       SMOOTH SCROLLING
+       ========================================= */
+    scroll-behavior: smooth;
+
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: #c8c8c8 transparent;
+}
+
+/* =========================================
+   DROPDOWN SCROLLBAR - CHROME / EDGE / SAFARI
+   ========================================= */
+
+.dropdown-menu::-webkit-scrollbar {
+    width: 5px;
+}
+
+.dropdown-menu::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb {
+    background: #c8c8c8;
+    border-radius: 10px;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb:hover {
+    background: #999999;
+}
+
+/* .dropdown-menu {
 
     position: absolute;
 
@@ -664,7 +793,7 @@ defineProps({
 
         visibility 0.3s ease;
 
-}
+} */
 
 
 /* =========================================

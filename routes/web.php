@@ -81,7 +81,15 @@ Route::get('/dashboard', [DashboardController::class, 'dashboard'])
     Route::get('/products/{product:slug}', [ProductController::class, 'publicShow'])->name('products.show');
     Route::get('/shop/{slug}', [ShopController::class, 'category'])->name('shop.category');
 
+Route::get(
+    '/clothing/{slug}',
+    [ProductCategoryController::class, 'show']
+)->name('shop.clothing');
 
+Route::get(
+    '/accessories/{slug}',
+    [ProductCategoryController::class, 'show']
+)->name('shop.accessories');
     /*
     |--------------------------------------------------------------------------
     | SHOPPING CART

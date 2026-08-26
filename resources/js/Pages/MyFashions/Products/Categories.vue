@@ -1,3 +1,4 @@
+<!-- resources\js\Pages\MyFashions\Products\Categories.vue -->
 <script setup>
 
 import { ref, computed } from 'vue'
@@ -113,6 +114,7 @@ const editingCategory = ref(null)
 const form = ref({
 
     name: '',
+    group: '',
     description: '',
     image: null,
     is_active: true,
@@ -127,6 +129,7 @@ const resetForm = () => {
     form.value = {
 
         name: '',
+        group: '',
         description: '',
         image: null,
         is_active: true,
@@ -168,20 +171,12 @@ const openEdit = (category) => {
     form.value = {
 
         name: category.name ?? '',
-
-        description:
-            category.description ?? '',
-
+        group: category.group ?? '',
+        description: category.description ?? '',
         image: null,
-
-        is_active:
-            Boolean(category.is_active),
-
-        is_featured:
-            Boolean(category.is_featured),
-
-        sort_order:
-            category.sort_order ?? 0,
+        is_active: Boolean(category.is_active),
+        is_featured: Boolean(category.is_featured),
+        sort_order: category.sort_order ?? 0,
 
     }
 
@@ -229,34 +224,20 @@ const submit = () => {
 
     const data = new FormData()
 
-    data.append(
-        'name',
-        form.value.name
-    )
+    data.append('name', form.value.name)
 
-    data.append(
-        'description',
-        form.value.description ?? ''
-    )
+    data.append('group', form.value.group)
 
-    data.append(
-        'is_active',
-        form.value.is_active ? '1' : '0'
-    )
+    data.append('description', form.value.description ?? '')
 
-    data.append(
-        'is_featured',
-        form.value.is_featured ? '1' : '0'
-    )
+    data.append('is_active', form.value.is_active ? '1' : '0')
 
-    data.append(
-        'sort_order',
-        form.value.sort_order ?? 0
-    )
+    data.append('is_featured', form.value.is_featured ? '1' : '0')
+
+    data.append('sort_order',  form.value.sort_order ?? 0 )
 
 
     if (form.value.image) {
-
         data.append(
             'image',
             form.value.image
@@ -655,6 +636,10 @@ const imageUrl = (image) => {
                             </th>
 
                             <th>
+                                Group
+                            </th>
+
+                            <th>
                                 Description
                             </th>
 
@@ -724,6 +709,18 @@ const imageUrl = (image) => {
                                 </div>
 
                             </td>
+
+                              <!-- category group -->
+                                <td>
+                                    <span class="category-group" :class="category.group">
+                                        {{
+                                            category.group === 'clothing'
+                                                ? 'Clothing'
+                                        : 'Handbags & Accessories'
+                                        }}
+                                    </span>
+                                </td>
+
 
 
                             <!-- DESCRIPTION -->
@@ -1025,6 +1022,29 @@ const imageUrl = (image) => {
                         />
 
                     </div>
+
+                      <!-- GROUP -->
+                        <div class="form-group">
+                            <label>
+                                Category Group
+                            </label>
+
+                            <select v-model="form.group" required>
+                                <option value="">
+                                    Select Group
+                                </option>
+
+                                <option value="clothing">
+                                    Clothing
+                                </option>
+
+                                <option value="accessories">
+                                    Handbags & Accessories
+                                </option>
+                            </select>
+                        </div>
+
+
 
 
                     <!-- DESCRIPTION -->
@@ -1357,6 +1377,24 @@ th {
     color: #666;
 }
 
+.category-group {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.category-group.clothing {
+    background: #f0f0f0;
+    color: #222;
+}
+
+.category-group.accessories {
+    background: #fff4df;
+    color: #9a6500;
+}
+
 .status-button,
 .featured-button {
     border: none;
@@ -1491,6 +1529,18 @@ th {
 }
 
 .form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 11px;
+    outline: none;
+    background: white;
+}
+
+/* .form-group input,
 .form-group textarea {
     width: 100%;
     box-sizing: border-box;
@@ -1498,7 +1548,7 @@ th {
     border-radius: 8px;
     padding: 11px;
     outline: none;
-}
+} */
 
 .form-options {
     display: flex;
