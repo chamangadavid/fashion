@@ -43,7 +43,7 @@ public function index()
             ->where('is_active', true)
             ->where('is_new_arrival', true)
             ->latest()
-            ->take(5)
+            ->take(6)
             ->get();
 
 
@@ -58,7 +58,7 @@ public function index()
             ->where('is_active', true)
             ->where('is_featured', true)
             ->latest()
-            ->take(5)
+            ->take(6)
             ->get();
 
         return Inertia::render('Welcome', [

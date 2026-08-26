@@ -274,14 +274,13 @@ const props = defineProps({
                 <NewArrivals :products="newArrivals" />
             </section>
 
-            <!-- NEW ARRIVALS -->
-            <!-- <section>
-                <NewArrivals />
-            </section> -->
-
             <section>
-                <FeaturedProducts />
+                <FeaturedProducts :products="featuredProducts" />
             </section>
+
+            <!-- <section>
+                <FeaturedProducts />
+            </section> -->
 
             <!-- ========================= -->
             <!-- SIGNATURE STYLES -->
