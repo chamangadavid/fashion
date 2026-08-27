@@ -11,7 +11,6 @@ import CategorySection from "@/Components/CategorySection.vue";
 
 import FeaturedProducts from "@/Components/FeaturedProducts.vue";
 import SignatureStyles from "@/Components/SignatureStyles.vue";
-import AccessoriesSection from "@/Components/AccessoriesSection.vue";
 import PaymentMethods from "@/Components/PaymentMethods.vue";
 import AppFooter from "@/Components/AppFooter.vue";
 
@@ -288,9 +287,6 @@ const accessoryCategories = computed(() => {
                 <FeaturedProducts :products="featuredProducts" />
             </section>
 
-            <!-- <section>
-                <FeaturedProducts />
-            </section> -->
 
             <!-- ========================= -->
             <!-- SIGNATURE STYLES -->

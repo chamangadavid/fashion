@@ -94,16 +94,16 @@ import { Link } from "@inertiajs/vue3";
 
                     <nav class="footer-links">
 
-                        <Link href="/about">
-                            About
+                        <Link href="/new-arrivals">
+                            New Arrivals
                         </Link>
 
-                        <Link href="/shop">
-                            Shop
+                        <Link href="/categories">
+                            Categories
                         </Link>
 
-                        <Link href="/services">
-                            Services
+                        <Link href="/accessories">
+                            Clothing
                         </Link>
 
                         <Link href="/contact">
@@ -143,7 +143,7 @@ import { Link } from "@inertiajs/vue3";
                             </strong>
 
                             <span>
-                                +234-815-554-9606
+                                +260 970 000 00
                             </span>
 
                         </div>
@@ -164,7 +164,7 @@ import { Link } from "@inertiajs/vue3";
                             </strong>
 
                             <span>
-                                Seraphinestyles@gmail.com
+                                Instyleasara@gmail.com
                             </span>
 
                         </div>
@@ -193,13 +193,11 @@ import { Link } from "@inertiajs/vue3";
                         >
                             ◎
                         </a>
-
-                        <a
-                            href="#"
-                            aria-label="Facebook"
-                        >
+                        <a href="https://www.facebook.com/InStyleAsara/" target="_blank" rel="noopener noreferrer"
+                            aria-label="Facebook">
                             f
                         </a>
+                        
 
                         <a
                             href="#"
@@ -240,15 +238,15 @@ import { Link } from "@inertiajs/vue3";
             <div class="footer-bottom-content">
 
                 <span>
-                    © 2025 - All rights reserved
+                    © 2026 - All rights reserved
                 </span>
 
                 <span>
-                    Powered by : Seraphine Styles
+                    Powered by : In Style Asara
                 </span>
 
                 <span>
-                    Designed by Faves_Code.
+                    Designed by Chamanga David.
                 </span>
 
             </div>

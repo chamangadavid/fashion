@@ -1,5 +1,6 @@
 <!-- resources\js\Pages\Site\Collections\Index.vue -->
 <script setup>
+import { computed } from "vue";
 import { Head, Link } from "@inertiajs/vue3";
 import Header from "@/Components/Header.vue";
 import AppFooter from "@/Components/AppFooter.vue";
@@ -13,32 +14,35 @@ const props = defineProps({
     },
 });
 
-// =====================================================
-// COLLECTION CATEGORIES
-// =====================================================
+/*
+|--------------------------------------------------------------------------
+| COLLECTION CATEGORIES
+|--------------------------------------------------------------------------
+| Automatically generated from the collections in the database.
+|--------------------------------------------------------------------------
+*/
 
-const categories = [
-    {
-        name: "ALL",
-        value: "all",
-    },
-    {
-        name: "WOMEN",
-        value: "women",
-    },
-    {
-        name: "MEN",
-        value: "men",
-    },
-    {
-        name: "ACCESSORIES",
-        value: "accessories",
-    },
-    {
-        name: "BEAUTY",
-        value: "beauty",
-    },
-];
+const categories = computed(() => {
+    const uniqueCategories = [
+        ...new Set(
+            props.collections
+                .map((collection) => collection.category)
+                .filter(Boolean)
+        ),
+    ];
+
+    return [
+        {
+            name: "ALL",
+            value: "all",
+        },
+
+        ...uniqueCategories.map((category) => ({
+            name: category.replace(/[-_]/g, " ").toUpperCase(),
+            value: category,
+        })),
+    ];
+});
 
 </script>
 
@@ -343,7 +347,7 @@ const categories = [
 
     inset: 0;
 
-    background-image: url("/assets/collections/accessories/collections-hero.jpg");
+    background-image: url("/assets/collections.png");
 
     background-size: cover;
 

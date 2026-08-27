@@ -107,7 +107,7 @@ defineProps({
             </div>
 
             <div class="top-message">
-                NOTHING OVER K50.00 - SHOP NOW
+                FASHION | WINE | LIFESTYLE
             </div>
         </div>
 
@@ -146,21 +146,48 @@ defineProps({
                 </a-tooltip>
 
 
+                <a-tooltip v-if="user" :title="user.name" placement="bottom">
+    <Link href="/dashboard" class="header-user">
+        <span>{{ user.name }}</span>
+    </Link>
+</a-tooltip>
+
+<a-tooltip v-else title="Login" placement="bottom">
+    <Link
+        href="/login"
+        class="header-icon"
+        aria-label="Login"
+    >
+        <UserOutlined />
+    </Link>
+</a-tooltip>
+
+<a-tooltip v-if="!user" title="Create Account" placement="bottom">
+    <Link
+        href="/register"
+        class="header-icon"
+        aria-label="Create Account"
+    >
+        <UserAddOutlined />
+    </Link>
+</a-tooltip>
+
+
                 <!-- ========================= -->
                 <!-- LOGIN / ACCOUNT -->
                 <!-- ========================= -->
 
-                <a-tooltip v-if="user" :title="user.name" placement="bottom">
+                <!-- <a-tooltip v-if="user" :title="user.name" placement="bottom">
                     <Link href="/dashboard" class="header-user">
                         <span>{{ user.name }}</span>
                     </Link>
-                </a-tooltip>
+                </a-tooltip> -->
 
-                <a-tooltip v-else-if="canLogin" title="Login" placement="bottom">
+                <!-- <a-tooltip v-else-if="canLogin" title="Login" placement="bottom">
                     <Link href="/login" class="header-icon" aria-label="Login">
                         <UserOutlined />
                     </Link>
-                </a-tooltip>
+                </a-tooltip> -->
 
                 <!-- <a-tooltip v-if="canLogin" title="Login" placement="bottom">
                     <Link href="/login" class="header-icon" aria-label="Login">
@@ -172,11 +199,11 @@ defineProps({
                 <!-- ========================= -->
                 <!-- REGISTER / WISHLIST -->
                 <!-- ========================= -->
-                <a-tooltip v-if="canRegister" title="Create Account" placement="bottom">
+                <!-- <a-tooltip v-if="canRegister" title="Create Account" placement="bottom">
                     <Link href="/register" class="header-icon" aria-label="Create Account">
                         <UserAddOutlined />
                     </Link>
-                </a-tooltip>
+                </a-tooltip> -->
 
 
                 <!-- ========================= -->

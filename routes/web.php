@@ -47,17 +47,9 @@ Route::get('/', function () {
     ]);
 })->name('welcome');
 
-Route::get('/', [HomeController::class, 'index'])
-    ->name('home');
 
-
-Route::get('/dashboard', [DashboardController::class, 'dashboard'])
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
-
-
-   
-
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/dashboard', [DashboardController::class, 'dashboard'])->middleware(['auth', 'verified'])->name('dashboard');
 
     /*
     |--------------------------------------------------------------------------
@@ -70,12 +62,11 @@ Route::get('/dashboard', [DashboardController::class, 'dashboard'])
     Route::get('/collections/{collection:slug}', [CollectionController::class, 'publicShow'])->name('collections.show');
     Route::get('/products/{product:slug}', [ProductController::class, 'publicShow'])->name('products.show');
     Route::get('/shop/{slug}', [ShopController::class, 'category'])->name('shop.category');
-
     Route::get('/clothing/{slug}', [ProductCategoryController::class, 'show'])->name('shop.clothing');
     Route::get('/accessories/{slug}', [ProductCategoryController::class, 'show'])->name('shop.accessories');
     Route::get('/search', [SearchController::class, 'index'])->name('search');
 
-/*
+    /*
     |--------------------------------------------------------------------------
     | SHOPPING CART
     |--------------------------------------------------------------------------
@@ -86,26 +77,21 @@ Route::get('/dashboard', [DashboardController::class, 'dashboard'])
     Route::put('/cart/{product}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/{product}', [CartController::class, 'remove'])->name('cart.remove');
     Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
-
-    //New Arrivals
     Route::get('/new-arrivals', [ClientDashboardController::class, 'newArrivals'])->name('new-arrivals');
+    Route::get('/categories', [ProductCategoryController::class, 'categories'])->name('categories.index');
 
 
+// Route::get('/about-us', function () {
+//     return Inertia::render('Site/aboutUs');
+// })->name('aboutUs');
 
-Route::get('/categories', [ProductCategoryController::class, 'categories'])->name('categories.index');
+// Route::get('/product-gallery', function () {
+//     return Inertia::render('Site/Gallery');
+// })->name('productGalleries');
 
-
-Route::get('/about-us', function () {
-    return Inertia::render('Site/aboutUs');
-})->name('aboutUs');
-
-Route::get('/product-gallery', function () {
-    return Inertia::render('Site/Gallery');
-})->name('productGalleries');
-
-Route::get('/faq', function () {
-    return Inertia::render('Site/FAQ');
-})->name('faq');
+// Route::get('/faq', function () {
+//     return Inertia::render('Site/FAQ');
+// })->name('faq');
 
 Route::get('/contact-us', function () {
     return Inertia::render('Site/Contact');
@@ -113,43 +99,43 @@ Route::get('/contact-us', function () {
 
 
 
-Route::get('/management-team', function () {
-    return Inertia::render('Site/ManagementTeam');
-})->name('managementTeam');
+// Route::get('/management-team', function () {
+//     return Inertia::render('Site/ManagementTeam');
+// })->name('managementTeam');
 
-Route::get('/history-details', function () {
-    return Inertia::render('Site/History');
-})->name('history');
+// Route::get('/history-details', function () {
+//     return Inertia::render('Site/History');
+// })->name('history');
 
-Route::get('/our-services', function () {
-    return Inertia::render('Site/Services');
-})->name('ourServices');
+// Route::get('/our-services', function () {
+//     return Inertia::render('Site/Services');
+// })->name('ourServices');
 
 
 
-Route::get('/icao-annex', function () {
-    return Inertia::render('Site/ICAOAnnex');
-})->name('icaoAnnex');
+// Route::get('/icao-annex', function () {
+//     return Inertia::render('Site/ICAOAnnex');
+// })->name('icaoAnnex');
 
-Route::get('/document-repository', function () {
-    return Inertia::render('Site/Documents');
-})->name('documentRepository');
+// Route::get('/document-repository', function () {
+//     return Inertia::render('Site/Documents');
+// })->name('documentRepository');
 
-Route::get('/report-accidents', function () {
-    return Inertia::render('Site/AccidentReports');
-})->name('accidentPage');
+// Route::get('/report-accidents', function () {
+//     return Inertia::render('Site/AccidentReports');
+// })->name('accidentPage');
 
-Route::get('/all-news', function () {
-    return Inertia::render('Site/News');
-})->name('newsPage');
+// Route::get('/all-news', function () {
+//     return Inertia::render('Site/News');
+// })->name('newsPage');
 
-Route::get('/press-releases', function () {
-    return Inertia::render('Site/PressReleases');
-})->name('pressReleasesPage');
+// Route::get('/press-releases', function () {
+//     return Inertia::render('Site/PressReleases');
+// })->name('pressReleasesPage');
 
-Route::get('/announcement', function () {
-    return Inertia::render('Site/Announcements');
-})->name('announcementsPage');
+// Route::get('/announcement', function () {
+//     return Inertia::render('Site/Announcements');
+// })->name('announcementsPage');
 
 
 
