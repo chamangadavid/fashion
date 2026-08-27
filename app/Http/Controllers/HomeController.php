@@ -64,6 +64,18 @@ public function index()
         return Inertia::render('Welcome', [
             'quickShopCategories' => $quickShopCategories,
 
+             'productCategories' => ProductCategory::query()
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->get([
+                    'id',
+                    'name',
+                    'slug',
+                    'group',
+                    'image',
+                ]),
+
+
             'newArrivals' => $newArrivals,
 
             'featuredProducts' => $featuredProducts,

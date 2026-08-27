@@ -144,13 +144,13 @@ const addToBag = () => {
                 <div class="price">
 
                     <span v-if="product.sale_price" class="sale-price">
-                        {{ product.sale_price }}
+                        K{{ product.sale_price }}
                     </span>
 
                     <span :class="{
                         'old-price': product.sale_price
                     }">
-                        {{ product.price }}
+                        K{{ product.price }}
                     </span>
 
                 </div>

@@ -91,6 +91,10 @@ Route::get('/dashboard', [DashboardController::class, 'dashboard'])
     Route::get('/new-arrivals', [ClientDashboardController::class, 'newArrivals'])->name('new-arrivals');
 
 
+
+Route::get('/categories', [ProductCategoryController::class, 'categories'])->name('categories.index');
+
+
 Route::get('/about-us', function () {
     return Inertia::render('Site/aboutUs');
 })->name('aboutUs');

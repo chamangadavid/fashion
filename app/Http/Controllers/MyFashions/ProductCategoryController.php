@@ -324,7 +324,7 @@ class ProductCategoryController extends Controller
 
 
 
-     public function show(Request $request, $slug)
+    public function show(Request $request, $slug)
     {
         $category = ProductCategory::where('slug', $slug)
             ->where('is_active', true)
@@ -344,6 +344,69 @@ class ProductCategoryController extends Controller
                 'products' => $products,
             ]
         );
+    }
+
+     /**
+     * Display all product categories.
+     */
+    public function categories()
+    {
+        /*
+        |--------------------------------------------------------------------------
+        | ALL ACTIVE CATEGORIES
+        |--------------------------------------------------------------------------
+        */
+
+        $categories = ProductCategory::query()
+            ->where('is_active', true)
+            ->orderBy('group')
+            ->orderBy('sort_order')
+            ->get([
+                'id',
+                'name',
+                'slug',
+                'group',
+                'image',
+            ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CLOTHING CATEGORIES
+        |--------------------------------------------------------------------------
+        */
+
+        $clothingCategories = $categories
+            ->where('group', 'clothing')
+            ->values();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ACCESSORIES CATEGORIES
+        |--------------------------------------------------------------------------
+        */
+
+        $accessoryCategories = $categories
+            ->where('group', 'accessories')
+            ->values();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RETURN PAGE
+        |--------------------------------------------------------------------------
+        */
+
+        return Inertia::render('Site/Categories/Index', [
+
+            'categories' => $categories,
+
+            'clothingCategories' => $clothingCategories,
+
+            'accessoryCategories' => $accessoryCategories,
+
+        ]);
     }
 
 

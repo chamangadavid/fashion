@@ -1,24 +1,20 @@
 <!-- Resources/js/Pages/Welcome.vue -->
 <script setup>
+import { ref, computed } from "vue";
 import { Head } from "@inertiajs/vue3";
 import Header from "@/Components/Header.vue";
 import AnimatedHero from "@/Components/AnimatedHero.vue";
 import QuickShop from "@/Components/QuickShop.vue";
 import AboutBrand from "@/Components/AboutBrand.vue";
 import NewArrivals from "@/Components/NewArrivals.vue";
+import CategorySection from "@/Components/CategorySection.vue";
 
 import FeaturedProducts from "@/Components/FeaturedProducts.vue";
-import CategoryProductSection from "@/Components/CategoryProductSection.vue";
 import SignatureStyles from "@/Components/SignatureStyles.vue";
 import AccessoriesSection from "@/Components/AccessoriesSection.vue";
 import PaymentMethods from "@/Components/PaymentMethods.vue";
 import AppFooter from "@/Components/AppFooter.vue";
 
-
-// defineProps({
-//     canLogin: Boolean,
-//     canRegister: Boolean,
-// });
 
 const props = defineProps({
     canLogin: Boolean,
@@ -39,20 +35,34 @@ const props = defineProps({
         default: () => [],
     },
 
-    // denimProducts: {
-    //     type: Array,
-    //     default: () => [],
-    // },
+    productCategories: {
+        type: Array,
+        default: () => [],
+    },
 
-    // blouseProducts: {
-    //     type: Array,
-    //     default: () => [],
-    // },
 
-    // bottomsProducts: {
-    //     type: Array,
-    //     default: () => [],
-    // },
+});
+
+/*
+|--------------------------------------------------------------------------
+| CLOTHING CATEGORIES
+|--------------------------------------------------------------------------
+*/
+const clothingCategories = computed(() => {
+    return props.productCategories.filter(
+        category => category.group === "clothing"
+    );
+});
+
+/*
+|--------------------------------------------------------------------------
+| ACCESSORIES CATEGORIES
+|--------------------------------------------------------------------------
+*/
+const accessoryCategories = computed(() => {
+    return props.productCategories.filter(
+        category => category.group === "accessories"
+    );
 });
 
 
@@ -290,20 +300,15 @@ const props = defineProps({
                 <SignatureStyles />
             </section>
 
-            <!-- Accessories -->
+            <!-- categories types -->
             <section>
-                <AccessoriesSection />
-            </section>
 
-            <section>
-                <CategoryProductSection title="Denim Drops – Jeans, Jackets & Skirts" :products="denimProducts"
-                    view-more-href="/clothing/denim" />
+                <!-- CLOTHING -->
+                <CategorySection title="Clothing" :categories="clothingCategories" view-more-href="/categories" />
 
-                <CategoryProductSection title="Blouses, Tops, & Tees" :products="blouseProducts"
-                    view-more-href="/clothing/women/tops" />
+                <!-- ACCESSORIES -->
+                <CategorySection title="Accessories" :categories="accessoryCategories" view-more-href="/categories" />
 
-                <CategoryProductSection title="Flirty Skirts & Effortless Bottoms" :products="bottomsProducts"
-                    view-more-href="/clothing/women/bottoms" />
             </section>
 
         </main>
